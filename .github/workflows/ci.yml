@@ -30,4 +30,4 @@ jobs:
           PYTHONPATH=src pytest tests/ -m "not live"
 
       - name: Lint
-        run: ruff check src/ tests/
+        run: python -m ruff check src/ tests/
