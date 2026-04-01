@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "bag-health": {
+      "command": "python",
+      "args": ["-m", "bag_health_mcp.server"]
+    }
+  }
+}

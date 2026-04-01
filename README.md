@@ -73,7 +73,7 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 Architecture:
                     ┌─────────────────┐
   MCP Host          │  bag-health-mcp │
-  (Claude, etc.) ──▶│  FastMCP        │──▶ api.idd.bag.admin.ch
+  (Claude, etc.) ──▶│  MCP SDK        │──▶ api.idd.bag.admin.ch
                     │  8 Tools        │    (IDD API, no auth)
                     └─────────────────┘
 ```
@@ -95,12 +95,11 @@ Architecture:
 }
 ```
 
-### Cloud / SSE
+### Cloud / HTTP
 
 ```bash
 pip install bag-health-mcp
-PORT=8000 MCP_TRANSPORT=sse bag-health-mcp
-# SSE endpoint: http://localhost:8000/sse
+python -m bag_health_mcp.server --http --port 8000
 ```
 
 ---

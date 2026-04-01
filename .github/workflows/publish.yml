@@ -1,19 +1,13 @@
 name: Publish to PyPI
 
 on:
-  push:
-    tags:
-      - "v*"
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  release:
+    types: [published]
 
 jobs:
-  publish:
+  build:
+    name: Build distribution
     runs-on: ubuntu-latest
-    environment: pypi
-    permissions:
-      id-token: write
 
     steps:
       - uses: actions/checkout@v5
@@ -21,12 +15,36 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v6
         with:
-          python-version: "3.12"
+          python-version: "3.11"
+
+      - name: Install build tools
+        run: pip install build
 
       - name: Build package
-        run: |
-          pip install hatchling build
-          python -m build
+        run: python -m build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/bag-health-mcp/
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

@@ -8,11 +8,11 @@ No authentication required. All data is public.
 
 from __future__ import annotations
 
-import os
+import sys
 from typing import Any, Literal
 
 import httpx
-from fastmcp import FastMCP
+from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 # ---------------------------------------------------------------------------
@@ -734,14 +734,10 @@ async def bag_get_canton_situation(
 # Entry point
 # ---------------------------------------------------------------------------
 
-def main() -> None:
-    transport = os.environ.get("MCP_TRANSPORT", "stdio")
-    if transport == "sse":
-        port = int(os.environ.get("PORT", "8000"))
-        mcp.settings.host = "0.0.0.0"
-        mcp.settings.port = port
-    mcp.run(transport=transport)
-
-
 if __name__ == "__main__":
-    main()
+    if "--http" in sys.argv:
+        port_idx = sys.argv.index("--port") + 1 if "--port" in sys.argv else None
+        port     = int(sys.argv[port_idx]) if port_idx else 8000
+        mcp.run(transport="streamable-http", port=port)
+    else:
+        mcp.run()
