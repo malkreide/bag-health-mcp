@@ -8,11 +8,7 @@ import pytest
 import respx
 import httpx
 
-# We import the server module functions directly
-import sys
-import os
-sys.path.insert(0, os.path.dirname(__file__))
-from server import (
+from bag_health_mcp.server import (
     bag_list_diseases, bag_list_series, bag_get_series_details,
     bag_get_disease_data, bag_list_export_files, bag_get_data_version,
     bag_get_canton_situation, _fmt_isoweek,
