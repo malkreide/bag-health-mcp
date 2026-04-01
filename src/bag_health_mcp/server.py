@@ -9,7 +9,6 @@ No authentication required. All data is public.
 from __future__ import annotations
 
 import os
-from functools import lru_cache
 from typing import Any, Literal
 
 import httpx

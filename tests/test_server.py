@@ -7,10 +7,10 @@ Run live tests: pytest -m live --timeout=30
 import pytest
 import respx
 import httpx
-import json
 
 # We import the server module functions directly
-import sys, os
+import sys
+import os
 sys.path.insert(0, os.path.dirname(__file__))
 from server import (
     bag_list_diseases, bag_list_series, bag_get_series_details,
