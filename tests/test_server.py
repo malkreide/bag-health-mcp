@@ -4,19 +4,27 @@ Run unit tests: pytest -m "not live"
 Run live tests: pytest -m live --timeout=30
 """
 
+import httpx
 import pytest
 import respx
-import httpx
 
 from bag_health_mcp.server import (
-    bag_list_diseases, bag_list_series, bag_get_series_details,
-    bag_get_disease_data, bag_list_export_files, bag_get_data_version,
-    bag_get_canton_situation, _fmt_isoweek,
-    ListDiseasesInput, DataSetsInput, SeriesDetailsInput,
-    DiseaseDataInput, ExportFilesInput, DataVersionInput,
     IDD_BASE,
+    DataSetsInput,
+    DataVersionInput,
+    DiseaseDataInput,
+    ExportFilesInput,
+    ListDiseasesInput,
+    SeriesDetailsInput,
+    _fmt_isoweek,
+    bag_get_canton_situation,
+    bag_get_data_version,
+    bag_get_disease_data,
+    bag_get_series_details,
+    bag_list_diseases,
+    bag_list_export_files,
+    bag_list_series,
 )
-
 
 # ---------------------------------------------------------------------------
 # Unit: helpers
