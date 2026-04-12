@@ -76,6 +76,28 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 
 ---
 
+## 🖼️ Demo
+
+![Demo: Claude fragt BAG IDD über bag-health-mcp](assets/demo.svg)
+
+*Claude fragt nach der Grippesituation im Kanton Zürich — ein Tool-Call, strukturiertes Ergebnis, handlungsorientierte Zusammenfassung.*
+
+---
+
+## 🔒 Safety & Limits
+
+| Aspekt | Details |
+|--------|---------|
+| Zugriff | Nur lesend — keine Schreiboperationen möglich |
+| Personendaten | Keine — BAG-IDD-Daten sind gesetzlich auf Kantonsebene aggregiert und anonymisiert |
+| Rate Limits | Keine publizierten IDD-API-Limits; Server begrenzt Antworten auf 104 Datenpunkte pro Abfrage (`limit_weeks`-Parameter) |
+| Timeout | 30 Sekunden pro API-Aufruf |
+| Authentifizierung | Kein API-Key erforderlich — alle Daten öffentlich zugänglich |
+| Datenlizenz | Gemeinfrei (opendata.swiss — Bundesgesetz über das Öffentlichkeitsprinzip, OGD) |
+| Nutzungsbedingungen | Es gelten die [ToS der BAG IDD API](https://api.idd.bag.admin.ch) |
+
+---
+
 ## ⚠️ Bekannte Einschränkungen
 
 - **Beta-API**: Das IDD-API ist als `v0.1 beta` gekennzeichnet — Schema kann sich ohne Vorankündigung ändern

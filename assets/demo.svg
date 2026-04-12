@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="540" viewBox="0 0 720 540">
+  <defs>
+    <style>
+      .app-bg   { fill: #1a1a1a; }
+      .panel-bg { fill: #212121; }
+      .bubble-u { fill: #2f6feb; }
+      .bubble-a { fill: #2a2a2a; }
+      .tool-bg  { fill: #1e2a1e; }
+      .tool-bdr { fill: none; stroke: #3d7a3d; stroke-width: 1; }
+      .dot      { fill: #ff5f57; }
+      .dot2     { fill: #febc2e; }
+      .dot3     { fill: #28c840; }
+      .txt-wh   { fill: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; }
+      .txt-dim  { fill: #888; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 11px; }
+      .txt-grn  { fill: #7ec87e; font-family: 'SFMono-Regular', 'Consolas', monospace; font-size: 11.5px; }
+      .txt-cyn  { fill: #79c0ff; font-family: 'SFMono-Regular', 'Consolas', monospace; font-size: 11.5px; }
+      .txt-ora  { fill: #e3a04f; font-family: 'SFMono-Regular', 'Consolas', monospace; font-size: 11.5px; }
+      .txt-sm   { fill: #c8c8c8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12.5px; }
+      .txt-bold { fill: #e8e8e8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; }
+      .txt-head { fill: #a0a0a0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; }
+      .badge    { fill: #3d7a3d; rx: 3; }
+      .divider  { stroke: #333; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <!-- App background -->
+  <rect width="720" height="540" class="app-bg" rx="10"/>
+
+  <!-- Title bar -->
+  <rect width="720" height="38" class="panel-bg" rx="10"/>
+  <rect y="28" width="720" height="10" class="panel-bg"/>
+  <circle cx="20" cy="19" r="6" class="dot"/>
+  <circle cx="40" cy="19" r="6" class="dot2"/>
+  <circle cx="60" cy="19" r="6" class="dot3"/>
+  <text x="360" y="24" text-anchor="middle" class="txt-dim" font-size="12">Claude Desktop — bag-health MCP</text>
+
+  <!-- Divider -->
+  <line x1="0" y1="38" x2="720" y2="38" class="divider"/>
+
+  <!-- ── USER MESSAGE ── -->
+  <text x="22" y="68" class="txt-head">YOU</text>
+
+  <!-- User bubble -->
+  <rect x="22" y="76" width="476" height="36" class="bubble-u" rx="8"/>
+  <text x="36" y="97" class="txt-wh">"Wie ist die aktuelle Grippesituation im Kanton Zürich?"</text>
+
+  <!-- ── TOOL CALL BLOCK ── -->
+  <rect x="22" y="128" width="676" height="130" class="tool-bg" rx="6"/>
+  <rect x="22" y="128" width="676" height="130" class="tool-bdr" rx="6"/>
+
+  <!-- Badge -->
+  <rect x="34" y="140" width="80" height="16" fill="#3d7a3d" rx="3"/>
+  <text x="43" y="152" fill="#b8f0b8" font-family="-apple-system, sans-serif" font-size="10" font-weight="600">Tool Call</text>
+
+  <text x="124" y="152" class="txt-cyn">bag_get_canton_situation</text>
+  <text x="330" y="152" fill="#e8e8e8" font-family="monospace" font-size="11.5px">(</text>
+  <text x="338" y="152" class="txt-ora">canton</text>
+  <text x="379" y="152" fill="#e8e8e8" font-family="monospace" font-size="11.5px">=</text>
+  <text x="387" y="152" fill="#a8d8a8" font-family="monospace" font-size="11.5px">"ZH"</text>
+  <text x="415" y="152" fill="#e8e8e8" font-family="monospace" font-size="11.5px">)</text>
+
+  <line x1="34" y1="163" x2="686" y2="163" stroke="#3d7a3d" stroke-width="0.5"/>
+
+  <!-- Tool result lines -->
+  <text x="34" y="180" class="txt-grn">▸ influenza</text>
+  <text x="120" y="180" class="txt-dim">latest_period: 2026-W14  |  latest_value:</text>
+  <text x="370" y="180" fill="#ff8c69" font-family="monospace" font-size="11.5px">8.3</text>
+  <text x="385" y="180" class="txt-dim">incidence/100k  |  trend:</text>
+  <text x="490" y="180" fill="#ff6b6b" font-family="monospace" font-size="11.5px">increasing ↑</text>
+
+  <text x="34" y="198" class="txt-grn">▸ covid19</text>
+  <text x="112" y="198" class="txt-dim">latest_period: 2026-W14  |  latest_value:</text>
+  <text x="362" y="198" fill="#e3a04f" font-family="monospace" font-size="11.5px">2.1</text>
+  <text x="377" y="198" class="txt-dim">incidence/100k  |  trend:</text>
+  <text x="482" y="198" fill="#7ec87e" font-family="monospace" font-size="11.5px">stable →</text>
+
+  <text x="34" y="216" class="txt-grn">▸ measles</text>
+  <text x="111" y="216" class="txt-dim">latest_period: 2026      |  latest_value:</text>
+  <text x="361" y="216" fill="#7ec87e" font-family="monospace" font-size="11.5px">0.0</text>
+  <text x="376" y="216" class="txt-dim">incidence/100k  |  trend:</text>
+  <text x="482" y="216" fill="#7ec87e" font-family="monospace" font-size="11.5px">stable →</text>
+
+  <text x="34" y="234" class="txt-grn">▸ pertussis</text>
+  <text x="115" y="234" class="txt-dim">latest_period: 2026-W14  |  latest_value:</text>
+  <text x="365" y="234" fill="#e3a04f" font-family="monospace" font-size="11.5px">1.4</text>
+  <text x="380" y="234" class="txt-dim">incidence/100k  |  trend:</text>
+  <text x="485" y="234" fill="#e3a04f" font-family="monospace" font-size="11.5px">slight ↗</text>
+
+  <text x="34" y="249" class="txt-dim">source_date: 2026-04-09  |  data_version: 20260409</text>
+
+  <!-- ── CLAUDE RESPONSE ── -->
+  <text x="22" y="284" class="txt-head">CLAUDE</text>
+
+  <rect x="22" y="292" width="676" height="198" class="bubble-a" rx="8"/>
+
+  <text x="36" y="315" class="txt-bold">Grippesituation Kanton Zürich — KW 14 / 2026</text>
+
+  <text x="36" y="338" class="txt-sm">Die Grippeaktivität im Kanton Zürich ist aktuell erhöht und steigt weiter an:</text>
+
+  <text x="36" y="362" fill="#ff8c69" font-family="-apple-system, sans-serif" font-size="13px" font-weight="600">▲  Influenza:</text>
+  <text x="122" y="362" class="txt-sm">8.3 Fälle / 100'000 Einwohner (KW 14) — Trend steigend ↑</text>
+
+  <text x="36" y="383" fill="#c8c8c8" font-family="-apple-system, sans-serif" font-size="13px">→  COVID-19:</text>
+  <text x="118" y="383" class="txt-sm">2.1 / 100k — stabil, kein Handlungsbedarf</text>
+
+  <text x="36" y="404" fill="#7ec87e" font-family="-apple-system, sans-serif" font-size="13px">✓  Masern:</text>
+  <text x="104" y="404" class="txt-sm">0.0 / 100k — kein Ausbruchsgeschehen</text>
+
+  <line x1="36" y1="418" x2="684" y2="418" stroke="#3a3a3a" stroke-width="1"/>
+
+  <text x="36" y="436" class="txt-sm">Empfehlung Schulamt: Grippe-Kommunikation an Eltern erwägen. Kinder mit Symptomen</text>
+  <text x="36" y="453" class="txt-sm">sollten zu Hause bleiben. Masern-Situation unkritisch — Impfquoten-Monitoring fortsetzen.</text>
+
+  <text x="36" y="474" class="txt-dim">Daten: BAG Infektionskrankheiten-Dashboard (IDD) · Aktualisierung jeweils mittwochs</text>
+
+  <!-- Footer -->
+  <rect x="0" y="522" width="720" height="18" class="panel-bg"/>
+  <rect x="0" y="510" width="720" height="12" class="panel-bg"/>
+  <text x="360" y="534" text-anchor="middle" class="txt-dim" font-size="10">bag-health-mcp · api.idd.bag.admin.ch · MIT License · opendata.swiss</text>
+</svg>

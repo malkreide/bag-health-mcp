@@ -117,6 +117,28 @@ python -m bag_health_mcp.server --http --port 8000
 
 ---
 
+## 🖼️ Demo
+
+![Demo: Claude queries BAG IDD via bag-health-mcp](assets/demo.svg)
+
+*Claude asking about the influenza situation in canton Zurich — single tool call, structured result, actionable German-language summary.*
+
+---
+
+## 🔒 Safety & Limits
+
+| Aspect | Details |
+|--------|---------|
+| Access | Read-only — no write operations possible |
+| Personal data | None — BAG IDD data is aggregated and anonymised at canton level by law |
+| Rate limits | No published IDD API rate limit; server caps responses at 104 data points per call by default (`limit_weeks` param) |
+| Timeout | 30 s per API call |
+| Authentication | No API keys required — all data publicly accessible |
+| Data licence | Public domain (opendata.swiss — Federal Act on Open Government Data, OGD) |
+| Terms of Service | Subject to [BAG IDD API ToS](https://api.idd.bag.admin.ch) |
+
+---
+
 ## ⚠️ Known Limitations
 
 - **Beta API**: IDD API is labelled `v0.1 beta` — schema may change without notice
