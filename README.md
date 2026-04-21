@@ -26,6 +26,7 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 
 "Welche Krankheitsdaten stellt das BAG aktuell bereit?"
 → bag_list_diseases()
+→ More use cases by audience →
 ```
 
 ---

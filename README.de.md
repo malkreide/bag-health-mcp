@@ -14,6 +14,7 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 ```
 "Wie ist die aktuelle Grippesituation im Kanton Zürich?"
 → bag_get_canton_situation(canton="ZH")
+→ Weitere Anwendungsbeispiele nach Zielgruppe →
 ```
 
 ---
