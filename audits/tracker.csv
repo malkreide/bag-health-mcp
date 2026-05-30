@@ -1,0 +1,2 @@
+server_name,audit_status,findings,last_audit_run,last_audit_at,production_ready,released_version,notes
+bag-health-mcp,Findings dokumentiert,40,2026-05-30T184054-Z-bag-health-mcp,,False,,

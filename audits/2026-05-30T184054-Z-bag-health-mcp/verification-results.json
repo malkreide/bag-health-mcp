@@ -1,0 +1,679 @@
+{
+  "audit_meta": {
+    "server_name": "bag-health-mcp",
+    "run_id": "2026-05-30T184054-Z-bag-health-mcp",
+    "audit_date": "2026-05-30",
+    "skill_version": "1.0.0",
+    "catalog_hash": "091f446b27965044ce658a1d5f4b2cabe2b0ab5661dcc1a53b6be8f1f2e093c0",
+    "catalog_version": "v0.5.0 (68 checks)",
+    "applies_when_dsl_version": "1.0",
+    "policy": "fail-or-partial"
+  },
+  "results": {
+    "ARCH-001": {
+      "status": "pass",
+      "category": "ARCH",
+      "severity": "medium",
+      "evidence": [
+        "src/bag_health_mcp/server.py:179-593 — 8 tools all snake_case with consistent bag_ prefix",
+        "src/bag_health_mcp/server.py:173-178,585-592 — descriptions multi-sentence with use-case context"
+      ],
+      "gaps": [
+        "snake_case acceptable but not preferred camelCase"
+      ]
+    },
+    "ARCH-002": {
+      "status": "partial",
+      "category": "ARCH",
+      "severity": "medium",
+      "evidence": [
+        "src/bag_health_mcp/server.py:173-178 — descriptions well above 100 chars, multi-sentence with usage hints",
+        "src/bag_health_mcp/server.py:585-592 — canton_situation description includes anchor query"
+      ],
+      "gaps": [
+        "No structured <use_case>/<important_notes>/<example> tags in any tool description — fails use-case-tag criterion (>=80% of tools)"
+      ]
+    },
+    "ARCH-003": {
+      "status": "partial",
+      "category": "ARCH",
+      "severity": "medium",
+      "evidence": [
+        "src/bag_health_mcp/server.py:245-249 — bag_list_series returns {error,hint} not bare empty list",
+        "src/bag_health_mcp/server.py:411-417 — error+actionable hint on API failure",
+        "src/bag_health_mcp/server.py:676 — canton_situation returns {status:'no_data'}"
+      ],
+      "gaps": [
+        "No fuzzy-match/suggestion mechanism on no-results; no match_type field",
+        "Empty topic/series returns 'error' string rather than structured heuristic with related suggestions"
+      ]
+    },
+    "ARCH-004": {
+      "status": "partial",
+      "category": "ARCH",
+      "severity": "high",
+      "evidence": [
+        "src/bag_health_mcp/server.py — no request/transport internals leak into handlers; handlers take only Pydantic input models",
+        "src/bag_health_mcp/server.py:737-743 — both stdio and streamable-http from one codebase",
+        "tool business logic identical regardless of transport"
+      ],
+      "gaps": [
+        "No Pydantic BaseSettings/Settings object; config read ad-hoc from sys.argv (server.py:738-740)",
+        "No shared lifespan; new httpx.AsyncClient per call via _client() (server.py:55)"
+      ]
+    },
+    "ARCH-005": {
+      "status": "partial",
+      "category": "ARCH",
+      "severity": "critical",
+      "evidence": [
+        "src/bag_health_mcp/server.py — no hardcoded keys/passwords/tokens (secret grep clean); API is auth-none (README.md:68,137)",
+        "src/bag_health_mcp/server.py:22-24 — only constants are public base URL + User-Agent",
+        "Dockerfile:1-12 — no ENV secret lines"
+      ],
+      "gaps": [
+        "No .gitignore (no ignore for .env/secrets)",
+        "No .env.example",
+        "No secret-scanning (gitleaks/trufflehog) in CI workflows",
+        "No Pydantic SecretStr/Settings pattern (moot today, criterion unmet)"
+      ]
+    },
+    "ARCH-006": {
+      "status": "pass",
+      "category": "ARCH",
+      "severity": "high",
+      "evidence": [
+        "src/bag_health_mcp/server.py — exactly 8 tools, well under <=12 guideline",
+        "src/bag_health_mcp/server.py:593-730 — bag_get_canton_situation is use-case aggregation tool answering anchor query in one call",
+        "tools are discovery/data/export oriented, not 1:1 REST CRUD"
+      ],
+      "gaps": []
+    },
+    "ARCH-007": {
+      "status": "pass",
+      "category": "ARCH",
+      "severity": "medium",
+      "evidence": [
+        "src/bag_health_mcp/server.py:710-715 — canton_situation uses asyncio.gather to fetch 5 series in parallel",
+        "src/bag_health_mcp/server.py:692-728 — returns self-contained result, no follow-up needed"
+      ],
+      "gaps": [
+        "discovery tools are intentionally chained, documented as intended workflow"
+      ]
+    },
+    "ARCH-008": {
+      "status": "fail",
+      "category": "ARCH",
+      "severity": "medium",
+      "evidence": [
+        "src/bag_health_mcp/server.py — only @mcp.tool used; no @mcp.resource or @mcp.prompt despite read-only/idempotent data tools that are Resource candidates"
+      ],
+      "gaps": [
+        "Server uses only Tools (1 of 3 primitives)",
+        "No README justification for Tools-only choice"
+      ]
+    },
+    "ARCH-009": {
+      "status": "fail",
+      "category": "ARCH",
+      "severity": "high",
+      "evidence": [
+        "src/bag_health_mcp/server.py — no annotations/readOnlyHint/destructiveHint/idempotentHint/openWorldHint on any tool; all 8 use description= only"
+      ],
+      "gaps": [
+        "All tools read-only + reach external API (openWorldHint applies) yet no annotations declared; host must treat every call pessimistically",
+        "No annotations policy table in README/docs"
+      ]
+    },
+    "ARCH-011": {
+      "status": "partial",
+      "category": "ARCH",
+      "severity": "medium",
+      "evidence": [
+        "README.md, README.de.md, CHANGELOG.md, LICENSE, pyproject.toml all present",
+        "src/, tests/, .github/workflows/ all present",
+        "src-layout correct: pyproject.toml:55-56 packages=['src/bag_health_mcp']"
+      ],
+      "gaps": [
+        "8 tools all in single 743-line server.py, no tools/ split (expects tools/ + server.py <200 lines)",
+        "README.de.md sections not parallel to README.md"
+      ]
+    },
+    "ARCH-012": {
+      "status": "fail",
+      "category": "ARCH",
+      "severity": "medium",
+      "evidence": [
+        "src/bag_health_mcp/server.py:37-48 — FastMCP with no protocol_version pin",
+        "CHANGELOG.md present in Keep-a-Changelog format"
+      ],
+      "gaps": [
+        "protocolVersion not pinned — relies on SDK default, can break on SDK update",
+        "CHANGELOG entries reference no MCP spec version",
+        "No protocol-version/update-policy section in READMEs",
+        "No dependabot.yml/renovate.json"
+      ]
+    },
+    "SCALE-001": {
+      "status": "partial",
+      "category": "SCALE",
+      "severity": "high",
+      "evidence": [
+        "server.py:737-743 — dual transport, --http -> streamable-http, else stdio",
+        "Dockerfile:11 — CMD runs --http --port 8000, cloud image uses streamable-http",
+        "README.md:99-104 documents --http cloud invocation"
+      ],
+      "gaps": [
+        "Transport selection CLI-flag based, not ENV-based (no MCP_TRANSPORT)",
+        "No deployment manifest sets transport explicitly",
+        "Host not set to 0.0.0.0 explicitly (relies on FastMCP default)"
+      ]
+    },
+    "SCALE-002": {
+      "status": "fail",
+      "category": "SCALE",
+      "severity": "high",
+      "evidence": [
+        "No sticky-session config: no railway.toml/render.yaml/compose/k8s manifests",
+        "No redis/memcached/session_manager/stick/sessionAffinity anywhere",
+        "server.py:37-48 — FastMCP with no session_manager / shared-state backend; sessions in pod memory only"
+      ],
+      "gaps": [
+        "Neither sticky-session nor shared-state session manager implemented",
+        "No session TTL",
+        "Cloud-deployed dual transport with in-memory session state breaks on pod switch/restart"
+      ]
+    },
+    "SCALE-003": {
+      "status": "fail",
+      "category": "SCALE",
+      "severity": "high",
+      "evidence": [
+        "No HAProxy/NGINX/Ingress config in repo",
+        "No stick-table/Mcp-Session-Id/affinity config",
+        "Repo has only Dockerfile + workflows; no edge-LB layer"
+      ],
+      "gaps": [
+        "No Edge-LB reads Mcp-Session-Id for routing",
+        "No stick-table/hash, no TTL, no failover",
+        "is_cloud_deployed + dual transport means check applies and unmet"
+      ]
+    },
+    "SCALE-004": {
+      "status": "fail",
+      "category": "SCALE",
+      "severity": "medium",
+      "evidence": [
+        "Dockerfile:1 — single FROM python:3.12-slim (not multi-stage)",
+        "Dockerfile:7 — pip install -e . in final image",
+        "No USER directive (runs as root); no HEALTHCHECK"
+      ],
+      "gaps": [
+        "Not multi-stage",
+        "Runs as root (no non-root USER)",
+        "No HEALTHCHECK for LB integration",
+        "Editable-install/build tooling left in final image"
+      ]
+    },
+    "SCALE-005": {
+      "status": "fail",
+      "category": "SCALE",
+      "severity": "medium",
+      "evidence": [
+        "No gateway/proxy/allowlist in READMEs or src/",
+        "No tool-allowlist/mcp-policy files",
+        "README.md:99-104 documents direct --http access, project targets Stadt Zürich Schulamt context"
+      ],
+      "gaps": [
+        "No MCP gateway architecture documented despite Stadt Zürich/Schulamt context",
+        "No tool allow-list, no SIEM audit-log export, no justification for direct access"
+      ]
+    },
+    "SCALE-006": {
+      "status": "fail",
+      "category": "SCALE",
+      "severity": "medium",
+      "evidence": [
+        "No K8s/compose/railway manifests; no resources/limits anywhere",
+        "Dockerfile:1-13 sets no ulimits, no restart policy, no memory/CPU constraints"
+      ],
+      "gaps": [
+        "No memory limit",
+        "No CPU limit",
+        "No FD/ulimit config (relevant — httpx.AsyncClient per-call, server.py:55-64)",
+        "No OOM/restart-policy; is_cloud_deployed so check applies and unmet"
+      ]
+    },
+    "SDK-001": {
+      "status": "fail",
+      "category": "SDK",
+      "severity": "high",
+      "evidence": [
+        "server.py:37-48 — FastMCP() with NO lifespan= argument",
+        "No @asynccontextmanager/lifespan/AsyncExitStack in src/",
+        "server.py:55-64 _client() returns fresh httpx.AsyncClient; every tool uses 'async with _client()' — new client per call, no pooling",
+        "server.py:710-712 — canton_situation fans out 5+ tasks, each opening 2 clients (~10 fresh clients per call)"
+      ],
+      "gaps": [
+        "No @asynccontextmanager lifespan",
+        "FastMCP constructor missing lifespan=",
+        "No connection pooling; matches documented fail-pattern (httpx client per call)"
+      ]
+    },
+    "SDK-002": {
+      "status": "partial",
+      "category": "SDK",
+      "severity": "medium",
+      "evidence": [
+        "pyproject.toml — pydantic>=2.0.0 (v2 satisfied)",
+        "All 8 tools annotate -> dict[str,Any] (acceptable per criteria)",
+        "Inputs use Pydantic BaseModel with Field/Literal (server.py:91-166)"
+      ],
+      "gaps": [
+        "Returns are plain dict[str,Any] not BaseModel/TypedDict — no precise structured output schema in tools/list",
+        "No consistent response envelope across tools",
+        "No provenance field; source/source_date only on some tools"
+      ]
+    },
+    "SDK-003": {
+      "status": "fail",
+      "category": "SDK",
+      "severity": "medium",
+      "evidence": [
+        "No Context/report_progress/ctx. in src/ — no tool declares ctx: Context",
+        "server.py:593-730 canton_situation runs gather over 5+ series with many round-trips (>2s) but no progress",
+        "server.py:707-708 — errors swallowed into {error:str(e)} not ctx.warning/error",
+        "No FastMCP Context import"
+      ],
+      "gaps": [
+        "No Context injection in any tool",
+        "No ctx.report_progress() on the long-running multi-series tool",
+        "No ctx structured logging to client"
+      ]
+    },
+    "SDK-004": {
+      "status": "fail",
+      "category": "SDK",
+      "severity": "high",
+      "evidence": [
+        "No CORSMiddleware/cors/allow_origins/expose_headers in src/",
+        "server.py:737-743 — HTTP mode calls mcp.run(transport='streamable-http') with no Starlette middleware/CORS",
+        "Dockerfile:11 — server deployed in HTTP mode (cloud), so check applies"
+      ],
+      "gaps": [
+        "No CORS middleware at all",
+        "Mcp-Session-Id not in expose_headers — browser cross-origin clients cannot read session id, breaking stateful sessions",
+        "Mcp-Session-Id not in allow_headers; no explicit allow_origins"
+      ]
+    },
+    "OBS-001": {
+      "status": "fail",
+      "category": "OBS",
+      "severity": "high",
+      "evidence": [
+        "All tools return plain {error:...} dicts instead of MCP tool-results with isError:true — server.py:246-249,281-284,292-295,410-417,537-541",
+        "No isError flag anywhere; no TextContent usage",
+        "No standardized JSON-RPC error codes in src/",
+        "raise_for_status() at server.py:182,241,296,350,515,568 lets execution-class HTTP failures bubble up as protocol errors",
+        "tests have no execution-error/protocol-error contract test"
+      ],
+      "gaps": [
+        "Convert app errors (404, not-found, non-200) to tool-results with isError:true",
+        "Use standardized JSON-RPC codes for genuine protocol errors",
+        "Add execution-error + protocol-error tests"
+      ]
+    },
+    "OBS-002": {
+      "status": "fail",
+      "category": "OBS",
+      "severity": "high",
+      "evidence": [
+        "FastMCP initialized WITHOUT mask_error_details — server.py:37-48",
+        "Raw upstream body leaked to LLM: server.py:412 'detail': r.text[:500]",
+        "Raw exception leaked: server.py:708 return {error: str(e)}",
+        "Unhandled raise_for_status() (server.py:182,241,296,350,515,542,568) reach FastMCP"
+      ],
+      "gaps": [
+        "Set mask_error_details=True on FastMCP",
+        "Remove r.text[:500] and str(e) from returns; log originals server-side only"
+      ]
+    },
+    "OBS-003": {
+      "status": "fail",
+      "category": "OBS",
+      "severity": "medium",
+      "evidence": [
+        "No structlog/loguru in pyproject.toml or anywhere",
+        "No logging in src/ — no import logging/logger./structlog",
+        "No bound context (tool name/session_id/correlation_id), no severity levels"
+      ],
+      "gaps": [
+        "Add structlog (JSON output)",
+        "Emit structured logs per tool-call with bound context and >=4 severity levels"
+      ]
+    },
+    "OBS-004": {
+      "status": "partial",
+      "category": "OBS",
+      "severity": "critical",
+      "evidence": [
+        "No print() statements in src/ (passes hard criterion)",
+        "Transport dual: stdio default (server.py:743) + streamable-http (server.py:741)",
+        "No logging to stdout exists because there is no logging at all"
+      ],
+      "gaps": [
+        "No explicit stderr configuration (no logging.basicConfig(stream=sys.stderr))",
+        "Once logging added (OBS-003), explicitly route to sys.stderr; add CI guard against print()"
+      ]
+    },
+    "OBS-006": {
+      "status": "fail",
+      "category": "OBS",
+      "severity": "medium",
+      "evidence": [
+        "is_cloud_deployed=true so check applies (HTTP at server.py:741)",
+        "No opentelemetry/otel anywhere — not in src/ or pyproject.toml",
+        "No TracerProvider/OTLP exporter/HTTPXClientInstrumentor/per-tool spans",
+        "No OTEL_* config"
+      ],
+      "gaps": [
+        "Add OpenTelemetry SDK + OTLP exporter, instrument httpx, wrap each tool in a span (no PII), env-configurable endpoint"
+      ]
+    },
+    "OPS-001": {
+      "status": "pass",
+      "category": "OPS",
+      "severity": "high",
+      "evidence": [
+        "respx-mocked unit tests: tests/test_server.py:88-190 use @respx.mock",
+        "Live tests marked @pytest.mark.live: tests/test_server.py:197-235 (incl. anchor query test_live_influenza_zh:215)",
+        "Marker registered pyproject.toml:62-64",
+        "CI excludes live: .github/workflows/ci.yml:30 pytest -m 'not live'",
+        "respx>=0.21.0 dev dep"
+      ],
+      "gaps": [
+        "Below 5-unit-tests-per-tool bar; bag_download_export + canton_situation have no mocked unit test",
+        "No separate nightly/scheduled live-test workflow"
+      ]
+    },
+    "OPS-002": {
+      "status": "partial",
+      "category": "OPS",
+      "severity": "medium",
+      "evidence": [
+        "Both READMEs exist; CHANGELOG Keep-a-Changelog; CONTRIBUTING present",
+        "Anchor demo query natural-language: README.md:14-30, README.de.md:12-18",
+        "ASCII architecture diagram: README.md:73-80",
+        "Known Limitations >3: README.md:143-148, README.de.md:102-107",
+        "Tools overview, Installation (uvx+HTTP), Security/Limits: README.md:34-45,84-104,129-139"
+      ],
+      "gaps": [
+        "README.de.md not in section parity: missing ASCII diagram, HTTP/Cloud install, Tools/Topics table, License section",
+        "No architecture diagram in README.de.md"
+      ]
+    },
+    "OPS-003": {
+      "status": "fail",
+      "category": "OPS",
+      "severity": "high",
+      "evidence": [
+        "No explicit phase declaration in READMEs/CHANGELOG — only README.md:133 'Read-only — no write operations' safety cell",
+        "No docs/ dir, no roadmap.md",
+        "No phase status table/transition prerequisites",
+        "Server de-facto read-only (write_capable=false) consistent with Phase 1 but undeclared"
+      ],
+      "gaps": [
+        "Add explicit Phase 1 (read-only wrapper) declaration with status table to both READMEs",
+        "Add docs/roadmap.md with phase tasks + transition prerequisites"
+      ]
+    },
+    "CH-004": {
+      "status": "partial",
+      "category": "CH",
+      "severity": "medium",
+      "evidence": [
+        "README.md:138 documents data licence (public domain / OGD)",
+        "README.md:154 / README.de.md:97 repeat source+licence (MIT code, public-domain/OGD data)",
+        "server.py:308,491 emit 'source' field but only passthrough of data.get('source') — no controlled license/provenance",
+        "server.py:714-730 canton_situation return has no source/license field"
+      ],
+      "gaps": [
+        "No controlled license/attribution field in tool responses; no provenance field",
+        "README declares 'public domain' rather than required CC BY 4.0 attribution; no Datenquellen-&-Lizenzen table",
+        "Schulamt tool output omits source/license entirely"
+      ]
+    },
+    "CH-005": {
+      "status": "fail",
+      "category": "CH",
+      "severity": "high",
+      "evidence": [
+        "No docs/ directory; no isds-klassifikation.md",
+        "No isds/schutzbedarf/vertraulich/integrität/verfügbarkeit/oiz hits in any .md/.py/.toml"
+      ],
+      "gaps": [
+        "No ISDS classification document despite stadt_zuerich_context=true (mandatory)",
+        "No per-Schutzziel ratings with justifications",
+        "No Massnahmen-Mapping per class; no OIZ sign-off"
+      ]
+    },
+    "CH-006": {
+      "status": "fail",
+      "category": "CH",
+      "severity": "high",
+      "evidence": [
+        "No klassifikation/classification document; no docs/ dir",
+        "No BUI/vertraulich/streng-vertraulich declaration; only README.md:134/README.de.md:93 'aggregated and anonymised at canton level'",
+        "canton_situation (server.py:593-730) has no k_anonymity/min_class_size/aggregation_threshold control"
+      ],
+      "gaps": [
+        "No BUI/VERT/SVERT classification scheme documented despite schulamt_context=true (mandatory)",
+        "Highest level not declared; no Massnahmen-Mapping",
+        "Aggregation-risk not addressed; no documented min-group-size on the aggregating tool"
+      ]
+    },
+    "SEC-004": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "critical",
+      "evidence": [
+        "Base URL hardcoded to HTTPS: IDD_BASE='https://api.idd.bag.admin.ch' (server.py:22); all requests via _client() with base_url=IDD_BASE (server.py:55-64)",
+        "No user/LLM-supplied URLs reach the HTTP client — tool args are slugs/Literal enums interpolated into fixed API paths",
+        "No urlparse, no IP blocklist, no 169.254.169.254/metadata blocking, no egress proxy in src/"
+      ],
+      "gaps": [
+        "No explicit HTTPS-scheme enforcement or IP blocklist as required by Pass Criteria — relies solely on hardcoded base_url",
+        "follow_redirects=True (server.py:63) means a compromised upstream could 30x-redirect to an internal IP; no resolved-IP validation, no DNS pinning"
+      ]
+    },
+    "SEC-009": {
+      "status": "fail",
+      "category": "SEC",
+      "severity": "critical",
+      "evidence": [
+        "No session handling in code; auth_model=none",
+        "FastMCP streamable-http used with no auth (server.py:741), no OAuth token validation, no user_id, no Mcp-Session-Id binding"
+      ],
+      "gaps": [
+        "transport!=stdio-only (dual, HTTP via --http) so check applies",
+        "No cryptographically secure session-ID bound to validated user; no TTL, no invalidation — none of 6 Pass Criteria met"
+      ]
+    },
+    "SEC-016": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "critical",
+      "evidence": [
+        "server.py:741 — mcp.run(transport='streamable-http', port=port) sets no host argument",
+        "Verified against mcp 1.27.2 (fresh install of pinned 'mcp[cli]>=1.0.0'): FastMCP default host is '127.0.0.1' (FastMCP('probe').settings.host == '127.0.0.1'); localhost binding also auto-enables TransportSecuritySettings DNS-rebinding protection",
+        "grep for 0.0.0.0 across py/toml/yaml/Dockerfile = zero matches — no explicit all-interfaces binding"
+      ],
+      "gaps": [
+        "Binding relies on the IMPLICIT SDK default rather than an explicit 127.0.0.1 / MCP_HOST configuration; the pin 'mcp[cli]>=1.0.0' is unbounded and earlier SDK versions defaulted host to 0.0.0.0 — latent NeighborJack risk on a downgrade/older lockfile",
+        "No README note on host binding / local-vs-container differentiation; no warning when a non-localhost host is configured",
+        "SEPARATE FUNCTIONAL DEFECT: FastMCP.run() signature is run(transport, mount_path) — it does NOT accept port=; server.py:741 raises TypeError at startup, so the --http path (and Dockerfile CMD --http --port 8000) crashes before binding at all"
+      ]
+    },
+    "SEC-019": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "critical",
+      "evidence": [
+        "Read-only/write_capable=false: only GET/query-POST to fetch public data; no send_mail/smtplib/slack/webhook exfiltration sinks",
+        "httpx.post (server.py:408,659) only target the fixed read API; Public Open Data (README.md:133)"
+      ],
+      "gaps": [
+        "No documented Lethal Trifecta assessment in README/docs (grep trifecta/lethal = none; no docs/ dir)",
+        "Score effectively safe (<=1 leg) but undocumented, so Pass Criteria not fully met"
+      ]
+    },
+    "SEC-020": {
+      "status": "pass",
+      "category": "SEC",
+      "severity": "critical",
+      "evidence": [
+        "grep -nE 'os\\.system|shell=True|eval\\(|exec\\(|os\\.popen|subprocess' over src/ = ZERO matches",
+        "Only outbound I/O is httpx HTTP to the fixed IDD API; no subprocess/shell anywhere",
+        "No filesystem path operations from user input"
+      ],
+      "gaps": [
+        "No CI static-analysis hook guarding against future shell-pattern regressions (suggestion, not Pass Criteria)"
+      ]
+    },
+    "SEC-005": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "high",
+      "evidence": [
+        "No code-level DNS pinning (no getaddrinfo, no resolved-IP substitution) in src/",
+        "FastMCP auto-enables inbound DNS-rebinding protection because host defaults to 127.0.0.1 — but this protects the inbound listener, not outbound httpx"
+      ],
+      "gaps": [
+        "No DNS-pinning on the OUTBOUND side (SSRF-relevant direction); follow_redirects=True (server.py:63) re-resolves DNS per request — TOCTOU window if target were attacker-controlled",
+        "Inbound protection is library-provided incidental, not authored; not the outbound pinning this check requires"
+      ]
+    },
+    "SEC-006": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "high",
+      "evidence": [
+        "Default transport is stdio: mcp.run() unless '--http' in sys.argv (server.py:738-743)",
+        "HTTP only via explicit --http flag, not default",
+        "README documents local stdio with Claude Desktop (README.md:86-96); claude_desktop_config.json uses stdio command"
+      ],
+      "gaps": [
+        "Cloud/HTTP section has no security warning about network exposure",
+        "Activation via CLI flag rather than MCP_TRANSPORT env-var (cosmetic vs Pass-Criteria wording)"
+      ]
+    },
+    "SEC-007": {
+      "status": "fail",
+      "category": "SEC",
+      "severity": "high",
+      "evidence": [
+        "Dockerfile has NO USER directive — container runs as root (grep USER/useradd/adduser = zero)",
+        "Single-stage python:3.12-slim, pip install -e ., CMD as root; no readOnlyRootFilesystem, no cap drop, no seccomp",
+        "No k8s/helm securityContext in repo"
+      ],
+      "gaps": [
+        "None of Pass Criteria met: no USER>=10000, no runAsNonRoot, no readOnlyRootFilesystem, no capabilities.drop, no seccomp",
+        "is_cloud_deployed=true so hardening expected"
+      ]
+    },
+    "SEC-013": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "high",
+      "evidence": [
+        "No secrets used: auth_model=none, IDD API needs no auth (README.md:68); grep os.environ/getenv/API_KEY/SECRET in src/ = zero",
+        "No hardcoded secrets, no .env, no plaintext keys in Dockerfile ENV"
+      ],
+      "gaps": [
+        "Public Open Data so no-secret is acceptable per Pass Criteria — BUT no docs/secret-management.md documenting the no-secret/acceptable-risk decision as the criteria require"
+      ]
+    },
+    "SEC-018": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "high",
+      "evidence": [
+        "Most tools use Pydantic BaseModel input models with constraints: DiseaseDataInput.limit_weeks ge=1,le=600 (server.py:137-143); Literal enums for canton/sex/format/version (server.py:83-88,124-131)"
+      ],
+      "gaps": [
+        "bag_get_canton_situation takes raw 'canton: str=\"ZH\"' and 'include_wastewater: bool' (server.py:593-596) — no Field constraints, only manual list check (server.py:601)",
+        "NO model_config strict=True / extra='forbid' on ANY input model — Pydantic coercion active, unknown fields silently accepted",
+        "String fields topic/series_id/file have no min/max_length or pattern; age_group free-form str",
+        "No tests for invalid-input rejection (out-of-range, extra fields)"
+      ]
+    },
+    "SEC-021": {
+      "status": "fail",
+      "category": "SEC",
+      "severity": "high",
+      "evidence": [
+        "No code-layer egress allow-list: grep allowed_domains/allowed_hosts/host_whitelist in src/ = zero",
+        "Outbound relies solely on hardcoded base_url IDD_BASE (server.py:22) with no assert_host_allowed()",
+        "No network-layer egress control (no NetworkPolicy, no Smokescreen) in repo"
+      ],
+      "gaps": [
+        "Neither required layer (code-layer allow-list + network-layer egress control) present; tools_make_external_requests + is_cloud_deployed so check applies",
+        "Hardcoded base_url is implicit single-host restriction, not enforced, bypassable via follow_redirects=True (server.py:63)"
+      ]
+    },
+    "SEC-022": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "high",
+      "evidence": [
+        "All tools share consistent 'bag_' prefix giving basic namespace",
+        "CHANGELOG.md lists tools, but no hashes"
+      ],
+      "gaps": [
+        "Namespace uses single 'bag_' prefix, not the required server-identity '<server>__<tool>' double-underscore format preventing cross-server shadowing",
+        "No tool-definition SHA-256 hash snapshot in CI (ci.yml/publish.yml have no hash step)",
+        "CHANGELOG has no per-tool hash entries; is_cloud_deployed so check applies"
+      ]
+    },
+    "SEC-008": {
+      "status": "partial",
+      "category": "SEC",
+      "severity": "medium",
+      "evidence": [
+        "No install hooks: hatchling backend, standard [project.scripts] entry-point; no pre/postinstall",
+        "README shows full Claude Desktop config transparently (README.md:86-96)",
+        "publish.yml uses pypa/gh-action-pypi-publish with id-token: write -> OIDC Trusted Publisher / Sigstore signing"
+      ],
+      "gaps": [
+        "[project.scripts] 'bag-health-mcp = bag_health_mcp.server:mcp.run' points at a bound method, not a main callable (cosmetic/bug, not security)",
+        "No Sigstore signature-verification instructions for users in README"
+      ]
+    },
+    "SEC-014": {
+      "status": "todo",
+      "category": "SEC",
+      "severity": "medium",
+      "evidence": [
+        "Single standalone server, auth_model=none, no MCP-gateway in this repo; no per-team/role allow-list config",
+        "No server-side group/role checks in src/"
+      ],
+      "gaps": [
+        "is_cloud_deployed triggers applies_when, but tool-allow-listing is a gateway-layer/portfolio concern — out of scope for a single auth-less read-only server, needs central gateway (SCALE-005)",
+        "No default-deny allow-list, no audit logging of denied calls"
+      ]
+    },
+    "SEC-015": {
+      "status": "todo",
+      "category": "SEC",
+      "severity": "medium",
+      "evidence": [
+        "No pre-flight tool-poisoning detection layer in src/",
+        "Server exposes only first-party tools; no multi-server gateway integrating untrusted servers"
+      ],
+      "gaps": [
+        "is_cloud_deployed triggers applies_when, but detection is a gateway-layer control not present in a single first-party server — belongs at gateway (SCALE-005)",
+        "No injection-pattern/invisible-char scanning, no SIEM alerting"
+      ]
+    }
+  }
+}

@@ -1,0 +1,27 @@
+# Audit-Profil für bag-health-mcp
+# Abgeleitet aus dem Repo-Code (kein Notion-Tracker verfügbar in dieser Session).
+# Begründungen siehe Audit-Report.
+name: bag-health-mcp
+repo: https://github.com/malkreide/bag-health-mcp
+prio: null
+
+# --- Kanonische Profil-Felder ---
+transport: dual                       # stdio default + streamable-http via --http (server.py:738-743)
+sdk_language: Python                  # FastMCP / Python (server.py:15)
+auth_model: none                      # IDD API ist public, kein Auth (server.py:6)
+data_class: Public Open Data          # BAG IDD, alle Daten öffentlich
+write_capable: false                  # nur GET + Query-POST, keine mutierenden Operationen
+deployment: [local-stdio, andere]     # Dockerfile EXPOSE 8000 / HTTP-Modus -> Container/Cloud-fähig
+is_cloud_deployed: true               # derived: deployment enthält ausser local-stdio noch "andere"
+uses_sampling: false                  # kein ctx.sample / MCP-Sampling
+uses_sequential_thinking: false
+tools_include_filesystem: false       # keine FS-Tools
+tools_make_external_requests: true    # httpx -> api.idd.bag.admin.ch
+stadt_zuerich_context: true           # "city administration Public Health Reporting", Kanton ZH
+schulamt_context: true                # bag_get_canton_situation: Schulamt / Kreisschulbehörde
+volksschule_context: true             # school-relevant diseases / Schulausbruchsrisiko
+enterprise_context: false
+data_source:
+  is_swiss_open_data: true
+  name: BAG Infectious Disease Dashboard (IDD API)
+  url: https://api.idd.bag.admin.ch
