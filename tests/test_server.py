@@ -4,6 +4,8 @@ Run unit tests: pytest -m "not live"
 Run live tests: pytest -m live --timeout=30
 """
 
+import sys
+
 import httpx
 import pytest
 import respx
@@ -232,3 +234,48 @@ async def test_live_canton_situation():
     result = await bag_get_canton_situation(canton="ZH")
     assert result["canton"] == "ZH"
     assert "influenza" in result["diseases"]
+
+
+# ---------------------------------------------------------------------------
+# Unit: entry point / transport selection
+# ---------------------------------------------------------------------------
+
+def test_main_stdio_default(monkeypatch):
+    """Without --http, main() runs the default stdio transport."""
+    from bag_health_mcp import server
+
+    called = {}
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp"])
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(args=a, kwargs=k))
+    server.main()
+    # stdio = run() with no transport argument
+    assert called == {"args": (), "kwargs": {}}
+
+
+def test_main_http_sets_settings_and_no_port_kwarg(monkeypatch):
+    """--http must configure host/port on settings and call run() WITHOUT a
+    port kwarg (regression guard: FastMCP.run() raises TypeError on port=)."""
+    from bag_health_mcp import server
+
+    called = {}
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp", "--http", "--port", "9001"])
+    monkeypatch.delenv("MCP_HOST", raising=False)
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(args=a, kwargs=k))
+    server.main()
+    assert called["kwargs"] == {"transport": "streamable-http"}
+    assert "port" not in called["kwargs"]
+    assert server.mcp.settings.port == 9001
+    assert server.mcp.settings.host == "127.0.0.1"  # safe default, no MCP_HOST
+
+
+def test_main_http_respects_mcp_host_env(monkeypatch):
+    """Container deployments set MCP_HOST=0.0.0.0 to bind all interfaces."""
+    from bag_health_mcp import server
+
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp", "--http"])
+    monkeypatch.setenv("MCP_HOST", "0.0.0.0")
+    monkeypatch.setenv("MCP_PORT", "8123")
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: None)
+    server.main()
+    assert server.mcp.settings.host == "0.0.0.0"
+    assert server.mcp.settings.port == 8123

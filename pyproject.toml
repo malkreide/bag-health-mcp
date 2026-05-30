@@ -45,7 +45,7 @@ dev = [
 ]
 
 [project.scripts]
-bag-health-mcp = "bag_health_mcp.server:mcp.run"
+bag-health-mcp = "bag_health_mcp.server:main"
 
 [project.urls]
 Homepage   = "https://github.com/malkreide/bag-health-mcp"
