@@ -14,6 +14,7 @@ from typing import Any, Literal
 
 import httpx
 from mcp.server.fastmcp import FastMCP
+from mcp.types import ToolAnnotations
 from pydantic import BaseModel, Field
 
 # ---------------------------------------------------------------------------
@@ -171,7 +172,17 @@ class DataVersionInput(BaseModel):
 # Tools
 # ---------------------------------------------------------------------------
 
-@mcp.tool(description=(
+# Every tool only reads from the public BAG IDD API: no mutations (read-only),
+# safe to repeat (idempotent), and reaches an external system (open world).
+READ_ONLY = ToolAnnotations(
+    readOnlyHint=True,
+    destructiveHint=False,
+    idempotentHint=True,
+    openWorldHint=True,
+)
+
+
+@mcp.tool(annotations=READ_ONLY, description=(
     "List all 51 disease topics available in the BAG Infectious Disease Dashboard (IDD). "
     "Returns the topic slug needed for other tools, grouped by category "
     "(respiratory, enteric, STI, vector-borne, wastewater). "
@@ -231,7 +242,7 @@ async def bag_list_diseases(params: ListDiseasesInput) -> dict[str, Any]:
     }
 
 
-@mcp.tool(description=(
+@mcp.tool(annotations=READ_ONLY, description=(
     "List all available data series for a specific disease topic. "
     "Each series is identified by 'topic/chapter/aggregation/temporality'. "
     "Returns series IDs to use with bag_get_series_details and bag_get_disease_data."
@@ -271,7 +282,7 @@ async def bag_list_series(params: DataSetsInput) -> dict[str, Any]:
     }
 
 
-@mcp.tool(description=(
+@mcp.tool(annotations=READ_ONLY, description=(
     "Get metadata and available filter values for a specific data series. "
     "Shows which canton, age group, sex, and other dimensions are available. "
     "Always call this before bag_get_disease_data to know valid filter options."
@@ -325,7 +336,7 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> dict[str, Any]:
     }
 
 
-@mcp.tool(description=(
+@mcp.tool(annotations=READ_ONLY, description=(
     "Fetch time-series surveillance data for a disease from the BAG IDD. "
     "Returns weekly or yearly case counts, incidence rates, or other metrics. "
     "Data updated every Wednesday. "
@@ -408,9 +419,10 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
             url += f"?groupBy={group_by}"
         r = await c.post(url, json=body)
         if r.status_code != 200:
+            # Return the status code only — never the raw upstream response
+            # body, which can leak internal details into the model context.
             return {
                 "error": f"API error {r.status_code}",
-                "detail": r.text[:500],
                 "hint": (
                     "Use bag_get_series_details to verify valid filter values, "
                     "then retry with adjusted parameters."
@@ -504,7 +516,7 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
     }
 
 
-@mcp.tool(description=(
+@mcp.tool(annotations=READ_ONLY, description=(
     "List all available export file names from the BAG IDD. "
     "These are complete datasets (CSV/JSON) per disease, "
     "e.g. INFLUENZA_oblig, COVID19_wastewater_sequencing, MEASLES_oblig. "
@@ -527,7 +539,7 @@ async def bag_list_export_files(params: ExportFilesInput) -> dict[str, Any]:
     }
 
 
-@mcp.tool(description=(
+@mcp.tool(annotations=READ_ONLY, description=(
     "Download a complete export dataset from the BAG IDD as CSV or JSON. "
     "Returns the raw data content for a specific disease file. "
     "Useful for bulk analysis. Files are updated weekly."
@@ -558,7 +570,7 @@ async def bag_download_export(params: ExportDownloadInput) -> dict[str, Any]:
     }
 
 
-@mcp.tool(description=(
+@mcp.tool(annotations=READ_ONLY, description=(
     "Get the current data version of the BAG IDD. "
     "Returns the date of the last data update (format YYYYMMDD). "
     "IDD is updated every Wednesday."
@@ -583,7 +595,7 @@ async def bag_get_data_version(params: DataVersionInput) -> dict[str, Any]:
     }
 
 
-@mcp.tool(description=(
+@mcp.tool(annotations=READ_ONLY, description=(
     "Get a public health situation overview for a specific canton or Switzerland. "
     "Combines current incidence data for key school-relevant diseases "
     "(influenza, measles, norovirus proxy via acute_respiratory_infection) "
@@ -705,8 +717,10 @@ async def bag_get_canton_situation(
                     for p in recent if p.get("y") is not None
                 ],
             }
-        except Exception as e:
-            return name, {"error": str(e)}
+        except Exception:
+            # Don't surface the raw exception string to the model — keep the
+            # message generic and stable per series.
+            return name, {"error": f"Could not retrieve data for '{name}'."}
 
     import asyncio
     tasks = [_fetch_series(name, sid) for name, sid in school_relevant.items()]
