@@ -8,6 +8,7 @@ No authentication required. All data is public.
 
 from __future__ import annotations
 
+import os
 import sys
 from typing import Any, Literal
 
@@ -734,10 +735,29 @@ async def bag_get_canton_situation(
 # Entry point
 # ---------------------------------------------------------------------------
 
-if __name__ == "__main__":
+def main() -> None:
+    """Console-script / module entry point.
+
+    Default transport is stdio. Pass ``--http`` (optionally ``--port N``) to
+    serve over Streamable HTTP. Host and port can also be configured via the
+    ``MCP_HOST`` / ``MCP_PORT`` environment variables. The host defaults to
+    ``127.0.0.1`` so a local HTTP server is not exposed to the network;
+    container deployments opt into all-interface binding explicitly by setting
+    ``MCP_HOST=0.0.0.0`` (see Dockerfile).
+    """
     if "--http" in sys.argv:
-        port_idx = sys.argv.index("--port") + 1 if "--port" in sys.argv else None
-        port     = int(sys.argv[port_idx]) if port_idx else 8000
-        mcp.run(transport="streamable-http", port=port)
+        if "--port" in sys.argv:
+            port = int(sys.argv[sys.argv.index("--port") + 1])
+        else:
+            port = int(os.environ.get("MCP_PORT", "8000"))
+        # FastMCP.run() accepts no host/port kwargs — configure them on the
+        # instance settings, which the Streamable HTTP runner (uvicorn) reads.
+        mcp.settings.host = os.environ.get("MCP_HOST", "127.0.0.1")
+        mcp.settings.port = port
+        mcp.run(transport="streamable-http")
     else:
         mcp.run()
+
+
+if __name__ == "__main__":
+    main()
