@@ -631,6 +631,144 @@ class DataVersionInput(_StrictInput):
 
 
 # ---------------------------------------------------------------------------
+# Output models (SDK-002)
+# ---------------------------------------------------------------------------
+#
+# Tools return typed Pydantic models rather than bare dict[str, Any], so FastMCP
+# advertises a precise outputSchema in tools/list and emits structuredContent.
+# Every output carries a shared Provenance block (consistent envelope) naming the
+# data source and licence attribution; the loose source/source_date/version
+# fields the dicts used are folded into it.
+
+DATA_ATTRIBUTION = (
+    "Federal Office of Public Health FOPH — Infectious Disease Dashboard (IDD); "
+    "open data via opendata.swiss"
+)
+
+
+class Provenance(BaseModel):
+    """Where a result came from, attached to every tool output (SDK-002/CH-004)."""
+
+    source: str | None = None
+    source_date: str | None = None
+    data_version: str | None = None
+    attribution: str = DATA_ATTRIBUTION
+
+
+class ListDiseasesOutput(BaseModel):
+    total_topics: int
+    categories: dict[str, list[str]]
+    usage: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class ListSeriesOutput(BaseModel):
+    topic: str
+    total_series: int
+    chapters: dict[str, list[str]]
+    series_ids: list[str]
+    usage: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class SeriesDetailsOutput(BaseModel):
+    series_id: str
+    available_filters: dict[str, list[str]]
+    cantons: list[str]
+    age_groups: list[str]
+    sex_options: list[str]
+    note: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class DiseaseDataPoint(BaseModel):
+    period: str
+    value: float | None = None
+    trend: str | None = None
+    data_complete: str | None = None
+
+
+class CantonSeries(BaseModel):
+    canton: str
+    data_points: int
+    series: list[DiseaseDataPoint]
+
+
+class DiseaseDataSummary(BaseModel):
+    canton: str | None = None
+    latest_period: str | None = None
+    latest_value: float | None = None
+    trend: str | None = None
+    data_points_returned: int | None = None
+
+
+class DiseaseDataOutput(BaseModel):
+    series_id: str
+    topic: str
+    aggregation: str
+    temporality: str
+    filters_applied: dict[str, str]
+    summary: DiseaseDataSummary
+    # Canton-grouped responses yield CantonSeries; flat responses yield bare
+    # DiseaseDataPoints — the union preserves both existing shapes.
+    results: list[CantonSeries | DiseaseDataPoint]
+    interpretation: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class ListExportFilesOutput(BaseModel):
+    version: str
+    total_files: int
+    files: list[str]
+    usage: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class DownloadExportOutput(BaseModel):
+    file: str
+    format: str
+    size_bytes: int
+    rows: int | None
+    preview: str
+    note: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class DataVersionOutput(BaseModel):
+    version: str
+    date: str
+    note: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class CantonDiseaseStatus(BaseModel):
+    """A school-relevant series that could not be resolved for this canton."""
+
+    status: str
+    source_date: str | None = None
+
+
+class CantonDiseaseData(BaseModel):
+    """A school-relevant series with current data for this canton."""
+
+    latest_period: str | None = None
+    latest_value: float | None = None
+    unit: str | None = None
+    trend: str | None = None
+    change_vs_prev_period_pct: float | None = None
+    source_date: str | None = None
+    series: list[DiseaseDataPoint] = Field(default_factory=list)
+
+
+class CantonSituationOutput(BaseModel):
+    canton: str
+    diseases: dict[str, CantonDiseaseStatus | CantonDiseaseData]
+    note: str
+    school_relevance: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+# ---------------------------------------------------------------------------
 # Tools
 # ---------------------------------------------------------------------------
 
@@ -650,7 +788,7 @@ READ_ONLY = ToolAnnotations(
     "(respiratory, enteric, STI, vector-borne, wastewater). "
     "Start here to discover what data is available."
 ))
-async def bag_list_diseases(params: ListDiseasesInput) -> dict[str, Any]:
+async def bag_list_diseases(params: ListDiseasesInput) -> ListDiseasesOutput:
     async with _client() as c:
         r = await _get(c, "/api/v1/data/sets", context="listing disease topics")
         all_sets: list[str] = r.json()
@@ -684,10 +822,9 @@ async def bag_list_diseases(params: ListDiseasesInput) -> dict[str, Any]:
     wastewater = {t for t in topics if "wastewater" in t}
     other = topics - respiratory - enteric - sti_blood - vaccine_prev - vector_borne - wastewater
 
-    return {
-        "total_topics": len(topics),
-        "data_version": "see bag_get_data_version",
-        "categories": {
+    return ListDiseasesOutput(
+        total_topics=len(topics),
+        categories={
             "respiratory": sorted(respiratory),
             "enteric": sorted(enteric),
             "sti_and_bloodborne": sorted(sti_blood),
@@ -696,11 +833,11 @@ async def bag_list_diseases(params: ListDiseasesInput) -> dict[str, Any]:
             "wastewater_surveillance": sorted(wastewater),
             "other": sorted(other),
         },
-        "usage": (
+        usage=(
             "Use a topic slug with bag_list_series(topic=...) "
             "to see available data series."
         ),
-    }
+    )
 
 
 @mcp.tool(annotations=READ_ONLY, description=(
@@ -708,7 +845,7 @@ async def bag_list_diseases(params: ListDiseasesInput) -> dict[str, Any]:
     "Each series is identified by 'topic/chapter/aggregation/temporality'. "
     "Returns series IDs to use with bag_get_series_details and bag_get_disease_data."
 ))
-async def bag_list_series(params: DataSetsInput) -> dict[str, Any]:
+async def bag_list_series(params: DataSetsInput) -> ListSeriesOutput:
     async with _client() as c:
         r = await _get(c, "/api/v1/data/sets", context="listing data series")
         all_sets: list[str] = r.json()
@@ -729,17 +866,17 @@ async def bag_list_series(params: DataSetsInput) -> dict[str, Any]:
             agg_temp = f"{parts[2]}/{parts[3]}"
             chapters.setdefault(chapter, []).append(agg_temp)
 
-    return {
-        "topic": params.topic,
-        "total_series": len(topic_sets),
-        "chapters": {ch: sorted(series) for ch, series in sorted(chapters.items())},
-        "series_ids": sorted(topic_sets),
-        "usage": (
+    return ListSeriesOutput(
+        topic=params.topic,
+        total_series=len(topic_sets),
+        chapters={ch: sorted(series) for ch, series in sorted(chapters.items())},
+        series_ids=sorted(topic_sets),
+        usage=(
             "Use a series_id with bag_get_series_details to see available "
             "filter values (canton, age_group, sex, type), then "
             "bag_get_disease_data to fetch the time series."
         ),
-    }
+    )
 
 
 @mcp.tool(annotations=READ_ONLY, description=(
@@ -747,7 +884,7 @@ async def bag_list_series(params: DataSetsInput) -> dict[str, Any]:
     "Shows which canton, age group, sex, and other dimensions are available. "
     "Always call this before bag_get_disease_data to know valid filter options."
 ))
-async def bag_get_series_details(params: SeriesDetailsInput) -> dict[str, Any]:
+async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOutput:
     parts = params.series_id.split("/")
     if len(parts) != 4:
         _fail(
@@ -777,25 +914,27 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> dict[str, Any]:
         if isinstance(val, dict):
             filters[key] = val.get("possibleValues", [])
 
-    return {
-        "series_id": params.series_id,
-        "source": data.get("source"),
-        "source_date": data.get("sourceDate"),
-        "version": data.get("version"),
-        "available_filters": filters,
-        "cantons": filters.get("canton", []),
-        "age_groups": (
+    return SeriesDetailsOutput(
+        series_id=params.series_id,
+        available_filters=filters,
+        cantons=filters.get("canton", []),
+        age_groups=(
             filters.get("agegroup_ili_ari")
             or filters.get("agegroup_oblig")
             or filters.get("agegroup")
             or []
         ),
-        "sex_options": filters.get("sex", []),
-        "note": (
+        sex_options=filters.get("sex", []),
+        note=(
             "Use these filter values in bag_get_disease_data. "
             "Use 'all' for any aggregated dimension."
         ),
-    }
+        provenance=Provenance(
+            source=data.get("source"),
+            source_date=data.get("sourceDate"),
+            data_version=data.get("version"),
+        ),
+    )
 
 
 @mcp.tool(annotations=READ_ONLY, description=(
@@ -804,7 +943,7 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> dict[str, Any]:
     "Data updated every Wednesday. "
     "Example: Influenza incidence per 100k population in Zurich by week."
 ))
-async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
+async def bag_get_disease_data(params: DiseaseDataInput) -> DiseaseDataOutput:
     parts = params.series_id.split("/")
     if len(parts) != 4:
         _fail("series_id must be 'topic/chapter/aggregation/temporality'.")
@@ -903,7 +1042,7 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
             return _fmt_isoweek(x) if is_weekly else _fmt_year(x)
         return str(x)
 
-    result_series: list[dict[str, Any]] = []
+    result_series: list[CantonSeries | DiseaseDataPoint] = []
 
     if isinstance(values, dict):
         # grouped by canton
@@ -913,70 +1052,71 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
             # Take last N points
             recent = points[-params.limit_weeks:]
             series_points = [
-                {
-                    "period": fmt_period(p["x"]),
-                    "value": p.get("y"),
-                    "trend": p.get("properties", {}).get("trend"),
-                    "data_complete": p.get("properties", {}).get("dataComplete"),
-                }
+                DiseaseDataPoint(
+                    period=fmt_period(p["x"]),
+                    value=p.get("y"),
+                    trend=p.get("properties", {}).get("trend"),
+                    data_complete=p.get("properties", {}).get("dataComplete"),
+                )
                 for p in recent
                 if p.get("y") is not None
             ]
             if series_points:
-                result_series.append({
-                    "canton": canton_key,
-                    "data_points": len(series_points),
-                    "series": series_points,
-                })
+                result_series.append(CantonSeries(
+                    canton=canton_key,
+                    data_points=len(series_points),
+                    series=series_points,
+                ))
     elif isinstance(values, list):
         recent = values[-params.limit_weeks:]
         result_series = [
-            {
-                "period": fmt_period(p["x"]),
-                "value": p.get("y"),
-                "trend": p.get("properties", {}).get("trend"),
-            }
+            DiseaseDataPoint(
+                period=fmt_period(p["x"]),
+                value=p.get("y"),
+                trend=p.get("properties", {}).get("trend"),
+            )
             for p in recent
             if p.get("y") is not None
         ]
 
     # Summary stats for canton=all case
-    summary: dict[str, Any] = {}
+    summary = DiseaseDataSummary()
     if params.canton == "ZH" or params.canton != "all":
         matching = next(
-            (s for s in result_series if isinstance(s, dict) and s.get("canton") == params.canton),
+            (s for s in result_series
+             if isinstance(s, CantonSeries) and s.canton == params.canton),
             None,
         )
-        if matching:
-            pts = matching["series"]
-            if pts:
-                last = pts[-1]
-                summary = {
-                    "canton": params.canton,
-                    "latest_period": last["period"],
-                    "latest_value": last["value"],
-                    "trend": last.get("trend"),
-                    "data_points_returned": len(pts),
-                }
+        if matching and matching.series:
+            last = matching.series[-1]
+            summary = DiseaseDataSummary(
+                canton=params.canton,
+                latest_period=last.period,
+                latest_value=last.value,
+                trend=last.trend,
+                data_points_returned=len(matching.series),
+            )
 
-    return {
-        "series_id": params.series_id,
-        "topic": topic,
-        "aggregation": aggregation,
-        "temporality": temporality,
-        "source": data.get("source"),
-        "source_date": data.get("sourceDate"),
-        "data_version": data.get("version"),
-        "filters_applied": body,
-        "summary": summary,
-        "results": result_series,
-        "interpretation": (
+    return DiseaseDataOutput(
+        series_id=params.series_id,
+        topic=topic,
+        aggregation=aggregation,
+        temporality=temporality,
+        filters_applied=body,
+        summary=summary,
+        results=result_series,
+        interpretation=(
             f"Values represent '{aggregation}' ({chapter}) for '{topic}'. "
             "Period format: YYYY-Www for weekly, YYYY for yearly. "
             "'incValue' = incidence per 100'000 population. "
             "'value' = absolute case count."
         ),
-    }
+        provenance=Provenance(
+            source=data.get("source"),
+            source_date=data.get("sourceDate"),
+            data_version=data.get("version"),
+        ),
+    )
 
 
 @mcp.tool(annotations=READ_ONLY, description=(
@@ -985,7 +1125,7 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
     "e.g. INFLUENZA_oblig, COVID19_wastewater_sequencing, MEASLES_oblig. "
     "Use with bag_download_export to get raw data files."
 ))
-async def bag_list_export_files(params: ExportFilesInput) -> dict[str, Any]:
+async def bag_list_export_files(params: ExportFilesInput) -> ListExportFilesOutput:
     async with _client() as c:
         r = await _get(
             c,
@@ -994,15 +1134,15 @@ async def bag_list_export_files(params: ExportFilesInput) -> dict[str, Any]:
         )
         files: list[str] = r.json()
 
-    return {
-        "version": params.version,
-        "total_files": len(files),
-        "files": sorted(files),
-        "usage": (
+    return ListExportFilesOutput(
+        version=params.version,
+        total_files=len(files),
+        files=sorted(files),
+        usage=(
             "Use bag_download_export(file='INFLUENZA_oblig', format='csv') "
             "to download the raw dataset."
         ),
-    }
+    )
 
 
 @mcp.tool(annotations=READ_ONLY, description=(
@@ -1010,7 +1150,7 @@ async def bag_list_export_files(params: ExportFilesInput) -> dict[str, Any]:
     "Returns the raw data content for a specific disease file. "
     "Useful for bulk analysis. Files are updated weekly."
 ))
-async def bag_download_export(params: ExportDownloadInput) -> dict[str, Any]:
+async def bag_download_export(params: ExportDownloadInput) -> DownloadExportOutput:
     async with _client() as c:
         r = await _get(
             c,
@@ -1027,17 +1167,17 @@ async def bag_download_export(params: ExportDownloadInput) -> dict[str, Any]:
     content = r.text
     lines = content.split("\n") if params.format == "csv" else []
 
-    return {
-        "file": params.file,
-        "format": params.format,
-        "size_bytes": len(content),
-        "rows": len(lines) - 1 if lines else None,
-        "preview": content[:3000],
-        "note": (
+    return DownloadExportOutput(
+        file=params.file,
+        format=params.format,
+        size_bytes=len(content),
+        rows=len(lines) - 1 if lines else None,
+        preview=content[:3000],
+        note=(
             "Full data returned in 'preview' (truncated at 3000 chars). "
             "For large datasets, use the IDD web interface at idd.bag.admin.ch."
         ),
-    }
+    )
 
 
 @mcp.tool(annotations=READ_ONLY, description=(
@@ -1045,7 +1185,7 @@ async def bag_download_export(params: ExportDownloadInput) -> dict[str, Any]:
     "Returns the date of the last data update (format YYYYMMDD). "
     "IDD is updated every Wednesday."
 ))
-async def bag_get_data_version(params: DataVersionInput) -> dict[str, Any]:
+async def bag_get_data_version(params: DataVersionInput) -> DataVersionOutput:
     async with _client() as c:
         r = await _get(c, "/api/v1/data/version", context="fetching data version")
         data = r.json()
@@ -1057,11 +1197,12 @@ async def bag_get_data_version(params: DataVersionInput) -> dict[str, Any]:
     else:
         formatted = version_str
 
-    return {
-        "version": version_str,
-        "date": formatted,
-        "note": "IDD is updated every Wednesday. Data reflects the state as of this date.",
-    }
+    return DataVersionOutput(
+        version=version_str,
+        date=formatted,
+        note="IDD is updated every Wednesday. Data reflects the state as of this date.",
+        provenance=Provenance(source_date=formatted, data_version=version_str),
+    )
 
 
 @mcp.tool(annotations=READ_ONLY, description=(
@@ -1075,7 +1216,7 @@ async def bag_get_data_version(params: DataVersionInput) -> dict[str, Any]:
 async def bag_get_canton_situation(
     canton: str = "ZH",
     include_wastewater: bool = False,
-) -> dict[str, Any]:
+) -> CantonSituationOutput:
     """
     High-level situational awareness tool combining multiple series.
     Optimised for Schulamt / Kreisschulbehörde use cases.
@@ -1087,7 +1228,6 @@ async def bag_get_canton_situation(
         )
 
     canton_up = canton.upper()
-    results: dict[str, Any] = {"canton": canton_up, "diseases": {}}
 
     # Key disease series for schools
     school_relevant = {
@@ -1100,14 +1240,16 @@ async def bag_get_canton_situation(
     if include_wastewater:
         school_relevant["wastewater_covid19"] = "wastewater_viral_load/NA/value/date"
 
-    async def _fetch_series(name: str, series_id: str) -> tuple[str, Any]:
+    async def _fetch_series(
+        name: str, series_id: str
+    ) -> tuple[str, CantonDiseaseStatus | CantonDiseaseData]:
         # This aggregates several independent series into one overview. A failure
         # of a single series is reported inline as that series' status and never
         # fails the whole overview (which would be the wrong granularity); the
         # tool call itself still succeeds. Raw causes are logged server-side.
         parts = series_id.split("/")
         if len(parts) != 4:
-            return name, {"status": "unavailable"}
+            return name, CantonDiseaseStatus(status="unavailable")
         topic, chapter, aggregation, temporality = parts
 
         is_yearly = "year" in temporality
@@ -1118,7 +1260,7 @@ async def bag_get_canton_situation(
                     f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}/details"
                 )
                 if dr.status_code != 200:
-                    return name, {"status": "series_not_found"}
+                    return name, CantonDiseaseStatus(status="series_not_found")
                 details = dr.json()
 
             props = details.get("properties", {})
@@ -1147,7 +1289,7 @@ async def bag_get_canton_situation(
                     json=body,
                 )
                 if r.status_code != 200:
-                    return name, {"status": "data_unavailable"}
+                    return name, CantonDiseaseStatus(status="data_unavailable")
                 data = r.json()
 
             values = data.get("values", {})
@@ -1159,7 +1301,9 @@ async def bag_get_canton_situation(
                 canton_data = values
 
             if not canton_data:
-                return name, {"status": "no_data", "source_date": data.get("sourceDate")}
+                return name, CantonDiseaseStatus(
+                    status="no_data", source_date=data.get("sourceDate")
+                )
 
             recent = canton_data[-8:]  # last 8 periods
             latest = recent[-1]
@@ -1175,48 +1319,49 @@ async def bag_get_canton_situation(
                 if prev["y"] != 0:
                     change_pct = round(((latest["y"] - prev["y"]) / prev["y"]) * 100, 1)
 
-            return name, {
-                "latest_period": period_fmt,
-                "latest_value": latest.get("y"),
-                "unit": "incidence per 100'000" if "incValue" in aggregation else "absolute count",
-                "trend": trend,
-                "change_vs_prev_period_pct": change_pct,
-                "source_date": data.get("sourceDate"),
-                "series": [
-                    {
-                        "period": _fmt_isoweek(p["x"]) if not is_yearly else _fmt_year(p["x"]),
-                        "value": p.get("y"),
-                    }
+            return name, CantonDiseaseData(
+                latest_period=period_fmt,
+                latest_value=latest.get("y"),
+                unit="incidence per 100'000" if "incValue" in aggregation else "absolute count",
+                trend=trend,
+                change_vs_prev_period_pct=change_pct,
+                source_date=data.get("sourceDate"),
+                series=[
+                    DiseaseDataPoint(
+                        period=_fmt_isoweek(p["x"]) if not is_yearly else _fmt_year(p["x"]),
+                        value=p.get("y"),
+                    )
                     for p in recent if p.get("y") is not None
                 ],
-            }
+            )
         except (EgressNotAllowed, httpx.HTTPError, KeyError, ValueError, TypeError) as exc:
             # Don't surface the raw exception to the model — log it server-side
             # and report a stable, generic per-series status (OBS-002). An egress
             # block fails this series closed; the guard already logged the target.
             logger.warning("canton_situation series '%s' failed: %r", name, exc)
-            return name, {"status": "unavailable"}
+            return name, CantonDiseaseStatus(status="unavailable")
 
     tasks = [_fetch_series(name, sid) for name, sid in school_relevant.items()]
     fetched = await asyncio.gather(*tasks)
 
-    for name, data in fetched:
-        results["diseases"][name] = data
+    diseases: dict[str, CantonDiseaseStatus | CantonDiseaseData] = dict(fetched)
 
-    results["note"] = (
-        f"Situation overview for canton {canton_up}. "
-        "incValue = incidence per 100'000 population. "
-        "Data from BAG Infectious Disease Dashboard, updated weekly. "
-        "For outbreak assessment, compare to 5-year mean using series "
-        "ending in 'valueMean5y'."
+    return CantonSituationOutput(
+        canton=canton_up,
+        diseases=diseases,
+        note=(
+            f"Situation overview for canton {canton_up}. "
+            "incValue = incidence per 100'000 population. "
+            "Data from BAG Infectious Disease Dashboard, updated weekly. "
+            "For outbreak assessment, compare to 5-year mean using series "
+            "ending in 'valueMean5y'."
+        ),
+        school_relevance=(
+            "Influenza and ARI spikes correlate with school outbreak risk. "
+            "Measles: single case = potential outbreak in low-vaccination schools. "
+            "Pertussis: high risk for unvaccinated infants (siblings of school children)."
+        ),
     )
-    results["school_relevance"] = (
-        "Influenza and ARI spikes correlate with school outbreak risk. "
-        "Measles: single case = potential outbreak in low-vaccination schools. "
-        "Pertussis: high risk for unvaccinated infants (siblings of school children)."
-    )
-
-    return results
 
 
 # ---------------------------------------------------------------------------

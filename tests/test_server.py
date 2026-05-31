@@ -12,9 +12,14 @@ import respx
 from mcp.server.fastmcp.exceptions import ToolError
 
 from bag_health_mcp.server import (
+    DATA_ATTRIBUTION,
     IDD_BASE,
+    CantonDiseaseData,
+    CantonDiseaseStatus,
+    CantonSeries,
     DataSetsInput,
     DataVersionInput,
+    DataVersionOutput,
     DiseaseDataInput,
     ExportFilesInput,
     ListDiseasesInput,
@@ -95,8 +100,8 @@ async def test_bag_list_diseases():
         return_value=httpx.Response(200, json=MOCK_SETS)
     )
     result = await bag_list_diseases(ListDiseasesInput())
-    assert result["total_topics"] > 0
-    cats = result["categories"]
+    assert result.total_topics > 0
+    cats = result.categories
     assert "respiratory" in cats
     assert "influenza" in cats["respiratory"]
 
@@ -108,9 +113,9 @@ async def test_bag_list_series_found():
         return_value=httpx.Response(200, json=MOCK_SETS)
     )
     result = await bag_list_series(DataSetsInput(topic="influenza"))
-    assert result["topic"] == "influenza"
-    assert result["total_series"] == 3
-    assert "cases" in result["chapters"]
+    assert result.topic == "influenza"
+    assert result.total_series == 3
+    assert "cases" in result.chapters
 
 
 @pytest.mark.asyncio
@@ -135,9 +140,9 @@ async def test_bag_get_series_details_ok():
     result = await bag_get_series_details(
         SeriesDetailsInput(series_id="influenza/cases/incValue/iso_week")
     )
-    assert result["series_id"] == "influenza/cases/incValue/iso_week"
-    assert "ZH" in result["cantons"]
-    assert result["source_date"] == "2026-03-24"
+    assert result.series_id == "influenza/cases/incValue/iso_week"
+    assert "ZH" in result.cantons
+    assert result.provenance.source_date == "2026-03-24"
 
 
 @pytest.mark.asyncio
@@ -166,12 +171,13 @@ async def test_bag_get_disease_data_zh():
             canton="ZH",
         )
     )
-    assert result["topic"] == "influenza"
-    assert result["source_date"] == "2026-03-24"
+    assert result.topic == "influenza"
+    assert result.provenance.source_date == "2026-03-24"
     # ZH has 3 data points
-    zh_results = [r for r in result["results"] if isinstance(r, dict) and r.get("canton") == "ZH"]
+    zh_results = [r for r in result.results
+                  if isinstance(r, CantonSeries) and r.canton == "ZH"]
     assert len(zh_results) > 0
-    assert zh_results[0]["data_points"] == 3
+    assert zh_results[0].data_points == 3
 
 
 @pytest.mark.asyncio
@@ -204,8 +210,8 @@ async def test_bag_get_data_version():
         return_value=httpx.Response(200, json={"name": "20260325"})
     )
     result = await bag_get_data_version(DataVersionInput())
-    assert result["version"] == "20260325"
-    assert result["date"] == "2026-03-25"
+    assert result.version == "20260325"
+    assert result.date == "2026-03-25"
 
 
 @pytest.mark.asyncio
@@ -215,8 +221,8 @@ async def test_bag_list_export_files():
         return_value=httpx.Response(200, json=["INFLUENZA_oblig", "COVID19_oblig"])
     )
     result = await bag_list_export_files(ExportFilesInput())
-    assert result["total_files"] == 2
-    assert "INFLUENZA_oblig" in result["files"]
+    assert result.total_files == 2
+    assert "INFLUENZA_oblig" in result.files
 
 
 # ---------------------------------------------------------------------------
@@ -227,16 +233,16 @@ async def test_bag_list_export_files():
 @pytest.mark.asyncio
 async def test_live_list_diseases():
     result = await bag_list_diseases(ListDiseasesInput())
-    assert result["total_topics"] >= 40
-    assert "influenza" in result["categories"]["respiratory"]
+    assert result.total_topics >= 40
+    assert "influenza" in result.categories["respiratory"]
 
 
 @pytest.mark.live
 @pytest.mark.asyncio
 async def test_live_data_version():
     result = await bag_get_data_version(DataVersionInput())
-    assert len(result["version"]) == 8
-    assert result["version"].startswith("2026") or result["version"].startswith("2025")
+    assert len(result.version) == 8
+    assert result.version.startswith("2026") or result.version.startswith("2025")
 
 
 @pytest.mark.live
@@ -250,17 +256,16 @@ async def test_live_influenza_zh():
             limit_weeks=26,
         )
     )
-    assert "error" not in result
-    assert result["topic"] == "influenza"
-    assert len(result["results"]) > 0
+    assert result.topic == "influenza"
+    assert len(result.results) > 0
 
 
 @pytest.mark.live
 @pytest.mark.asyncio
 async def test_live_canton_situation():
     result = await bag_get_canton_situation(canton="ZH")
-    assert result["canton"] == "ZH"
-    assert "influenza" in result["diseases"]
+    assert result.canton == "ZH"
+    assert "influenza" in result.diseases
 
 
 # ---------------------------------------------------------------------------
@@ -474,8 +479,8 @@ async def test_tools_reuse_pooled_client_under_lifespan():
         r2 = await bag_list_series(DataSetsInput(topic="influenza"))
         # Both calls ran against the single pooled client.
         assert server._shared_client is pooled
-        assert r1["total_topics"] > 0
-        assert r2["topic"] == "influenza"
+        assert r1.total_topics > 0
+        assert r2.topic == "influenza"
 
 
 # ---------------------------------------------------------------------------
@@ -741,9 +746,10 @@ async def test_canton_situation_degrades_on_egress_block_no_leak():
 
     result = await bag_get_canton_situation(canton="ZH")
 
-    assert result["canton"] == "ZH"
-    statuses = {k: v.get("status") for k, v in result["diseases"].items()}
-    assert all(s == "unavailable" for s in statuses.values())
+    assert result.canton == "ZH"
+    # Every series failed closed as a status (not data), all 'unavailable'.
+    assert all(isinstance(v, CantonDiseaseStatus) and v.status == "unavailable"
+               for v in result.diseases.values())
     assert "LEAK-MUST-NOT-APPEAR" not in repr(result)
 
 
@@ -956,3 +962,110 @@ def test_main_configures_logging(monkeypatch):
             if h.get_name() == "bag_health_mcp_json":
                 server.logger.removeHandler(h)
         server.logger.propagate = True
+
+
+# ---------------------------------------------------------------------------
+# SDK-002: typed output models + provenance
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_tool_returns_typed_output_model():
+    """A tool returns its Pydantic output model instance, not a bare dict."""
+    respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
+        return_value=httpx.Response(200, json={"name": "20260325"})
+    )
+    result = await bag_get_data_version(DataVersionInput())
+    assert isinstance(result, DataVersionOutput)
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_every_output_carries_attribution_provenance():
+    """Every tool output exposes provenance with the data attribution (CH-004)."""
+    respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
+        return_value=httpx.Response(200, json={"name": "20260325"})
+    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
+        return_value=httpx.Response(200, json=MOCK_SETS)
+    )
+    v = await bag_get_data_version(DataVersionInput())
+    d = await bag_list_diseases(ListDiseasesInput())
+    assert v.provenance.attribution == DATA_ATTRIBUTION
+    assert d.provenance.attribution == DATA_ATTRIBUTION
+    # data_version tool also pins the version into provenance
+    assert v.provenance.data_version == "20260325"
+
+
+@pytest.mark.asyncio
+async def test_all_tools_advertise_output_schema():
+    """Every tool exposes a non-null outputSchema in tools/list (SDK-002)."""
+    from bag_health_mcp.server import mcp
+
+    tools = await mcp.list_tools()
+    assert len(tools) == 8
+    for t in tools:
+        assert t.outputSchema is not None, f"{t.name} has no outputSchema"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_call_through_client_yields_structured_content():
+    """An in-memory client call returns structuredContent with provenance."""
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import mcp
+
+    respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
+        return_value=httpx.Response(200, json={"name": "20260325"})
+    )
+    async with connect(mcp._mcp_server) as client:
+        result = await client.call_tool("bag_get_data_version", {"params": {}})
+
+    assert result.isError is False
+    assert result.structuredContent is not None
+    assert result.structuredContent["version"] == "20260325"
+    assert "provenance" in result.structuredContent
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_disease_data_results_are_typed_union():
+    """Canton-grouped results are CantonSeries of typed DiseaseDataPoints, and
+    the summary is a typed model populated from them (SDK-002)."""
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+
+    result = await bag_get_disease_data(
+        DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
+    )
+    zh = next(r for r in result.results
+              if isinstance(r, CantonSeries) and r.canton == "ZH")
+    assert zh.series[0].period  # typed DiseaseDataPoint
+    assert result.summary.canton == "ZH"
+    assert result.summary.data_points_returned == 3
+    assert result.provenance.data_version == "20260325"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_canton_situation_returns_typed_disease_data():
+    """A successful canton overview yields typed CantonDiseaseData entries."""
+    respx.get(url__regex=r".*/details$").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(url__regex=r"/api/v1/data/[^/]+/[^/]+/[^/]+/[^/]+$").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
+
+    result = await bag_get_canton_situation(canton="ZH")
+    assert result.canton == "ZH"
+    flu = result.diseases["influenza"]
+    assert isinstance(flu, CantonDiseaseData)
+    assert flu.latest_value is not None
