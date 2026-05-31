@@ -70,6 +70,17 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 - **Coverage**: Switzerland + Liechtenstein (FL), 26 cantons
 - **Topics**: 51 pathogens, 1386 data series
 
+### Datenquellen & Lizenzen / Data sources & licences
+
+| Source | Provider | Licence | Attribution required |
+|--------|----------|---------|----------------------|
+| Infectious Disease Dashboard (IDD) | Federal Office of Public Health (FOPH / BAG) | [opendata.swiss](https://opendata.swiss) Open Government Data — *free use, source attribution required* (Swiss OGD terms, CC BY-equivalent) | Yes |
+
+**Required citation:** *Federal Office of Public Health FOPH — Infectious Disease
+Dashboard (IDD), open data via opendata.swiss.* Every tool response carries this
+in a `provenance` block (`attribution` + `license` fields) so downstream
+consumers can surface it automatically.
+
 ```
 Architecture:
                     ┌─────────────────┐
@@ -145,7 +156,7 @@ transport. Set the level with `MCP_LOG_LEVEL` (default `INFO`).
 | Rate limits | No published IDD API rate limit; server caps responses at 104 data points per call by default (`limit_weeks` param) |
 | Timeout | 30 s per API call |
 | Authentication | No API keys required — all data publicly accessible |
-| Data licence | Public domain (opendata.swiss — Federal Act on Open Government Data, OGD) |
+| Data licence | opendata.swiss OGD — **free use, source attribution required** (CC BY-equivalent). FOPH IDD must be cited; see [Data sources & licences](#datenquellen--lizenzen--data-sources--licences) |
 | Terms of Service | Subject to [BAG IDD API ToS](https://api.idd.bag.admin.ch) |
 
 ---
@@ -161,7 +172,12 @@ transport. Set the level with `MCP_LOG_LEVEL` (default `INFO`).
 
 ## 📄 License
 
-MIT — Data from BAG IDD is public domain (opendata.swiss).
+**Code:** MIT (see [LICENSE](LICENSE)).
+
+**Data:** BAG IDD is Open Government Data on [opendata.swiss](https://opendata.swiss)
+under *free use with mandatory source attribution* (Swiss OGD terms, CC BY-equivalent)
+— **not** public domain. Cite the Federal Office of Public Health FOPH (IDD) when
+reusing the data; see [Data sources & licences](#datenquellen--lizenzen--data-sources--licences).
 
 ## 🔗 Related Portfolio Servers
 

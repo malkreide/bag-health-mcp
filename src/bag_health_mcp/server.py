@@ -644,15 +644,28 @@ DATA_ATTRIBUTION = (
     "Federal Office of Public Health FOPH — Infectious Disease Dashboard (IDD); "
     "open data via opendata.swiss"
 )
+# BAG IDD is published on opendata.swiss as federal Open Government Data under
+# "free use — source attribution required" terms (the Swiss OGD equivalent of
+# CC BY): reuse is permitted provided the source is cited (CH-004).
+DATA_LICENSE = (
+    "opendata.swiss Open Government Data — free use, source attribution "
+    "required (Swiss OGD terms, CC BY-equivalent). Cite: "
+    "Federal Office of Public Health FOPH, Infectious Disease Dashboard (IDD)."
+)
 
 
 class Provenance(BaseModel):
-    """Where a result came from, attached to every tool output (SDK-002/CH-004)."""
+    """Where a result came from, attached to every tool output (SDK-002/CH-004).
+
+    Carries the upstream source/date/version plus a controlled licence and
+    attribution string so every response states how the data may be reused.
+    """
 
     source: str | None = None
     source_date: str | None = None
     data_version: str | None = None
     attribution: str = DATA_ATTRIBUTION
+    license: str = DATA_LICENSE
 
 
 class ListDiseasesOutput(BaseModel):

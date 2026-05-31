@@ -13,6 +13,7 @@ from mcp.server.fastmcp.exceptions import ToolError
 
 from bag_health_mcp.server import (
     DATA_ATTRIBUTION,
+    DATA_LICENSE,
     IDD_BASE,
     CantonDiseaseData,
     CantonDiseaseStatus,
@@ -993,6 +994,10 @@ async def test_every_output_carries_attribution_provenance():
     d = await bag_list_diseases(ListDiseasesInput())
     assert v.provenance.attribution == DATA_ATTRIBUTION
     assert d.provenance.attribution == DATA_ATTRIBUTION
+    # CH-004: a controlled licence accompanies the attribution on every output.
+    assert v.provenance.license == DATA_LICENSE
+    assert d.provenance.license == DATA_LICENSE
+    assert "attribution required" in v.provenance.license
     # data_version tool also pins the version into provenance
     assert v.provenance.data_version == "20260325"
 
@@ -1069,3 +1074,17 @@ async def test_canton_situation_returns_typed_disease_data():
     flu = result.diseases["influenza"]
     assert isinstance(flu, CantonDiseaseData)
     assert flu.latest_value is not None
+
+
+@pytest.mark.asyncio
+async def test_license_advertised_in_output_schema():
+    """CH-004: the controlled licence field is part of every tool's outputSchema
+    (so reuse terms are discoverable from tools/list, not just at call time)."""
+    import json
+
+    from bag_health_mcp.server import mcp
+
+    for t in await mcp.list_tools():
+        blob = json.dumps(t.outputSchema)
+        assert "license" in blob, f"{t.name} outputSchema lacks license"
+        assert "attribution" in blob, f"{t.name} outputSchema lacks attribution"
