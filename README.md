@@ -218,6 +218,11 @@ class — never tool arguments, cantons or surveillance data.
   [`docs/isds-klassifikation.md`](docs/isds-klassifikation.md). It is a
   technically-grounded **draft pending ISBO/OIZ sign-off** — not a binding
   classification.
+- **Data classification (Schulamt):** the data is classified **ÖFFENTLICH / BUI**
+  (public OGD, no personal data, aggregated at canton level with small cells
+  suppressed at source). Draft scheme + aggregation-risk note in
+  [`docs/datenklassifikation-schulamt.md`](docs/datenklassifikation-schulamt.md);
+  the aggregating `bag_get_canton_situation` tool surfaces this in its response.
 
 ---
 

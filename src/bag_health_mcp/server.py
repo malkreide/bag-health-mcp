@@ -242,6 +242,19 @@ CANTONS = [
     "TI","UR","VD","VS","ZG","ZH","FL","all",
 ]
 
+# Data classification (CH-006, Stadt Zürich Schulamt scheme).
+# All data served is public BAG IDD Open Government Data, already aggregated and
+# anonymised at canton level by the BAG by law, with small cells suppressed at
+# source. It is therefore "Öffentlich / BUI" (not VERTRAULICH/STRENG VERTRAULICH).
+# See docs/datenklassifikation-schulamt.md.
+DATA_CLASSIFICATION = "ÖFFENTLICH / BUI"
+# The smallest geographic granularity this server ever exposes is the canton.
+# It never re-aggregates below what the upstream OGD API returns, so it cannot
+# create a finer-grained (re-identifying) view; this documents that floor and is
+# surfaced on the aggregating overview tool for transparency. It is not a
+# re-suppression threshold — the BAG already suppresses small cells at source.
+MIN_AGGREGATION_LEVEL = "canton"
+
 # Disease-topic taxonomy: which known IDD topics fall in each category. Used both
 # to categorise bag_list_diseases output and to serve the bag://disease-categories
 # reference resource, so the two never drift (single source of truth).
@@ -1529,7 +1542,10 @@ async def bag_get_canton_situation(
             "incValue = incidence per 100'000 population. "
             "Data from BAG Infectious Disease Dashboard, updated weekly. "
             "For outbreak assessment, compare to 5-year mean using series "
-            "ending in 'valueMean5y'."
+            "ending in 'valueMean5y'. "
+            f"Classification: {DATA_CLASSIFICATION}; data is aggregated at "
+            f"'{MIN_AGGREGATION_LEVEL}' level (public OGD, small cells suppressed "
+            "at source by the BAG) — no finer-grained or personal data is exposed."
         ),
         school_relevance=(
             "Influenza and ARI spikes correlate with school outbreak risk. "

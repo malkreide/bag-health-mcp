@@ -1407,3 +1407,36 @@ def test_configure_tracing_noop_without_endpoint(monkeypatch):
     monkeypatch.setattr(server, "_tracing_enabled", False)
     assert server._configure_tracing() is False
     assert server._tracing_enabled is False
+
+
+# ---------------------------------------------------------------------------
+# CH-006: data classification + aggregation floor on the aggregating tool
+# ---------------------------------------------------------------------------
+
+def test_data_classification_constants_declared():
+    """The server declares its (public/BUI) classification and aggregation floor
+    as documented constants (CH-006)."""
+    from bag_health_mcp.server import DATA_CLASSIFICATION, MIN_AGGREGATION_LEVEL
+
+    assert "BUI" in DATA_CLASSIFICATION
+    assert MIN_AGGREGATION_LEVEL == "canton"
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_canton_situation_note_states_classification_and_aggregation():
+    """The aggregating overview surfaces the classification and that data is
+    aggregated at canton level with no finer/personal data (CH-006)."""
+    from bag_health_mcp.server import DATA_CLASSIFICATION, MIN_AGGREGATION_LEVEL
+
+    respx.get(url__regex=r".*/details$").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(url__regex=r"/api/v1/data/[^/]+/[^/]+/[^/]+/[^/]+$").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
+
+    result = await bag_get_canton_situation(canton="ZH")
+    assert DATA_CLASSIFICATION in result.note
+    assert MIN_AGGREGATION_LEVEL in result.note
+    assert "no finer-grained or personal data" in result.note
