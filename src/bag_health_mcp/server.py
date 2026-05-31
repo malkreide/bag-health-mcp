@@ -19,6 +19,7 @@ from contextlib import AsyncExitStack, asynccontextmanager
 from typing import Any, Literal, NoReturn
 from urllib.parse import urlsplit
 
+import httpcore
 import httpx
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
@@ -154,11 +155,103 @@ async def _egress_guard(request: httpx.Request) -> None:
     Registered on the client so it fires for the initial request *and* each
     redirect target, closing the follow_redirects bypass flagged by SEC-004.
     Validates scheme, host allow-list, and resolved IP blocklist.
+
+    Note this is the *first* of two checks. It runs before the connection is
+    established and gives a fast, early rejection, but on its own it is subject
+    to a DNS resolve-vs-connect TOCTOU race: the address it validates may differ
+    from the one httpcore later connects to. :class:`_PinningBackend` closes that
+    window by validating and connecting to the *same* address (SEC-005).
     """
     await _assert_egress_allowed(request.url)
 
 
+class _PinningBackend(httpcore.AsyncNetworkBackend):
+    """Network backend that pins outbound TCP to a validated IP (SEC-005).
+
+    DNS rebinding / TOCTOU defence on the *outbound* side: the egress hook
+    validates a URL before connecting, but DNS could resolve differently between
+    that check and the actual socket connect. This backend resolves the host
+    once, rejects the connection if *any* resolved address is non-public
+    (:func:`_is_disallowed_ip`), and then connects to that exact validated IP —
+    so the address checked is the address dialled, with no second lookup.
+
+    TLS still uses the original hostname for SNI/cert validation: httpcore calls
+    ``start_tls(server_hostname=...)`` separately from ``connect_tcp``, so
+    pinning the connect address does not weaken certificate checking.
+
+    Wraps the pool's default backend; a literal-IP host is validated directly
+    without a DNS lookup. ``connect_unix_socket`` is refused outright — this
+    server only ever speaks to a remote HTTPS API.
+    """
+
+    def __init__(self, inner: httpcore.AsyncNetworkBackend) -> None:
+        self._inner = inner
+
+    async def connect_tcp(
+        self,
+        host: str,
+        port: int,
+        timeout: float | None = None,
+        local_address: str | None = None,
+        socket_options: Any = None,
+    ) -> httpcore.AsyncNetworkStream:
+        try:
+            ipaddress.ip_address(host)
+            candidates = [host]  # already an IP literal; no lookup needed
+        except ValueError:
+            try:
+                candidates = await _resolve_host(host)
+            except OSError as exc:
+                logger.warning("egress DNS resolution failed for %s: %r", host, exc)
+                raise EgressNotAllowed(
+                    "could not resolve the BAG IDD API host; refusing the request"
+                ) from exc
+
+        pinned: str | None = None
+        for addr in candidates:
+            stripped = addr.split("%", 1)[0]  # strip IPv6 zone id
+            try:
+                ip = ipaddress.ip_address(stripped)
+            except ValueError:
+                logger.warning("egress: unparseable resolved address %r for %s", addr, host)
+                raise EgressNotAllowed("host resolved to an unparseable address; refused")
+            if _is_disallowed_ip(ip):
+                logger.warning(
+                    "blocked egress: host %s resolved to disallowed IP %s", host, ip
+                )
+                raise EgressNotAllowed(
+                    "the target host resolved to a non-public address; refused as a "
+                    "possible SSRF attempt"
+                )
+            if pinned is None:
+                pinned = stripped
+
+        # Connect to the exact address we just validated (no re-resolution).
+        return await self._inner.connect_tcp(
+            pinned,
+            port,
+            timeout=timeout,
+            local_address=local_address,
+            socket_options=socket_options,
+        )
+
+    async def connect_unix_socket(
+        self,
+        path: str,
+        timeout: float | None = None,
+        socket_options: Any = None,
+    ) -> httpcore.AsyncNetworkStream:
+        raise EgressNotAllowed("unix-socket egress is not permitted")
+
+    async def sleep(self, seconds: float) -> None:
+        await self._inner.sleep(seconds)
+
+
 def _new_client() -> httpx.AsyncClient:
+    # The pinning backend (SEC-005) sits below httpx's transport layer: it owns
+    # the actual DNS + connect, so the address validated is the address dialled.
+    transport = httpx.AsyncHTTPTransport()
+    transport._pool._network_backend = _PinningBackend(transport._pool._network_backend)
     return httpx.AsyncClient(
         base_url=IDD_BASE,
         timeout=TIMEOUT,
@@ -171,6 +264,7 @@ def _new_client() -> httpx.AsyncClient:
         # can no longer be followed (SEC-004 / SEC-021).
         follow_redirects=True,
         event_hooks={"request": [_egress_guard]},
+        transport=transport,
     )
 
 
