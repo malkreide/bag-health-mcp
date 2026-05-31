@@ -10,12 +10,14 @@ from __future__ import annotations
 
 import asyncio
 import ipaddress
+import json
 import logging
 import os
 import socket
 import sys
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack, asynccontextmanager
+from datetime import UTC, datetime
 from typing import Any, Literal, NoReturn
 from urllib.parse import urlsplit
 
@@ -43,6 +45,82 @@ ALLOWED_SCHEMES = frozenset({"https"})
 
 # Logs go to stderr (stdout is reserved for the stdio JSON-RPC channel).
 logger = logging.getLogger("bag_health_mcp")
+
+# ---------------------------------------------------------------------------
+# Structured logging (OBS-003 / OBS-004)
+# ---------------------------------------------------------------------------
+#
+# OBS-004: stdout is the stdio JSON-RPC transport, so every log line must go to
+# stderr — a stray print/handler on stdout would corrupt the protocol stream.
+# OBS-003: emit one JSON object per line with an RFC 5424 severity, so log
+# aggregators can parse and filter by level.
+
+# Python logging level -> RFC 5424 severity (keyword, numeric code).
+_RFC5424_SEVERITY: dict[int, tuple[str, int]] = {
+    logging.CRITICAL: ("crit", 2),
+    logging.ERROR: ("err", 3),
+    logging.WARNING: ("warning", 4),
+    logging.INFO: ("info", 6),
+    logging.DEBUG: ("debug", 7),
+}
+
+
+class JsonLogFormatter(logging.Formatter):
+    """Render a log record as a single-line JSON object (OBS-003).
+
+    Includes an RFC 5424 severity keyword and numeric code alongside the Python
+    level name, plus exception text when present. Reserved/internal record
+    attributes are skipped; any structured fields passed via ``extra=`` are
+    merged in.
+    """
+
+    _RESERVED = frozenset(
+        logging.makeLogRecord({}).__dict__.keys()
+    ) | {"message", "asctime", "taskName"}
+
+    def format(self, record: logging.LogRecord) -> str:
+        severity, severity_code = _RFC5424_SEVERITY.get(
+            record.levelno, ("info", 6)
+        )
+        payload: dict[str, Any] = {
+            "timestamp": datetime.fromtimestamp(record.created, tz=UTC).isoformat(),
+            "level": record.levelname,
+            "severity": severity,
+            "severity_code": severity_code,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        if record.exc_info:
+            payload["exception"] = self.formatException(record.exc_info)
+        # Merge any caller-provided structured fields (logger.x(..., extra={...})).
+        for key, value in record.__dict__.items():
+            if key not in self._RESERVED and not key.startswith("_"):
+                payload[key] = value
+        return json.dumps(payload, default=str)
+
+
+def _configure_logging(level: str | int | None = None) -> None:
+    """Attach a stderr JSON handler to the package logger (OBS-003/OBS-004).
+
+    Idempotent: a second call replaces the handler rather than stacking another.
+    The level comes from ``level``, else ``MCP_LOG_LEVEL`` (default ``INFO``).
+    ``propagate`` is disabled so records are not also emitted by the root logger
+    (which could reach stdout). Called from :func:`main`; library importers keep
+    full control of their own logging config.
+    """
+    resolved = level if level is not None else os.environ.get("MCP_LOG_LEVEL", "INFO")
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setFormatter(JsonLogFormatter())
+    handler.set_name("bag_health_mcp_json")
+
+    # Drop any handler we previously installed so repeated calls stay idempotent.
+    for existing in list(logger.handlers):
+        if existing.get_name() == "bag_health_mcp_json":
+            logger.removeHandler(existing)
+    logger.addHandler(handler)
+    logger.setLevel(resolved)
+    logger.propagate = False
+
 
 # Swiss cantons (incl. FL = Liechtenstein as BAG tracks it)
 CANTONS = [
@@ -1155,6 +1233,7 @@ def main() -> None:
     container deployments opt into all-interface binding explicitly by setting
     ``MCP_HOST=0.0.0.0`` (see Dockerfile).
     """
+    _configure_logging()
     if "--http" in sys.argv:
         if "--port" in sys.argv:
             port = int(sys.argv[sys.argv.index("--port") + 1])
