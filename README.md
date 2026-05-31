@@ -211,6 +211,16 @@ class — never tool arguments, cantons or surveillance data.
 
 ---
 
+## 🇨🇭 Compliance
+
+- **ISDS (Stadt Zürich):** a draft information-security protection-needs
+  classification (Schutzbedarfsanalyse per Grundwert + measures mapping) is in
+  [`docs/isds-klassifikation.md`](docs/isds-klassifikation.md). It is a
+  technically-grounded **draft pending ISBO/OIZ sign-off** — not a binding
+  classification.
+
+---
+
 ## 📄 License
 
 **Code:** MIT (see [LICENSE](LICENSE)).
