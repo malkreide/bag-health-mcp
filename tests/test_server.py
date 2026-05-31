@@ -836,3 +836,123 @@ async def test_input_schema_advertises_constraints():
     assert "pattern" in blob
     assert "maxLength" in blob
     assert '"additionalProperties": false' in blob
+
+
+# ---------------------------------------------------------------------------
+# OBS-003 / OBS-004: structured JSON logging on stderr
+# ---------------------------------------------------------------------------
+
+import io as _io  # noqa: E402
+import json as _json  # noqa: E402
+import logging as _logging  # noqa: E402
+
+
+def test_json_log_formatter_emits_valid_json_with_rfc5424_severity():
+    """Each record renders as one JSON object carrying an RFC 5424 severity."""
+    from bag_health_mcp.server import JsonLogFormatter
+
+    fmt = JsonLogFormatter()
+    rec = _logging.LogRecord(
+        name="bag_health_mcp", level=_logging.WARNING, pathname=__file__,
+        lineno=1, msg="careful %s", args=("now",), exc_info=None,
+    )
+    obj = _json.loads(fmt.format(rec))
+    assert obj["message"] == "careful now"
+    assert obj["level"] == "WARNING"
+    assert obj["severity"] == "warning"
+    assert obj["severity_code"] == 4
+    assert obj["logger"] == "bag_health_mcp"
+    assert "timestamp" in obj
+
+
+def test_json_log_formatter_merges_extra_and_exception():
+    """extra= fields are merged and exceptions captured as text."""
+    from bag_health_mcp.server import JsonLogFormatter
+
+    fmt = JsonLogFormatter()
+    try:
+        raise ValueError("boom")
+    except ValueError:
+        rec = _logging.LogRecord(
+            name="bag_health_mcp", level=_logging.ERROR, pathname=__file__,
+            lineno=1, msg="failed", args=(), exc_info=sys.exc_info(),
+        )
+        rec.request_id = "abc123"  # as logger.error(..., extra={"request_id": ...})
+    obj = _json.loads(fmt.format(rec))
+    assert obj["request_id"] == "abc123"
+    assert "ValueError" in obj["exception"]
+    assert obj["severity_code"] == 3
+
+
+def test_configure_logging_writes_json_to_stderr(monkeypatch):
+    """_configure_logging sends JSON records to stderr (OBS-004: stdout is the
+    stdio protocol channel)."""
+    import bag_health_mcp.server as server
+
+    cap = _io.StringIO()
+    monkeypatch.setattr(sys, "stderr", cap)
+    server._configure_logging("DEBUG")
+    try:
+        server.logger.info("hello")
+    finally:
+        for h in list(server.logger.handlers):
+            if h.get_name() == "bag_health_mcp_json":
+                server.logger.removeHandler(h)
+
+    line = cap.getvalue().strip().splitlines()[-1]
+    obj = _json.loads(line)
+    assert obj["message"] == "hello"
+    assert obj["severity"] == "info"
+
+
+def test_configure_logging_is_idempotent_and_no_propagate():
+    """Repeated calls keep exactly one handler and disable propagation so
+    records never reach the root logger (which could hit stdout)."""
+    import bag_health_mcp.server as server
+
+    try:
+        server._configure_logging("INFO")
+        server._configure_logging("INFO")
+        server._configure_logging("INFO")
+        handlers = [h for h in server.logger.handlers
+                    if h.get_name() == "bag_health_mcp_json"]
+        assert len(handlers) == 1
+        assert server.logger.propagate is False
+        assert server.logger.level == _logging.INFO
+    finally:
+        for h in list(server.logger.handlers):
+            if h.get_name() == "bag_health_mcp_json":
+                server.logger.removeHandler(h)
+        server.logger.propagate = True
+
+
+def test_configure_logging_honors_env_level(monkeypatch):
+    """Level falls back to MCP_LOG_LEVEL when not passed explicitly."""
+    import bag_health_mcp.server as server
+
+    monkeypatch.setenv("MCP_LOG_LEVEL", "ERROR")
+    try:
+        server._configure_logging()
+        assert server.logger.level == _logging.ERROR
+    finally:
+        for h in list(server.logger.handlers):
+            if h.get_name() == "bag_health_mcp_json":
+                server.logger.removeHandler(h)
+
+
+def test_main_configures_logging(monkeypatch):
+    """main() installs the structured logging handler on startup."""
+    import bag_health_mcp.server as server
+
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp"])
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: None)
+    try:
+        server.main()
+        handlers = [h for h in server.logger.handlers
+                    if h.get_name() == "bag_health_mcp_json"]
+        assert len(handlers) == 1
+    finally:
+        for h in list(server.logger.handlers):
+            if h.get_name() == "bag_health_mcp_json":
+                server.logger.removeHandler(h)
+        server.logger.propagate = True

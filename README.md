@@ -108,6 +108,10 @@ The server binds to `127.0.0.1` by default so a local HTTP server is **not**
 exposed to the network. Container/cloud deployments bind all interfaces by
 setting `MCP_HOST=0.0.0.0` explicitly — the provided `Dockerfile` does this.
 
+**Logging:** the server emits structured JSON logs (one object per line, with an
+RFC 5424 severity) to **stderr** — stdout is reserved for the stdio JSON-RPC
+transport. Set the level with `MCP_LOG_LEVEL` (default `INFO`).
+
 ---
 
 ## 🗂️ Available Disease Topics
