@@ -94,7 +94,7 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 | Rate Limits | Keine publizierten IDD-API-Limits; Server begrenzt Antworten auf 104 Datenpunkte pro Abfrage (`limit_weeks`-Parameter) |
 | Timeout | 30 Sekunden pro API-Aufruf |
 | Authentifizierung | Kein API-Key erforderlich — alle Daten öffentlich zugänglich |
-| Datenlizenz | Gemeinfrei (opendata.swiss — Bundesgesetz über das Öffentlichkeitsprinzip, OGD) |
+| Datenlizenz | opendata.swiss OGD — **freie Nutzung mit Quellenangabe** (CC-BY-äquivalent), **nicht** gemeinfrei. Quelle BAG IDD ist zu nennen |
 | Nutzungsbedingungen | Es gelten die [ToS der BAG IDD API](https://api.idd.bag.admin.ch) |
 
 ---
