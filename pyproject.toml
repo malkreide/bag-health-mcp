@@ -42,6 +42,9 @@ dependencies = [
     # (httpx's transport layer; httpx already depends on httpcore).
     "httpcore>=1.0.0,<2",
     "pydantic>=2.0.0,<3",
+    # Imported directly for the Settings config object (ARCH-004); already a
+    # transitive dependency of mcp.
+    "pydantic-settings>=2.0,<3",
 ]
 
 [project.optional-dependencies]

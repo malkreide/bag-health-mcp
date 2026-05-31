@@ -1515,3 +1515,45 @@ async def test_canton_situation_note_states_classification_and_aggregation():
     assert DATA_CLASSIFICATION in result.note
     assert MIN_AGGREGATION_LEVEL in result.note
     assert "no finer-grained or personal data" in result.note
+
+
+# ---------------------------------------------------------------------------
+# ARCH-004: Settings config object (IoC, transport-agnostic)
+# ---------------------------------------------------------------------------
+
+def test_settings_defaults():
+    """Settings has safe defaults when no MCP_* env vars are set."""
+    import bag_health_mcp.server as server
+
+    s = server.Settings(transport="", host="127.0.0.1", port=8000, log_level="INFO")
+    assert s.host == "127.0.0.1"
+    assert s.port == 8000
+    assert s.is_local_bind is True
+    assert s.wants_http(http_flag=False) is False
+    assert s.wants_http(http_flag=True) is True
+
+
+def test_settings_reads_mcp_env(monkeypatch):
+    """Settings is populated from MCP_* environment variables (ARCH-004)."""
+    import bag_health_mcp.server as server
+
+    monkeypatch.setenv("MCP_HOST", "0.0.0.0")
+    monkeypatch.setenv("MCP_PORT", "9100")
+    monkeypatch.setenv("MCP_TRANSPORT", "http")
+    monkeypatch.setenv("MCP_LOG_LEVEL", "DEBUG")
+    s = server.Settings()
+    assert s.host == "0.0.0.0"
+    assert s.port == 9100
+    assert s.log_level == "DEBUG"
+    assert s.is_local_bind is False
+    # MCP_TRANSPORT wins over the (absent) --http flag.
+    assert s.wants_http(http_flag=False) is True
+
+
+def test_settings_transport_stdio_overrides_flag(monkeypatch):
+    """MCP_TRANSPORT=stdio forces stdio even if --http is passed."""
+    import bag_health_mcp.server as server
+
+    monkeypatch.setenv("MCP_TRANSPORT", "stdio")
+    s = server.Settings()
+    assert s.wants_http(http_flag=True) is False

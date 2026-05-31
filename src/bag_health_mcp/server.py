@@ -27,6 +27,7 @@ from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -35,6 +36,40 @@ from pydantic import BaseModel, ConfigDict, Field
 IDD_BASE = "https://api.idd.bag.admin.ch"
 TIMEOUT = 30.0
 USER_AGENT = "bag-health-mcp/0.1.0 (https://github.com/malkreide/bag-health-mcp)"
+
+
+# ---------------------------------------------------------------------------
+# Runtime configuration (ARCH-004)
+# ---------------------------------------------------------------------------
+#
+# Transport-agnostic config object: the server logic reads settings from this
+# object, not ad-hoc from os.environ / sys.argv. Values come from MCP_* env vars
+# (or their defaults). main() builds one instance and uses it to wire up
+# logging, transport and binding.
+
+class Settings(BaseSettings):
+    """Runtime configuration, sourced from ``MCP_*`` environment variables."""
+
+    model_config = SettingsConfigDict(env_prefix="MCP_", extra="ignore")
+
+    transport: str = ""  # "http"/"streamable-http" | "stdio" | "" (fall back to --http)
+    host: str = "127.0.0.1"
+    port: int = 8000
+    log_level: str = "INFO"
+
+    def wants_http(self, *, http_flag: bool) -> bool:
+        """Whether to serve over Streamable HTTP (vs. stdio), SCALE-001.
+
+        ``MCP_TRANSPORT`` wins when set; otherwise the ``--http`` CLI flag.
+        """
+        t = self.transport.strip().lower()
+        if t:
+            return t in {"http", "streamable-http", "streamable_http"}
+        return http_flag
+
+    @property
+    def is_local_bind(self) -> bool:
+        return self.host in ("127.0.0.1", "::1", "localhost")
 
 # Code-layer egress allow-list (SEC-021): the only host this server may ever
 # talk to is the BAG IDD API, derived from IDD_BASE so there is a single source
@@ -1657,53 +1692,40 @@ def outbreak_check(disease: str = "measles", canton: str = "all") -> str:
 # Entry point
 # ---------------------------------------------------------------------------
 
-def _select_http() -> bool:
-    """Decide whether to serve over Streamable HTTP (vs. stdio).
-
-    Selection order (SCALE-001): the ``MCP_TRANSPORT`` env var wins when set
-    (``http``/``streamable-http`` → HTTP, ``stdio`` → stdio), which is what
-    container/cloud deployment manifests should set; otherwise the ``--http``
-    CLI flag is honoured for local/back-compat use. Default is stdio.
-    """
-    transport_env = os.environ.get("MCP_TRANSPORT", "").strip().lower()
-    if transport_env:
-        return transport_env in {"http", "streamable-http", "streamable_http"}
-    return "--http" in sys.argv
-
-
 def main() -> None:
     """Console-script / module entry point.
 
-    Transport is selected by the ``MCP_TRANSPORT`` env var (``http`` or
+    Runtime configuration is read into a :class:`Settings` object from ``MCP_*``
+    environment variables (ARCH-004), keeping the server logic transport- and
+    source-agnostic. Transport is selected by ``MCP_TRANSPORT`` (``http`` or
     ``stdio``) when set — the recommended way for container/cloud deployments —
     otherwise by the ``--http`` CLI flag; the default is stdio. For HTTP, host
-    and port come from ``MCP_HOST`` / ``MCP_PORT`` (or ``--port``). The host
-    defaults to ``127.0.0.1`` so a local HTTP server is not exposed to the
+    and port come from ``MCP_HOST`` / ``MCP_PORT`` (``--port`` overrides). The
+    host defaults to ``127.0.0.1`` so a local HTTP server is not exposed to the
     network; container deployments opt into all-interface binding explicitly by
     setting ``MCP_HOST=0.0.0.0`` (see Dockerfile).
     """
-    _configure_logging()
+    settings = Settings()
+    _configure_logging(settings.log_level)
     _configure_tracing()  # no-op unless telemetry installed + OTEL endpoint set
-    if _select_http():
+    if settings.wants_http(http_flag="--http" in sys.argv):
+        # --port is a CLI-only override (not an env var) for local convenience.
         if "--port" in sys.argv:
-            port = int(sys.argv[sys.argv.index("--port") + 1])
-        else:
-            port = int(os.environ.get("MCP_PORT", "8000"))
-        # FastMCP.run() accepts no host/port kwargs — configure them on the
-        # instance settings, which the Streamable HTTP runner (uvicorn) reads.
-        host = os.environ.get("MCP_HOST", "127.0.0.1")
-        if host not in ("127.0.0.1", "::1", "localhost"):
+            settings.port = int(sys.argv[sys.argv.index("--port") + 1])
+        if not settings.is_local_bind:
             # NeighborJack awareness (SEC-016): binding beyond localhost exposes
             # the server on the network; that should only happen in an isolated,
             # gateway-fronted deployment.
             logger.warning(
                 "binding HTTP server to non-localhost host %s — ensure this is "
                 "an intended, network-isolated deployment behind a gateway",
-                host,
-                extra={"bind_host": host},
+                settings.host,
+                extra={"bind_host": settings.host},
             )
-        mcp.settings.host = host
-        mcp.settings.port = port
+        # FastMCP.run() accepts no host/port kwargs — configure them on the
+        # instance settings, which the Streamable HTTP runner (uvicorn) reads.
+        mcp.settings.host = settings.host
+        mcp.settings.port = settings.port
         mcp.run(transport="streamable-http")
     else:
         mcp.run()
