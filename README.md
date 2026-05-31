@@ -164,6 +164,13 @@ deployments (the `--http` flag still works for local use). The server binds to
 Container/cloud deployments bind all interfaces by setting `MCP_HOST=0.0.0.0`
 explicitly — the provided `Dockerfile` does this.
 
+> ⚠️ **Security:** HTTP transport exposes the server on the network and is
+> **unauthenticated** (it serves only public data). Only bind beyond
+> `127.0.0.1` in a **network-isolated** environment behind an authenticating
+> gateway — never expose it directly on a public/shared network. Binding to a
+> non-localhost host logs a warning at startup. The default stdio transport has
+> no network surface. See [`docs/security-posture.md`](docs/security-posture.md).
+
 For running at scale (session affinity, resource limits, MCP gateway), see the
 [deployment & scaling guide](docs/deployment-scaling.md) and the reference
 manifests in [`deploy/`](deploy/).
@@ -245,6 +252,13 @@ class — never tool arguments, cantons or surveillance data.
   suppressed at source). Draft scheme + aggregation-risk note in
   [`docs/datenklassifikation-schulamt.md`](docs/datenklassifikation-schulamt.md);
   the aggregating `bag_get_canton_situation` tool surfaces this in its response.
+- **Security posture:** lethal-trifecta assessment (the server is strictly
+  read-only → not affected), secret-management decision (no secrets — public
+  data), and network-exposure notes are in
+  [`docs/security-posture.md`](docs/security-posture.md).
+- **Phase architecture:** this is a **Phase 1 (read-only)** server; write/send
+  capabilities are deferred behind documented prerequisites. See
+  [`docs/roadmap.md`](docs/roadmap.md).
 
 ---
 
