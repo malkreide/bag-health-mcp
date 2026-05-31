@@ -8,12 +8,14 @@ No authentication required. All data is public.
 
 from __future__ import annotations
 
+import logging
 import os
 import sys
-from typing import Any, Literal
+from typing import Any, Literal, NoReturn
 
 import httpx
 from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import BaseModel, Field
 
@@ -24,6 +26,9 @@ from pydantic import BaseModel, Field
 IDD_BASE = "https://api.idd.bag.admin.ch"
 TIMEOUT = 30.0
 USER_AGENT = "bag-health-mcp/0.1.0 (https://github.com/malkreide/bag-health-mcp)"
+
+# Logs go to stderr (stdout is reserved for the stdio JSON-RPC channel).
+logger = logging.getLogger("bag_health_mcp")
 
 # Swiss cantons (incl. FL = Liechtenstein as BAG tracks it)
 CANTONS = [
@@ -51,6 +56,45 @@ mcp = FastMCP(
 
 
 # ---------------------------------------------------------------------------
+# Error handling (OBS-001 / OBS-002)
+# ---------------------------------------------------------------------------
+#
+# Protocol vs. execution errors are kept separate:
+#   * Protocol errors (unknown tool, malformed request, schema-invalid params)
+#     are raised by the MCP SDK itself with standard JSON-RPC error codes — we
+#     never fabricate those.
+#   * Execution errors (upstream non-200, not-found, unreachable API, malformed
+#     series_id) are signalled with ``_fail`` below, which raises ``ToolError``.
+#     The SDK converts a raised ToolError into a tool *result* with
+#     ``isError: true`` (not a protocol error), so the model gets a clear,
+#     actionable message it can recover from.
+#
+# Raw upstream detail (status bodies, exception text, URLs) is logged
+# server-side only and never placed in the returned message (OBS-002).
+
+def _fail(message: str, *, detail: str | None = None) -> NoReturn:
+    """Raise an execution-class error as an MCP tool result (``isError: true``).
+
+    ``message`` must be safe to expose to the model; ``detail`` (optional) holds
+    the raw upstream cause and is logged to stderr only.
+    """
+    if detail:
+        logger.warning("tool execution error: %s | detail=%s", message, detail)
+    raise ToolError(message)
+
+
+def _ensure_ok(r: httpx.Response, *, context: str) -> None:
+    """Raise a safe ToolError if an upstream response is not a 2xx success."""
+    if r.is_success:
+        return
+    _fail(
+        f"BAG IDD API returned error {r.status_code} while {context}. "
+        "Verify your parameters with bag_get_series_details or retry later.",
+        detail=r.text[:500],
+    )
+
+
+# ---------------------------------------------------------------------------
 # HTTP client
 # ---------------------------------------------------------------------------
 
@@ -64,6 +108,47 @@ def _client() -> httpx.AsyncClient:
         },
         follow_redirects=True,
     )
+
+
+async def _get(
+    client: httpx.AsyncClient, url: str, *, context: str, allow_404: bool = False
+) -> httpx.Response:
+    """GET ``url``, converting transport/HTTP failures into safe ToolErrors.
+
+    When ``allow_404`` is set, a 404 response is returned to the caller so it can
+    render a domain-specific not-found message; every other non-2xx status and
+    any transport error raises via :func:`_fail`.
+    """
+    try:
+        r = await client.get(url)
+    except httpx.HTTPError as exc:
+        _fail(
+            f"Could not reach the BAG IDD API while {context}. "
+            "The upstream service may be temporarily unavailable; retry later.",
+            detail=repr(exc),
+        )
+    if allow_404 and r.status_code == 404:
+        return r
+    _ensure_ok(r, context=context)
+    return r
+
+
+async def _post(
+    client: httpx.AsyncClient, url: str, *, json: Any, context: str
+) -> httpx.Response:
+    """POST ``json`` to ``url``, converting transport errors into safe ToolErrors.
+
+    The response is returned without status validation so callers can branch on
+    specific codes; transport failures (DNS, connect, timeout) raise.
+    """
+    try:
+        return await client.post(url, json=json)
+    except httpx.HTTPError as exc:
+        _fail(
+            f"Could not reach the BAG IDD API while {context}. "
+            "The upstream service may be temporarily unavailable; retry later.",
+            detail=repr(exc),
+        )
 
 
 def _fmt_isoweek(x: int) -> str:
@@ -190,8 +275,7 @@ READ_ONLY = ToolAnnotations(
 ))
 async def bag_list_diseases(params: ListDiseasesInput) -> dict[str, Any]:
     async with _client() as c:
-        r = await c.get("/api/v1/data/sets")
-        r.raise_for_status()
+        r = await _get(c, "/api/v1/data/sets", context="listing disease topics")
         all_sets: list[str] = r.json()
 
     topics: set[str] = {s.split("/")[0] for s in all_sets}
@@ -249,16 +333,15 @@ async def bag_list_diseases(params: ListDiseasesInput) -> dict[str, Any]:
 ))
 async def bag_list_series(params: DataSetsInput) -> dict[str, Any]:
     async with _client() as c:
-        r = await c.get("/api/v1/data/sets")
-        r.raise_for_status()
+        r = await _get(c, "/api/v1/data/sets", context="listing data series")
         all_sets: list[str] = r.json()
 
     topic_sets = [s for s in all_sets if s.startswith(f"{params.topic}/")]
     if not topic_sets:
-        return {
-            "error": f"Topic '{params.topic}' not found.",
-            "hint": "Use bag_list_diseases to see valid topic slugs.",
-        }
+        _fail(
+            f"Topic '{params.topic}' not found. "
+            "Use bag_list_diseases to see valid topic slugs."
+        )
 
     # Parse structure
     chapters: dict[str, list[str]] = {}
@@ -290,22 +373,24 @@ async def bag_list_series(params: DataSetsInput) -> dict[str, Any]:
 async def bag_get_series_details(params: SeriesDetailsInput) -> dict[str, Any]:
     parts = params.series_id.split("/")
     if len(parts) != 4:
-        return {
-            "error": "series_id must be in format 'topic/chapter/aggregation/temporality'",
-            "example": "influenza/cases/incValue/iso_week",
-        }
+        _fail(
+            "series_id must be in format 'topic/chapter/aggregation/temporality', "
+            "e.g. 'influenza/cases/incValue/iso_week'."
+        )
     topic, chapter, aggregation, temporality = parts
 
     async with _client() as c:
-        r = await c.get(
-            f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}/details"
+        r = await _get(
+            c,
+            f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}/details",
+            context=f"fetching details for '{params.series_id}'",
+            allow_404=True,
         )
         if r.status_code == 404:
-            return {
-                "error": f"Series '{params.series_id}' not found.",
-                "hint": "Use bag_list_series(topic=...) to discover valid series.",
-            }
-        r.raise_for_status()
+            _fail(
+                f"Series '{params.series_id}' not found. "
+                "Use bag_list_series(topic=...) to discover valid series."
+            )
         data = r.json()
 
     props = data.get("properties", {})
@@ -345,21 +430,23 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> dict[str, Any]:
 async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
     parts = params.series_id.split("/")
     if len(parts) != 4:
-        return {"error": "series_id must be 'topic/chapter/aggregation/temporality'"}
+        _fail("series_id must be 'topic/chapter/aggregation/temporality'.")
     topic, chapter, aggregation, temporality = parts
 
     # Build filter body based on series details
     async with _client() as c:
         # Fetch details to build correct filter
-        dr = await c.get(
-            f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}/details"
+        dr = await _get(
+            c,
+            f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}/details",
+            context=f"fetching details for '{params.series_id}'",
+            allow_404=True,
         )
         if dr.status_code == 404:
-            return {
-                "error": f"Series not found: {params.series_id}",
-                "hint": "Use bag_list_series to find valid series_ids.",
-            }
-        dr.raise_for_status()
+            _fail(
+                f"Series not found: {params.series_id}. "
+                "Use bag_list_series to find valid series_ids."
+            )
         details = dr.json()
 
     props = details.get("properties", {})
@@ -417,17 +504,16 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
         url = f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}"
         if group_by:
             url += f"?groupBy={group_by}"
-        r = await c.post(url, json=body)
+        r = await _post(c, url, json=body, context=f"fetching data for '{params.series_id}'")
         if r.status_code != 200:
-            # Return the status code only — never the raw upstream response
-            # body, which can leak internal details into the model context.
-            return {
-                "error": f"API error {r.status_code}",
-                "hint": (
-                    "Use bag_get_series_details to verify valid filter values, "
-                    "then retry with adjusted parameters."
-                ),
-            }
+            # Surface the status only — never the raw upstream response body,
+            # which can leak internal details into the model context (OBS-002).
+            _fail(
+                f"BAG IDD API error {r.status_code} while fetching "
+                f"'{params.series_id}'. Use bag_get_series_details to verify "
+                "valid filter values, then retry with adjusted parameters.",
+                detail=r.text[:500],
+            )
         data = r.json()
 
     values = data.get("values", {})
@@ -524,8 +610,11 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> dict[str, Any]:
 ))
 async def bag_list_export_files(params: ExportFilesInput) -> dict[str, Any]:
     async with _client() as c:
-        r = await c.get(f"/api/v1/export/{params.version}/files")
-        r.raise_for_status()
+        r = await _get(
+            c,
+            f"/api/v1/export/{params.version}/files",
+            context="listing export files",
+        )
         files: list[str] = r.json()
 
     return {
@@ -546,13 +635,17 @@ async def bag_list_export_files(params: ExportFilesInput) -> dict[str, Any]:
 ))
 async def bag_download_export(params: ExportDownloadInput) -> dict[str, Any]:
     async with _client() as c:
-        r = await c.get(f"/api/v1/export/latest/{params.file}/{params.format}")
+        r = await _get(
+            c,
+            f"/api/v1/export/latest/{params.file}/{params.format}",
+            context=f"downloading export '{params.file}'",
+            allow_404=True,
+        )
         if r.status_code == 404:
-            return {
-                "error": f"File '{params.file}' not found.",
-                "hint": "Use bag_list_export_files to see available files.",
-            }
-        r.raise_for_status()
+            _fail(
+                f"File '{params.file}' not found. "
+                "Use bag_list_export_files to see available files."
+            )
 
     content = r.text
     lines = content.split("\n") if params.format == "csv" else []
@@ -577,8 +670,7 @@ async def bag_download_export(params: ExportDownloadInput) -> dict[str, Any]:
 ))
 async def bag_get_data_version(params: DataVersionInput) -> dict[str, Any]:
     async with _client() as c:
-        r = await c.get("/api/v1/data/version")
-        r.raise_for_status()
+        r = await _get(c, "/api/v1/data/version", context="fetching data version")
         data = r.json()
 
     version_str = data.get("name", "")
@@ -612,10 +704,10 @@ async def bag_get_canton_situation(
     Optimised for Schulamt / Kreisschulbehörde use cases.
     """
     if canton.upper() not in [c for c in CANTONS if c != "all"]:
-        return {
-            "error": f"Unknown canton '{canton}'.",
-            "valid_cantons": [c for c in CANTONS if c != "all"],
-        }
+        _fail(
+            f"Unknown canton '{canton}'. Valid cantons: "
+            + ", ".join(c for c in CANTONS if c != "all")
+        )
 
     canton_up = canton.upper()
     results: dict[str, Any] = {"canton": canton_up, "diseases": {}}
@@ -632,9 +724,13 @@ async def bag_get_canton_situation(
         school_relevant["wastewater_covid19"] = "wastewater_viral_load/NA/value/date"
 
     async def _fetch_series(name: str, series_id: str) -> tuple[str, Any]:
+        # This aggregates several independent series into one overview. A failure
+        # of a single series is reported inline as that series' status and never
+        # fails the whole overview (which would be the wrong granularity); the
+        # tool call itself still succeeds. Raw causes are logged server-side.
         parts = series_id.split("/")
         if len(parts) != 4:
-            return name, {"error": "Invalid series_id"}
+            return name, {"status": "unavailable"}
         topic, chapter, aggregation, temporality = parts
 
         is_yearly = "year" in temporality
@@ -645,7 +741,7 @@ async def bag_get_canton_situation(
                     f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}/details"
                 )
                 if dr.status_code != 200:
-                    return name, {"error": f"Series not found: {series_id}"}
+                    return name, {"status": "series_not_found"}
                 details = dr.json()
 
             props = details.get("properties", {})
@@ -674,7 +770,7 @@ async def bag_get_canton_situation(
                     json=body,
                 )
                 if r.status_code != 200:
-                    return name, {"error": f"Data fetch failed: {r.status_code}"}
+                    return name, {"status": "data_unavailable"}
                 data = r.json()
 
             values = data.get("values", {})
@@ -717,10 +813,11 @@ async def bag_get_canton_situation(
                     for p in recent if p.get("y") is not None
                 ],
             }
-        except Exception:
-            # Don't surface the raw exception string to the model — keep the
-            # message generic and stable per series.
-            return name, {"error": f"Could not retrieve data for '{name}'."}
+        except (httpx.HTTPError, KeyError, ValueError, TypeError) as exc:
+            # Don't surface the raw exception to the model — log it server-side
+            # and report a stable, generic per-series status (OBS-002).
+            logger.warning("canton_situation series '%s' failed: %r", name, exc)
+            return name, {"status": "unavailable"}
 
     import asyncio
     tasks = [_fetch_series(name, sid) for name, sid in school_relevant.items()]
