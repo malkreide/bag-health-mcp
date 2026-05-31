@@ -476,3 +476,90 @@ async def test_tools_reuse_pooled_client_under_lifespan():
         assert server._shared_client is pooled
         assert r1["total_topics"] > 0
         assert r2["topic"] == "influenza"
+
+
+# ---------------------------------------------------------------------------
+# SEC-021 / SEC-004: egress allow-list + HTTPS enforcement
+# ---------------------------------------------------------------------------
+
+def test_assert_egress_allows_idd_host():
+    """The configured BAG IDD host over HTTPS is permitted."""
+    from bag_health_mcp.server import _assert_egress_allowed
+
+    _assert_egress_allowed(httpx.URL("https://api.idd.bag.admin.ch/api/v1/data/version"))
+
+
+def test_assert_egress_blocks_other_host():
+    """Any host outside the allow-list is refused (SEC-021)."""
+    from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
+
+    with pytest.raises(EgressNotAllowed):
+        _assert_egress_allowed(httpx.URL("https://evil.example.com/steal"))
+
+
+def test_assert_egress_blocks_internal_ip():
+    """The cloud metadata endpoint (and any non-allow-listed IP) is refused."""
+    from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
+
+    with pytest.raises(EgressNotAllowed):
+        _assert_egress_allowed(httpx.URL("http://169.254.169.254/latest/meta-data"))
+
+
+def test_assert_egress_blocks_non_https_scheme():
+    """Plain HTTP to the allowed host is still refused (SEC-004 scheme enforce)."""
+    from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
+
+    with pytest.raises(EgressNotAllowed):
+        _assert_egress_allowed(httpx.URL("http://api.idd.bag.admin.ch/api/v1/data/version"))
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_redirect_to_internal_host_is_blocked_no_leak():
+    """A compromised-upstream 30x redirect to an internal host must be blocked
+    on the redirect hop and must not leak the internal response (SEC-004)."""
+    secret = "SECRET-METADATA-TOKEN"
+    respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
+        return_value=httpx.Response(302, headers={"location": "http://169.254.169.254/x"})
+    )
+    # Even if the attacker stands up a listener, the guard fires before this
+    # response can be consumed:
+    respx.get("http://169.254.169.254/x").mock(
+        return_value=httpx.Response(200, text=secret)
+    )
+
+    with pytest.raises(ToolError) as exc:
+        await bag_get_data_version(DataVersionInput())
+    assert secret not in str(exc.value)
+
+
+@pytest.mark.asyncio
+async def test_new_client_registers_egress_guard():
+    """The pooled client is built with the egress guard wired as a request hook
+    so every request (and redirect hop) is validated."""
+    from bag_health_mcp.server import _egress_guard, _new_client
+
+    client = _new_client()
+    try:
+        assert _egress_guard in client.event_hooks["request"]
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_canton_situation_degrades_on_egress_block_no_leak():
+    """If a per-series fetch hits a blocked redirect, that series fails closed
+    (status 'unavailable') instead of crashing the whole overview or leaking
+    the internal response (SEC-004/SEC-021 + OBS-002)."""
+    respx.get(url__regex=r".*/details$").mock(
+        return_value=httpx.Response(302, headers={"location": "http://169.254.169.254/x"})
+    )
+    respx.route().mock(return_value=httpx.Response(200, text="LEAK-MUST-NOT-APPEAR"))
+
+    result = await bag_get_canton_situation(canton="ZH")
+
+    assert result["canton"] == "ZH"
+    statuses = {k: v.get("status") for k, v in result["diseases"].items()}
+    assert all(s == "unavailable" for s in statuses.values())
+    assert "LEAK-MUST-NOT-APPEAR" not in repr(result)

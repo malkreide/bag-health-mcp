@@ -14,6 +14,7 @@ import sys
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack, asynccontextmanager
 from typing import Any, Literal, NoReturn
+from urllib.parse import urlsplit
 
 import httpx
 from mcp.server.fastmcp import FastMCP
@@ -28,6 +29,13 @@ from pydantic import BaseModel, Field
 IDD_BASE = "https://api.idd.bag.admin.ch"
 TIMEOUT = 30.0
 USER_AGENT = "bag-health-mcp/0.1.0 (https://github.com/malkreide/bag-health-mcp)"
+
+# Code-layer egress allow-list (SEC-021): the only host this server may ever
+# talk to is the BAG IDD API, derived from IDD_BASE so there is a single source
+# of truth. Enforced on every outbound request — including redirect hops — by
+# the egress guard below, and only over HTTPS (SEC-004 scheme enforcement).
+ALLOWED_HOSTS = frozenset({urlsplit(IDD_BASE).hostname or ""})
+ALLOWED_SCHEMES = frozenset({"https"})
 
 # Logs go to stderr (stdout is reserved for the stdio JSON-RPC channel).
 logger = logging.getLogger("bag_health_mcp")
@@ -55,6 +63,37 @@ CANTONS = [
 _shared_client: httpx.AsyncClient | None = None
 
 
+class EgressNotAllowed(Exception):
+    """Raised when an outbound request targets a non-allow-listed host/scheme.
+
+    Carries only safe, non-sensitive text; the offending URL is logged
+    server-side by the guard, never surfaced to the model (OBS-002).
+    """
+
+
+def _assert_egress_allowed(url: httpx.URL) -> None:
+    """Enforce the egress allow-list + HTTPS on a single URL (SEC-021/SEC-004).
+
+    Rejects any scheme other than https and any host outside ALLOWED_HOSTS.
+    Raises :class:`EgressNotAllowed`; the raw URL is logged, not returned.
+    """
+    if url.scheme not in ALLOWED_SCHEMES or url.host not in ALLOWED_HOSTS:
+        logger.warning("blocked egress to disallowed target: %s", url)
+        raise EgressNotAllowed(
+            f"refused to contact a non-allow-listed endpoint ({url.scheme} host); "
+            "this server may only reach the BAG IDD API"
+        )
+
+
+async def _egress_guard(request: httpx.Request) -> None:
+    """httpx request event-hook: validate every hop, including redirects.
+
+    Registered on the client so it fires for the initial request *and* each
+    redirect target, closing the follow_redirects bypass flagged by SEC-004.
+    """
+    _assert_egress_allowed(request.url)
+
+
 def _new_client() -> httpx.AsyncClient:
     return httpx.AsyncClient(
         base_url=IDD_BASE,
@@ -63,7 +102,11 @@ def _new_client() -> httpx.AsyncClient:
             "User-Agent": USER_AGENT,
             "Accept": "application/json",
         },
+        # Redirects stay enabled for legitimate same-host hops, but every hop is
+        # re-validated by the egress guard, so a redirect to an internal host
+        # can no longer be followed (SEC-004 / SEC-021).
         follow_redirects=True,
+        event_hooks={"request": [_egress_guard]},
     )
 
 
@@ -179,6 +222,8 @@ async def _get(
     """
     try:
         r = await client.get(url)
+    except EgressNotAllowed as exc:
+        _fail(f"Request blocked: {exc}.")
     except httpx.HTTPError as exc:
         _fail(
             f"Could not reach the BAG IDD API while {context}. "
@@ -201,6 +246,8 @@ async def _post(
     """
     try:
         return await client.post(url, json=json)
+    except EgressNotAllowed as exc:
+        _fail(f"Request blocked: {exc}.")
     except httpx.HTTPError as exc:
         _fail(
             f"Could not reach the BAG IDD API while {context}. "
@@ -871,9 +918,10 @@ async def bag_get_canton_situation(
                     for p in recent if p.get("y") is not None
                 ],
             }
-        except (httpx.HTTPError, KeyError, ValueError, TypeError) as exc:
+        except (EgressNotAllowed, httpx.HTTPError, KeyError, ValueError, TypeError) as exc:
             # Don't surface the raw exception to the model — log it server-side
-            # and report a stable, generic per-series status (OBS-002).
+            # and report a stable, generic per-series status (OBS-002). An egress
+            # block fails this series closed; the guard already logged the target.
             logger.warning("canton_situation series '%s' failed: %r", name, exc)
             return name, {"status": "unavailable"}
 

@@ -1,0 +1,50 @@
+# Network-layer egress control for bag-health-mcp (audit SEC-021).
+#
+# Defense-in-depth companion to the code-layer egress allow-list enforced in
+# src/bag_health_mcp/server.py (_assert_egress_allowed): the server may only
+# contact the BAG IDD API, over HTTPS. Kubernetes NetworkPolicies match on
+# IP/port, not hostname, so this policy restricts egress to DNS + HTTPS while
+# the code layer pins the exact host. Together they bound what a compromised
+# process can reach.
+#
+# Apply with: kubectl apply -f deploy/networkpolicy.yaml
+# Requires a CNI that enforces NetworkPolicy (Calico, Cilium, etc.).
+# Adjust the podSelector label to match your Deployment.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bag-health-mcp-egress
+  labels:
+    app.kubernetes.io/name: bag-health-mcp
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: bag-health-mcp
+  policyTypes:
+    - Egress
+  egress:
+    # Allow DNS resolution (UDP and TCP 53) to in-cluster resolvers.
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - protocol: UDP
+          port: 53
+        - protocol: TCP
+          port: 53
+    # Allow outbound HTTPS only. The exact destination host (the BAG IDD API)
+    # is enforced at the code layer; this caps the network surface to 443 and
+    # blocks plaintext egress and link-local / metadata endpoints reached over
+    # other ports.
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except:
+              # Block egress to private and link-local ranges (e.g. cloud
+              # metadata at 169.254.169.254) as a network-layer SSRF backstop.
+              - 10.0.0.0/8
+              - 172.16.0.0/12
+              - 192.168.0.0/16
+              - 169.254.0.0/16
+      ports:
+        - protocol: TCP
+          port: 443
