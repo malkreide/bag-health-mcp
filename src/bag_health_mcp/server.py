@@ -8,8 +8,11 @@ No authentication required. All data is public.
 
 from __future__ import annotations
 
+import asyncio
+import ipaddress
 import logging
 import os
+import socket
 import sys
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack, asynccontextmanager
@@ -71,11 +74,47 @@ class EgressNotAllowed(Exception):
     """
 
 
-def _assert_egress_allowed(url: httpx.URL) -> None:
-    """Enforce the egress allow-list + HTTPS on a single URL (SEC-021/SEC-004).
+def _is_disallowed_ip(ip: ipaddress.IPv4Address | ipaddress.IPv6Address) -> bool:
+    """True if an IP must never be contacted (SSRF blocklist, SEC-004).
 
-    Rejects any scheme other than https and any host outside ALLOWED_HOSTS.
-    Raises :class:`EgressNotAllowed`; the raw URL is logged, not returned.
+    Blocks private, loopback, link-local (incl. the 169.254.169.254 cloud
+    metadata endpoint), reserved, multicast and unspecified addresses — every
+    range that should be unreachable from a server that only talks to a public
+    API.
+    """
+    return (
+        ip.is_private
+        or ip.is_loopback
+        or ip.is_link_local
+        or ip.is_reserved
+        or ip.is_multicast
+        or ip.is_unspecified
+    )
+
+
+async def _resolve_host(host: str) -> list[str]:
+    """Resolve ``host`` to its IP addresses (overridable in tests).
+
+    Pulled out as a module-level function so unit tests can substitute a stub
+    and avoid real DNS. A literal IP resolves to itself without a lookup.
+    """
+    loop = asyncio.get_running_loop()
+    infos = await loop.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
+    return [info[4][0] for info in infos]
+
+
+async def _assert_egress_allowed(url: httpx.URL) -> None:
+    """Enforce the egress allow-list, HTTPS, and IP blocklist on a URL.
+
+    Three layers (SEC-021 / SEC-004):
+      1. scheme must be https;
+      2. host must be in ALLOWED_HOSTS;
+      3. the host must resolve only to public IPs — if DNS returns a private,
+         loopback, link-local (e.g. cloud metadata), reserved, multicast or
+         unspecified address, the request is refused. This covers the case the
+         host-name allow-list alone cannot: an allowed host that resolves (or is
+         rebound) to an internal address.
+    Raises :class:`EgressNotAllowed`; the raw URL/IPs are logged, not returned.
     """
     if url.scheme not in ALLOWED_SCHEMES or url.host not in ALLOWED_HOSTS:
         logger.warning("blocked egress to disallowed target: %s", url)
@@ -84,14 +123,39 @@ def _assert_egress_allowed(url: httpx.URL) -> None:
             "this server may only reach the BAG IDD API"
         )
 
+    host = url.host
+    try:
+        addresses = await _resolve_host(host)
+    except OSError as exc:
+        logger.warning("egress DNS resolution failed for %s: %r", host, exc)
+        raise EgressNotAllowed(
+            "could not resolve the BAG IDD API host; refusing the request"
+        ) from exc
+
+    for addr in addresses:
+        try:
+            ip = ipaddress.ip_address(addr.split("%", 1)[0])  # strip IPv6 zone id
+        except ValueError:
+            logger.warning("egress: unparseable resolved address %r for %s", addr, host)
+            raise EgressNotAllowed("host resolved to an unparseable address; refused")
+        if _is_disallowed_ip(ip):
+            logger.warning(
+                "blocked egress: host %s resolved to disallowed IP %s", host, ip
+            )
+            raise EgressNotAllowed(
+                "the target host resolved to a non-public address; refused as a "
+                "possible SSRF attempt"
+            )
+
 
 async def _egress_guard(request: httpx.Request) -> None:
     """httpx request event-hook: validate every hop, including redirects.
 
     Registered on the client so it fires for the initial request *and* each
     redirect target, closing the follow_redirects bypass flagged by SEC-004.
+    Validates scheme, host allow-list, and resolved IP blocklist.
     """
-    _assert_egress_allowed(request.url)
+    await _assert_egress_allowed(request.url)
 
 
 def _new_client() -> httpx.AsyncClient:
@@ -925,7 +989,6 @@ async def bag_get_canton_situation(
             logger.warning("canton_situation series '%s' failed: %r", name, exc)
             return name, {"status": "unavailable"}
 
-    import asyncio
     tasks = [_fetch_series(name, sid) for name, sid in school_relevant.items()]
     fetched = await asyncio.gather(*tasks)
 
