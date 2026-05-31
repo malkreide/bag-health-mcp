@@ -1,13 +1,13 @@
 {
   "algorithm": "sha256",
   "tools": {
-    "bag_download_export": "5faea66714a4f78064c69aedc05d45148fb5838a511b5cfd22663d2c5681d1fc",
-    "bag_get_canton_situation": "cc636a3b734a87bf46f7c542fcccae524a01089e370e2a0e5e365550e08bbfcd",
-    "bag_get_data_version": "657be7231cf217c45f1588c30fbfe377e7002e7b5ea750777e4bd04a32c59443",
-    "bag_get_disease_data": "21738ff8a24a2485b251b2e8fea256c216474b20be34c9d3e3ec39e684b0b0e4",
-    "bag_get_series_details": "47b86d154028caa44ee4c1594982c6bc4ecc26188ac9eb96e3cbef4c83cb6f6d",
-    "bag_list_diseases": "2d28813b0d3efe9a95dda94cbfabe1cf92aa693bb258fe8b77e7ea3d06ce5ae2",
-    "bag_list_export_files": "372ec2d116b025aa0230aefd00f712d6ebf991f4de80bc640a151f2eccd4e069",
-    "bag_list_series": "93aabc362e869fb075b754da5bf48818689f5971af36de37a9600ea44af4259f"
+    "bag_health_mcp__download_export": "6317b4c45403fdaa36333ab0ac082f141e5b22be912f9a1e9f70779c2d6390dd",
+    "bag_health_mcp__get_canton_situation": "febc4225cdef1019d6eb79ed87823b7ce94bafe334081f18484840af01233ca8",
+    "bag_health_mcp__get_data_version": "907ae6beaa4b4e38c69d8cac64094a44400e28ecd5406785d42b06f5a2388b13",
+    "bag_health_mcp__get_disease_data": "bc62ff4e955a24df1bbf99aff9529a4e9b996d104b63253529cd084f0d4cfdad",
+    "bag_health_mcp__get_series_details": "c7d41efa9c4d84e564f2e91a68a3084ffa58b13749b668e44f70fd6f9be1bf00",
+    "bag_health_mcp__list_diseases": "c927ae355fbd08cd33962db54e22fad4093220a74bf747ff2603de041f63db68",
+    "bag_health_mcp__list_export_files": "19f030929a8a873dcfd2789412c010c7ba1064f2bb9b443e5da305419fa2c1c2",
+    "bag_health_mcp__list_series": "914bb949d3774be4c2b26b7648a16e14bf536a0228682598c4a2bb08f2369296"
   }
 }

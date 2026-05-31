@@ -7,19 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **BREAKING — tool namespace (SEC-022 #1):** all 8 tools are renamed from the
+  `bag_*` prefix to the server-identity `bag_health_mcp__*` double-underscore
+  format, preventing cross-server tool shadowing. Update client configurations
+  that reference the old names:
+  - `bag_list_diseases` → `bag_health_mcp__list_diseases`
+  - `bag_list_series` → `bag_health_mcp__list_series`
+  - `bag_get_series_details` → `bag_health_mcp__get_series_details`
+  - `bag_get_disease_data` → `bag_health_mcp__get_disease_data`
+  - `bag_get_canton_situation` → `bag_health_mcp__get_canton_situation`
+  - `bag_list_export_files` → `bag_health_mcp__list_export_files`
+  - `bag_download_export` → `bag_health_mcp__download_export`
+  - `bag_get_data_version` → `bag_health_mcp__get_data_version`
+
 ### Added
 - **Tool-definition hash pinning (SEC-022, rug-pull guard):** each tool's
   contract (name + description + input/output schema) is SHA-256-hashed and
   pinned in [`tool-hashes.json`](tool-hashes.json); CI fails on unacknowledged
   drift. Current truncated hashes (full values in the snapshot):
-  - `bag_download_export`: `5faea66714a4f780…`
-  - `bag_get_canton_situation`: `cc636a3b734a87bf…`
-  - `bag_get_data_version`: `657be7231cf217c4…`
-  - `bag_get_disease_data`: `21738ff8a24a2485…`
-  - `bag_get_series_details`: `47b86d154028caa4…`
-  - `bag_list_diseases`: `2d28813b0d3efe9a…`
-  - `bag_list_export_files`: `372ec2d116b025aa…`
-  - `bag_list_series`: `93aabc362e869fb0…`
+  - `bag_health_mcp__download_export`: `6317b4c45403fdaa…`
+  - `bag_health_mcp__get_canton_situation`: `febc4225cdef1019…`
+  - `bag_health_mcp__get_data_version`: `907ae6beaa4b4e38…`
+  - `bag_health_mcp__get_disease_data`: `bc62ff4e955a24df…`
+  - `bag_health_mcp__get_series_details`: `c7d41efa9c4d84e5…`
+  - `bag_health_mcp__list_diseases`: `c927ae355fbd08cd…`
+  - `bag_health_mcp__list_export_files`: `19f030929a8a873d…`
+  - `bag_health_mcp__list_series`: `914bb949d3774be4…`
 
   Regenerate after an intentional tool change with
   `python scripts/tool_hashes.py --write`.
