@@ -1577,3 +1577,39 @@ async def test_tool_descriptions_have_usecase_tags():
     assert len(tagged) / len(tools) >= 0.8
     # In practice all 8 are tagged.
     assert len(tagged) == len(tools)
+
+
+# ---------------------------------------------------------------------------
+# ARCH-003: fuzzy "did you mean" suggestions on not-found
+# ---------------------------------------------------------------------------
+
+def test_suggest_close_matches_and_substrings():
+    """_suggest returns typo-close and substring/prefix candidates, capped."""
+    from bag_health_mcp.server import _suggest
+
+    cands = ["influenza", "influenza-like_illness", "covid19",
+             "hepatitis_a", "hepatitis_b", "hepatitis_c"]
+    assert _suggest("influenzaa", cands)[0] == "influenza"        # typo
+    assert set(_suggest("hepatitis", cands)) == {                 # prefix → all three
+        "hepatitis_a", "hepatitis_b", "hepatitis_c"}
+    assert _suggest("zzz-nothing", cands) == []                   # no match
+    assert len(_suggest("hepatitis", cands, n=2)) == 2            # capped
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_unknown_topic_error_suggests_alternatives():
+    """An unknown topic raises ToolError whose message includes a 'Did you
+    mean' suggestion from the real topic list (ARCH-003)."""
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
+        return_value=httpx.Response(200, json=MOCK_SETS)
+    )
+    with pytest.raises(ToolError) as exc:
+        # 'influenz' is a near-miss for the real 'influenza' topic
+        await bag_list_series(DataSetsInput(topic="influenz"))
+    msg = str(exc.value)
+    assert "not found" in msg
+    assert "Did you mean" in msg
+    assert "influenza" in msg
+    # Still keeps the actionable hint (and the OBS-001 isError contract via raise).
+    assert "bag_list_diseases" in msg
