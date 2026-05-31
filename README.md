@@ -15,17 +15,17 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 
 ```
 "Wie ist die aktuelle Grippesituation im Kanton Zürich verglichen mit den letzten Wochen?"
-→ bag_get_canton_situation(canton="ZH")
+→ bag_health_mcp__get_canton_situation(canton="ZH")
 
 "Gibt es aktuell einen Masernausbruch in der Schweiz?"
-→ bag_get_disease_data(series_id="measles/cases/incValue/year", canton="all")
+→ bag_health_mcp__get_disease_data(series_id="measles/cases/incValue/year", canton="all")
 
 "Wie entwickelt sich das SARS-CoV-2-Signal im Abwasser?"
-→ bag_list_series(topic="wastewater_viral_load")
-→ bag_get_disease_data(series_id="wastewater_viral_load/NA/value/date", ...)
+→ bag_health_mcp__list_series(topic="wastewater_viral_load")
+→ bag_health_mcp__get_disease_data(series_id="wastewater_viral_load/NA/value/date", ...)
 
 "Welche Krankheitsdaten stellt das BAG aktuell bereit?"
-→ bag_list_diseases()
+→ bag_health_mcp__list_diseases()
 → More use cases by audience →
 ```
 
@@ -35,14 +35,14 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 
 | Tool | Description |
 |------|-------------|
-| `bag_list_diseases` | List all 51 disease topics, grouped by category |
-| `bag_list_series` | List data series for a specific disease |
-| `bag_get_series_details` | Get available filter dimensions (canton, age, sex) |
-| `bag_get_disease_data` | Fetch time-series surveillance data |
-| `bag_get_canton_situation` | Situational overview for a canton (Schulamt use case) |
-| `bag_list_export_files` | List available complete export datasets |
-| `bag_download_export` | Download raw CSV/JSON export |
-| `bag_get_data_version` | Current data version (updated every Wednesday) |
+| `bag_health_mcp__list_diseases` | List all 51 disease topics, grouped by category |
+| `bag_health_mcp__list_series` | List data series for a specific disease |
+| `bag_health_mcp__get_series_details` | Get available filter dimensions (canton, age, sex) |
+| `bag_health_mcp__get_disease_data` | Fetch time-series surveillance data |
+| `bag_health_mcp__get_canton_situation` | Situational overview for a canton (Schulamt use case) |
+| `bag_health_mcp__list_export_files` | List available complete export datasets |
+| `bag_health_mcp__download_export` | Download raw CSV/JSON export |
+| `bag_health_mcp__get_data_version` | Current data version (updated every Wednesday) |
 
 ### Tool annotations
 
@@ -236,7 +236,7 @@ class — never tool arguments, cantons or surveillance data.
 - **Beta API**: IDD API is labelled `v0.1 beta` — schema may change without notice
 - **Weekly cadence**: Data is not real-time; updated Wednesdays only
 - **Canton granularity**: Some rare diseases have insufficient cases for canton-level data (suppressed for privacy)
-- **Age groups**: Available dimensions vary by disease series; use `bag_get_series_details` to check
+- **Age groups**: Available dimensions vary by disease series; use `bag_health_mcp__get_series_details` to check
 
 ---
 
@@ -251,7 +251,7 @@ class — never tool arguments, cantons or surveillance data.
   (public OGD, no personal data, aggregated at canton level with small cells
   suppressed at source). Draft scheme + aggregation-risk note in
   [`docs/datenklassifikation-schulamt.md`](docs/datenklassifikation-schulamt.md);
-  the aggregating `bag_get_canton_situation` tool surfaces this in its response.
+  the aggregating `bag_health_mcp__get_canton_situation` tool surfaces this in its response.
 - **Security posture:** lethal-trifecta assessment (the server is strictly
   read-only → not affected), secret-management decision (no secrets — public
   data), and network-exposure notes are in

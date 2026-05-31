@@ -13,7 +13,7 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 
 ```
 "Wie ist die aktuelle Grippesituation im Kanton Zürich?"
-→ bag_get_canton_situation(canton="ZH")
+→ bag_health_mcp__get_canton_situation(canton="ZH")
 → Weitere Anwendungsbeispiele nach Zielgruppe →
 ```
 
@@ -40,14 +40,14 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 
 | Tool | Beschreibung |
 |------|-------------|
-| `bag_list_diseases` | Alle 51 Krankheitsthemen auflisten |
-| `bag_list_series` | Datenserien für ein Thema anzeigen |
-| `bag_get_series_details` | Verfügbare Filter (Kanton, Alter, Geschlecht) |
-| `bag_get_disease_data` | Zeitreihen-Daten abrufen |
-| `bag_get_canton_situation` | Lageübersicht für einen Kanton |
-| `bag_list_export_files` | Exportdateien auflisten |
-| `bag_download_export` | CSV/JSON-Export herunterladen |
-| `bag_get_data_version` | Aktueller Datenstand (jeweils Mittwoch) |
+| `bag_health_mcp__list_diseases` | Alle 51 Krankheitsthemen auflisten |
+| `bag_health_mcp__list_series` | Datenserien für ein Thema anzeigen |
+| `bag_health_mcp__get_series_details` | Verfügbare Filter (Kanton, Alter, Geschlecht) |
+| `bag_health_mcp__get_disease_data` | Zeitreihen-Daten abrufen |
+| `bag_health_mcp__get_canton_situation` | Lageübersicht für einen Kanton |
+| `bag_health_mcp__list_export_files` | Exportdateien auflisten |
+| `bag_health_mcp__download_export` | CSV/JSON-Export herunterladen |
+| `bag_health_mcp__get_data_version` | Aktueller Datenstand (jeweils Mittwoch) |
 
 ---
 
@@ -104,7 +104,7 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 - **Beta-API**: Das IDD-API ist als `v0.1 beta` gekennzeichnet — Schema kann sich ohne Vorankündigung ändern
 - **Wöchentlicher Rhythmus**: Keine Echtzeit-Daten; Aktualisierung jeweils mittwochs
 - **Kantonsebene**: Bei seltenen Krankheiten werden Daten aus Datenschutzgründen unterdrückt
-- **Altersgruppen**: Verfügbare Dimensionen variieren je nach Datenserie — `bag_get_series_details` verwenden
+- **Altersgruppen**: Verfügbare Dimensionen variieren je nach Datenserie — `bag_health_mcp__get_series_details` verwenden
 
 ## 🧭 Phasenarchitektur & Compliance
 

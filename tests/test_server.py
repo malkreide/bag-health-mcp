@@ -128,7 +128,7 @@ async def test_bag_list_series_not_found():
     # Unknown topic is an execution error: raised as ToolError -> isError:true.
     with pytest.raises(ToolError) as exc:
         await bag_list_series(DataSetsInput(topic="unknown_disease"))
-    assert "bag_list_diseases" in str(exc.value)
+    assert "bag_health_mcp__list_diseases" in str(exc.value)
 
 
 @pytest.mark.asyncio
@@ -431,7 +431,7 @@ async def test_execution_error_surfaces_as_tool_result_iserror():
 
     async with connect(mcp._mcp_server) as client:
         result = await client.call_tool(
-            "bag_get_disease_data",
+            "bag_health_mcp__get_disease_data",
             {"params": {"series_id": "influenza/cases/incValue/iso_week", "canton": "ZH"}},
         )
 
@@ -458,12 +458,12 @@ async def test_not_found_surfaces_as_tool_result_iserror():
 
     async with connect(mcp._mcp_server) as client:
         result = await client.call_tool(
-            "bag_list_series", {"params": {"topic": "unknown_disease"}}
+            "bag_health_mcp__list_series", {"params": {"topic": "unknown_disease"}}
         )
 
     assert result.isError is True
     text = " ".join(getattr(c, "text", "") for c in result.content)
-    assert "bag_list_diseases" in text
+    assert "bag_health_mcp__list_diseases" in text
 
 
 @pytest.mark.asyncio
@@ -479,7 +479,7 @@ async def test_schema_invalid_params_are_protocol_errors():
 
     async with connect(mcp._mcp_server) as client:
         result = await client.call_tool(
-            "bag_get_disease_data",
+            "bag_health_mcp__get_disease_data",
             {"params": {"series_id": "influenza/cases/incValue/iso_week",
                         "canton": "NOT_A_CANTON"}},
         )
@@ -507,7 +507,7 @@ async def test_successful_call_is_not_iserror():
 
     async with connect(mcp._mcp_server) as client:
         result = await client.call_tool(
-            "bag_get_disease_data",
+            "bag_health_mcp__get_disease_data",
             {"params": {"series_id": "influenza/cases/incValue/iso_week", "canton": "ZH"}},
         )
 
@@ -914,7 +914,7 @@ async def test_input_schema_advertises_constraints():
     from bag_health_mcp.server import mcp
 
     tools = {t.name: t for t in await mcp.list_tools()}
-    blob = json.dumps(tools["bag_get_disease_data"].inputSchema)
+    blob = json.dumps(tools["bag_health_mcp__get_disease_data"].inputSchema)
     assert "pattern" in blob
     assert "maxLength" in blob
     assert '"additionalProperties": false' in blob
@@ -1102,7 +1102,7 @@ async def test_call_through_client_yields_structured_content():
         return_value=httpx.Response(200, json={"name": "20260325"})
     )
     async with connect(mcp._mcp_server) as client:
-        result = await client.call_tool("bag_get_data_version", {"params": {}})
+        result = await client.call_tool("bag_health_mcp__get_data_version", {"params": {}})
 
     assert result.isError is False
     assert result.structuredContent is not None
@@ -1239,10 +1239,10 @@ async def test_prompts_render_with_arguments():
 
     brief_text = brief.messages[0].content.text
     assert "BE" in brief_text
-    assert "bag_get_canton_situation" in brief_text
+    assert "bag_health_mcp__get_canton_situation" in brief_text
     outbreak_text = outbreak.messages[0].content.text
     assert "measles" in outbreak_text
-    assert "bag_get_disease_data" in outbreak_text
+    assert "bag_health_mcp__get_disease_data" in outbreak_text
 
 
 def test_disease_categories_taxonomy_is_source_of_truth():
@@ -1290,7 +1290,7 @@ def test_context_param_not_in_input_schema():
     tools = asyncio.get_event_loop().run_until_complete(_get()) if False else None
     # Use a fresh loop run to avoid interfering with pytest-asyncio.
     tools = asyncio.run(_get())
-    for name in ("bag_get_disease_data", "bag_get_canton_situation"):
+    for name in ("bag_health_mcp__get_disease_data", "bag_health_mcp__get_canton_situation"):
         blob = json.dumps(tools[name].inputSchema)
         assert '"ctx"' not in blob
         assert "Context" not in blob
@@ -1423,6 +1423,8 @@ async def test_tool_emits_span_with_no_pii(otel_exporter):
         DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
     )
 
+    # The span name derives from the Python function name (fn.__name__), which
+    # is unchanged by the advertised-name rename (SEC-022 #1).
     spans = [s for s in otel_exporter.get_finished_spans()
              if s.name == "tool/bag_get_disease_data"]
     assert len(spans) == 1
@@ -1612,7 +1614,7 @@ async def test_unknown_topic_error_suggests_alternatives():
     assert "Did you mean" in msg
     assert "influenza" in msg
     # Still keeps the actionable hint (and the OBS-001 isError contract via raise).
-    assert "bag_list_diseases" in msg
+    assert "bag_health_mcp__list_diseases" in msg
 
 
 # ---------------------------------------------------------------------------
