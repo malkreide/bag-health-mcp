@@ -172,6 +172,27 @@ async def test_bag_get_disease_data_zh():
 
 @pytest.mark.asyncio
 @respx.mock
+async def test_disease_data_api_error_does_not_leak_body():
+    """On an upstream error, the raw response body must not reach the model
+    (OBS-002): only the status code and a generic hint are returned."""
+    secret_body = "INTERNAL-STACKTRACE secret upstream detail 0xDEADBEEF"
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(500, text=secret_body))
+
+    result = await bag_get_disease_data(
+        DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
+    )
+    assert result["error"] == "API error 500"
+    assert "detail" not in result
+    assert secret_body not in repr(result)
+
+
+@pytest.mark.asyncio
+@respx.mock
 async def test_bag_get_data_version():
     respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
         return_value=httpx.Response(200, json={"name": "20260325"})
@@ -239,6 +260,22 @@ async def test_live_canton_situation():
 # ---------------------------------------------------------------------------
 # Unit: entry point / transport selection
 # ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_all_tools_declare_readonly_annotations():
+    """Every tool is read-only, idempotent and open-world (ARCH-009)."""
+    from bag_health_mcp.server import mcp
+
+    tools = await mcp.list_tools()
+    assert len(tools) == 8
+    for t in tools:
+        ann = t.annotations
+        assert ann is not None, f"{t.name} has no annotations"
+        assert ann.readOnlyHint is True, t.name
+        assert ann.destructiveHint is False, t.name
+        assert ann.idempotentHint is True, t.name
+        assert ann.openWorldHint is True, t.name
+
 
 def test_main_stdio_default(monkeypatch):
     """Without --http, main() runs the default stdio transport."""
