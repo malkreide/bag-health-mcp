@@ -9,6 +9,7 @@ No authentication required. All data is public.
 from __future__ import annotations
 
 import asyncio
+import difflib
 import ipaddress
 import json
 import logging
@@ -605,6 +606,48 @@ def _fail(message: str, *, detail: str | None = None) -> NoReturn:
     raise ToolError(message)
 
 
+def _suggest(query: str, candidates: list[str], *, n: int = 3) -> list[str]:
+    """Return up to ``n`` candidates closest to ``query`` (ARCH-003).
+
+    Turns an empty/not-found result into an actionable heuristic ("did you
+    mean …") instead of a dead end. Matching is case-insensitive and also
+    catches substring/prefix overlaps that ``difflib`` alone can miss (e.g. a
+    user passing a parent topic that prefixes several real slugs).
+    """
+    if not query or not candidates:
+        return []
+    q = query.lower()
+    scored = difflib.get_close_matches(q, [c.lower() for c in candidates], n=n, cutoff=0.5)
+    lower_to_orig: dict[str, str] = {}
+    for c in candidates:  # keep first original spelling per lowercase key
+        lower_to_orig.setdefault(c.lower(), c)
+    out = [lower_to_orig[s] for s in scored if s in lower_to_orig]
+    # Add substring matches not already covered (stable order, capped at n).
+    for c in candidates:
+        if len(out) >= n:
+            break
+        if q in c.lower() and c not in out:
+            out.append(c)
+    return out[:n]
+
+
+def _fail_not_found(
+    label: str, query: str, candidates: list[str], hint: str
+) -> NoReturn:
+    """Raise a not-found ToolError enriched with fuzzy suggestions (ARCH-003).
+
+    Keeps the OBS-001 contract (not-found is an execution error → isError:true)
+    but, instead of a bare "not found", appends "Did you mean …" when close
+    matches exist, so the model can self-correct without a blind retry.
+    """
+    suggestions = _suggest(query, candidates)
+    msg = f"{label} '{query}' not found."
+    if suggestions:
+        msg += " Did you mean: " + ", ".join(suggestions) + "?"
+    msg += f" {hint}"
+    _fail(msg)
+
+
 def _ensure_ok(r: httpx.Response, *, context: str) -> None:
     """Raise a safe ToolError if an upstream response is not a 2xx success."""
     if r.is_success:
@@ -1045,9 +1088,10 @@ async def bag_list_series(params: DataSetsInput) -> ListSeriesOutput:
 
     topic_sets = [s for s in all_sets if s.startswith(f"{params.topic}/")]
     if not topic_sets:
-        _fail(
-            f"Topic '{params.topic}' not found. "
-            "Use bag_list_diseases to see valid topic slugs."
+        all_topics = sorted({s.split("/")[0] for s in all_sets})
+        _fail_not_found(
+            "Topic", params.topic, all_topics,
+            "Use bag_list_diseases to see valid topic slugs.",
         )
 
     # Parse structure
@@ -1101,9 +1145,12 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOut
             allow_404=True,
         )
         if r.status_code == 404:
-            _fail(
-                f"Series '{params.series_id}' not found. "
-                "Use bag_list_series(topic=...) to discover valid series."
+            # Suggest real series for this topic instead of a dead end (ARCH-003).
+            sets_r = await _get(c, "/api/v1/data/sets", context="listing series for suggestions")
+            topic_series = [s for s in sets_r.json() if s.startswith(f"{topic}/")]
+            _fail_not_found(
+                "Series", params.series_id, topic_series,
+                "Use bag_list_series(topic=...) to discover valid series.",
             )
         data = r.json()
 
@@ -1173,9 +1220,11 @@ async def bag_get_disease_data(
             allow_404=True,
         )
         if dr.status_code == 404:
-            _fail(
-                f"Series not found: {params.series_id}. "
-                "Use bag_list_series to find valid series_ids."
+            sets_r = await _get(c, "/api/v1/data/sets", context="listing series for suggestions")
+            topic_series = [s for s in sets_r.json() if s.startswith(f"{topic}/")]
+            _fail_not_found(
+                "Series", params.series_id, topic_series,
+                "Use bag_list_series to find valid series_ids.",
             )
         details = dr.json()
 
