@@ -1178,3 +1178,124 @@ def test_disease_categories_taxonomy_is_source_of_truth():
     assert "influenza" in DISEASE_CATEGORIES["respiratory"]
     assert "measles" in DISEASE_CATEGORIES["vaccine_preventable"]
     assert "wastewater_surveillance" not in DISEASE_CATEGORIES  # matched by substring
+
+
+# ---------------------------------------------------------------------------
+# SDK-003: Context injection (progress + structured logging)
+# ---------------------------------------------------------------------------
+
+class _RecordingCtx:
+    """Minimal stand-in for FastMCP Context capturing log/progress calls."""
+
+    def __init__(self):
+        self.infos: list[str] = []
+        self.warnings: list[str] = []
+        self.progress: list[tuple[float, float | None]] = []
+
+    async def info(self, message, **extra):
+        self.infos.append(message)
+
+    async def warning(self, message, **extra):
+        self.warnings.append(message)
+
+    async def report_progress(self, progress, total=None, message=None):
+        self.progress.append((progress, total))
+
+
+def test_context_param_not_in_input_schema():
+    """The injected ctx must not appear as a tool argument (SDK-003)."""
+    import asyncio
+    import json
+
+    from bag_health_mcp.server import mcp
+
+    async def _get():
+        return {t.name: t for t in await mcp.list_tools()}
+
+    tools = asyncio.get_event_loop().run_until_complete(_get()) if False else None
+    # Use a fresh loop run to avoid interfering with pytest-asyncio.
+    tools = asyncio.run(_get())
+    for name in ("bag_get_disease_data", "bag_get_canton_situation"):
+        blob = json.dumps(tools[name].inputSchema)
+        assert '"ctx"' not in blob
+        assert "Context" not in blob
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_disease_data_reports_progress_and_logs():
+    """bag_get_disease_data emits info logs and 0→1→2 progress via Context."""
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+
+    ctx = _RecordingCtx()
+    result = await bag_get_disease_data(
+        DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH"),
+        ctx=ctx,
+    )
+    assert result.topic == "influenza"
+    assert len(ctx.infos) >= 2
+    assert ctx.progress[0] == (0, 2)
+    assert ctx.progress[-1] == (2, 2)
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_canton_situation_reports_progress_per_series():
+    """The fan-out reports progress as each series completes (SDK-003)."""
+    respx.get(url__regex=r".*/details$").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(url__regex=r"/api/v1/data/[^/]+/[^/]+/[^/]+/[^/]+$").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
+
+    ctx = _RecordingCtx()
+    result = await bag_get_canton_situation(canton="ZH", ctx=ctx)
+    n = len(result.diseases)
+    assert n >= 5
+    # One progress event per completed series, ending at n/n.
+    assert ctx.progress[-1] == (n, n)
+    assert len(ctx.progress) == n
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_canton_situation_warns_client_on_degraded_series():
+    """A blocked/failed series is reported to the client via ctx.warning, and
+    still degrades closed without leaking (SDK-003 + OBS-002)."""
+    respx.get(url__regex=r".*/details$").mock(
+        return_value=httpx.Response(302, headers={"location": "http://169.254.169.254/x"})
+    )
+    respx.get("http://169.254.169.254/x").mock(
+        return_value=httpx.Response(200, text="LEAK-MUST-NOT-APPEAR")
+    )
+
+    ctx = _RecordingCtx()
+    result = await bag_get_canton_situation(canton="ZH", ctx=ctx)
+    assert len(ctx.warnings) == len(result.diseases)
+    assert all(isinstance(v, CantonDiseaseStatus) and v.status == "unavailable"
+               for v in result.diseases.values())
+    assert "LEAK-MUST-NOT-APPEAR" not in repr(result)
+    assert all("LEAK-MUST-NOT-APPEAR" not in w for w in ctx.warnings)
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_tools_still_work_without_context():
+    """ctx is optional: a direct call with no Context behaves as before."""
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+
+    result = await bag_get_disease_data(
+        DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
+    )
+    assert result.topic == "influenza"

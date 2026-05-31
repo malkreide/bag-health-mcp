@@ -23,7 +23,7 @@ from urllib.parse import urlsplit
 
 import httpcore
 import httpx
-from mcp.server.fastmcp import FastMCP
+from mcp.server.fastmcp import Context, FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
 from mcp.types import ToolAnnotations
 from pydantic import BaseModel, ConfigDict, Field
@@ -963,11 +963,19 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOut
     "Data updated every Wednesday. "
     "Example: Influenza incidence per 100k population in Zurich by week."
 ))
-async def bag_get_disease_data(params: DiseaseDataInput) -> DiseaseDataOutput:
+async def bag_get_disease_data(
+    params: DiseaseDataInput, ctx: Context | None = None
+) -> DiseaseDataOutput:
     parts = params.series_id.split("/")
     if len(parts) != 4:
         _fail("series_id must be 'topic/chapter/aggregation/temporality'.")
     topic, chapter, aggregation, temporality = parts
+
+    # This tool makes two round-trips (details, then data); surface progress and
+    # structured logging to the client when a Context is injected (SDK-003).
+    if ctx:
+        await ctx.info(f"Resolving filters for '{params.series_id}'")
+        await ctx.report_progress(progress=0, total=2)
 
     # Build filter body based on series details
     async with _client() as c:
@@ -1036,6 +1044,9 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> DiseaseDataOutput:
     group_by = "canton" if params.canton == "all" else None
 
     # Fetch data
+    if ctx:
+        await ctx.info(f"Fetching time series for '{params.series_id}'")
+        await ctx.report_progress(progress=1, total=2)
     async with _client() as c:
         url = f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}"
         if group_by:
@@ -1116,6 +1127,9 @@ async def bag_get_disease_data(params: DiseaseDataInput) -> DiseaseDataOutput:
                 trend=last.trend,
                 data_points_returned=len(matching.series),
             )
+
+    if ctx:
+        await ctx.report_progress(progress=2, total=2)
 
     return DiseaseDataOutput(
         series_id=params.series_id,
@@ -1236,6 +1250,7 @@ async def bag_get_data_version(params: DataVersionInput) -> DataVersionOutput:
 async def bag_get_canton_situation(
     canton: str = "ZH",
     include_wastewater: bool = False,
+    ctx: Context | None = None,
 ) -> CantonSituationOutput:
     """
     High-level situational awareness tool combining multiple series.
@@ -1359,12 +1374,30 @@ async def bag_get_canton_situation(
             # and report a stable, generic per-series status (OBS-002). An egress
             # block fails this series closed; the guard already logged the target.
             logger.warning("canton_situation series '%s' failed: %r", name, exc)
+            if ctx:
+                # Tell the client this series degraded (no raw cause — OBS-002).
+                await ctx.warning(f"Series '{name}' unavailable; continuing.")
             return name, CantonDiseaseStatus(status="unavailable")
 
-    tasks = [_fetch_series(name, sid) for name, sid in school_relevant.items()]
-    fetched = await asyncio.gather(*tasks)
-
-    diseases: dict[str, CantonDiseaseStatus | CantonDiseaseData] = dict(fetched)
+    # Fan out over the series, reporting progress as each completes. The overview
+    # makes 5+ (2 round-trips each) calls and can take a few seconds, so a
+    # long-running client gets incremental progress (SDK-003).
+    total = len(school_relevant)
+    if ctx:
+        await ctx.info(f"Building situation overview for canton {canton_up} "
+                       f"({total} series)")
+    tasks = [
+        asyncio.ensure_future(_fetch_series(name, sid))
+        for name, sid in school_relevant.items()
+    ]
+    diseases: dict[str, CantonDiseaseStatus | CantonDiseaseData] = {}
+    done = 0
+    for coro in asyncio.as_completed(tasks):
+        name, value = await coro
+        diseases[name] = value
+        done += 1
+        if ctx:
+            await ctx.report_progress(progress=done, total=total)
 
     return CantonSituationOutput(
         canton=canton_up,
