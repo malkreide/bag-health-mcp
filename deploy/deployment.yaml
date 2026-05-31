@@ -1,0 +1,93 @@
+# Reference Kubernetes manifests for bag-health-mcp over Streamable HTTP.
+#
+# These are adaptable templates, not a turnkey production config — review
+# resource sizing, replica count, image ref and ingress class for your cluster.
+# Companion files: networkpolicy.yaml (egress, SEC-021). See
+# docs/deployment-scaling.md for the rationale (SCALE-001/002/003/005/006).
+#
+# Apply: kubectl apply -f deploy/deployment.yaml
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bag-health-mcp
+  labels:
+    app.kubernetes.io/name: bag-health-mcp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: bag-health-mcp
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: bag-health-mcp
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: server
+          image: ghcr.io/malkreide/bag-health-mcp:latest  # TODO: pin a digest
+          ports:
+            - containerPort: 8000
+          env:
+            # SCALE-001: select transport via env, not a CLI flag.
+            - name: MCP_TRANSPORT
+              value: "http"
+            - name: MCP_HOST
+              value: "0.0.0.0"   # bind all interfaces inside the pod
+            - name: MCP_PORT
+              value: "8000"
+            - name: MCP_LOG_LEVEL
+              value: "INFO"
+            # Optional tracing (OBS-006): set an OTLP endpoint to enable.
+            # - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            #   value: "http://otel-collector:4318"
+          # SCALE-006: bound memory/CPU so one pod can't exhaust the node.
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          # Liveness/readiness: the HTTP port accepts connections.
+          readinessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bag-health-mcp
+  labels:
+    app.kubernetes.io/name: bag-health-mcp
+spec:
+  selector:
+    app.kubernetes.io/name: bag-health-mcp
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8000
+  # SCALE-002: pin a client to one pod for the life of its MCP session. This is
+  # client-IP affinity (works without LB cookie support); for Mcp-Session-Id
+  # header routing use an edge LB / Ingress instead (see docs/deployment-scaling.md).
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 3600

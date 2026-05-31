@@ -141,10 +141,16 @@ pip install bag-health-mcp
 python -m bag_health_mcp.server --http --port 8000
 ```
 
-Host and port can also be set via environment variables (`MCP_HOST`, `MCP_PORT`).
-The server binds to `127.0.0.1` by default so a local HTTP server is **not**
-exposed to the network. Container/cloud deployments bind all interfaces by
-setting `MCP_HOST=0.0.0.0` explicitly — the provided `Dockerfile` does this.
+Transport, host and port are set via environment variables — `MCP_TRANSPORT`
+(`http`/`stdio`), `MCP_HOST`, `MCP_PORT` — which is the recommended way for
+deployments (the `--http` flag still works for local use). The server binds to
+`127.0.0.1` by default so a local HTTP server is **not** exposed to the network.
+Container/cloud deployments bind all interfaces by setting `MCP_HOST=0.0.0.0`
+explicitly — the provided `Dockerfile` does this.
+
+For running at scale (session affinity, resource limits, MCP gateway), see the
+[deployment & scaling guide](docs/deployment-scaling.md) and the reference
+manifests in [`deploy/`](deploy/).
 
 **Logging:** the server emits structured JSON logs (one object per line, with an
 RFC 5424 severity) to **stderr** — stdout is reserved for the stdio JSON-RPC
