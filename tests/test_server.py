@@ -1613,3 +1613,30 @@ async def test_unknown_topic_error_suggests_alternatives():
     assert "influenza" in msg
     # Still keeps the actionable hint (and the OBS-001 isError contract via raise).
     assert "bag_list_diseases" in msg
+
+
+# ---------------------------------------------------------------------------
+# SEC-022: tool-definition hash snapshot (rug-pull guard)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_tool_hashes_match_snapshot():
+    """The committed tool-hashes.json matches the live tool definitions. If this
+    fails after an intentional tool change, regenerate with
+    `python scripts/tool_hashes.py --write` and commit the result (SEC-022)."""
+    import json
+    import pathlib
+
+    snapshot_path = pathlib.Path(__file__).resolve().parent.parent / "tool-hashes.json"
+    assert snapshot_path.exists(), "tool-hashes.json snapshot is missing"
+
+    import importlib.util
+
+    script = pathlib.Path(__file__).resolve().parent.parent / "scripts" / "tool_hashes.py"
+    spec = importlib.util.spec_from_file_location("tool_hashes", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    current = await mod.current_hashes()
+    expected = json.loads(snapshot_path.read_text())["tools"]
+    assert current == expected
