@@ -164,12 +164,20 @@ deployments (the `--http` flag still works for local use). The server binds to
 Container/cloud deployments bind all interfaces by setting `MCP_HOST=0.0.0.0`
 explicitly — the provided `Dockerfile` does this.
 
-> ⚠️ **Security:** HTTP transport exposes the server on the network and is
-> **unauthenticated** (it serves only public data). Only bind beyond
-> `127.0.0.1` in a **network-isolated** environment behind an authenticating
-> gateway — never expose it directly on a public/shared network. Binding to a
-> non-localhost host logs a warning at startup. The default stdio transport has
-> no network surface. See [`docs/security-posture.md`](docs/security-posture.md).
+> ⚠️ **Security:** HTTP transport exposes the server on the network. Only bind
+> beyond `127.0.0.1` in a **network-isolated** environment — never directly on a
+> public/shared network. Binding to a non-localhost host logs a warning at
+> startup. The default stdio transport has no network surface. See
+> [`docs/security-posture.md`](docs/security-posture.md).
+
+**HTTP auth (optional):** set `MCP_AUTH_TOKEN` to require
+`Authorization: Bearer <token>` on every HTTP request (401 otherwise). Unset =
+no auth (fine for stdio/local). This gates *who may invoke* the server; for real
+user identity, front it with a gateway.
+
+**CORS (browser clients):** set `MCP_CORS_ORIGINS` to a comma-separated origin
+allow-list to enable cross-origin browser access; the `Mcp-Session-Id` header is
+exposed so stateful sessions work. Empty = no cross-origin (never a wildcard).
 
 For running at scale (session affinity, resource limits, MCP gateway), see the
 [deployment & scaling guide](docs/deployment-scaling.md) and the reference
