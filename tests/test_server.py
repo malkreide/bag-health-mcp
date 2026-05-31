@@ -1088,3 +1088,93 @@ async def test_license_advertised_in_output_schema():
         blob = json.dumps(t.outputSchema)
         assert "license" in blob, f"{t.name} outputSchema lacks license"
         assert "attribution" in blob, f"{t.name} outputSchema lacks attribution"
+
+
+# ---------------------------------------------------------------------------
+# ARCH-008: all three MCP primitives (tools, resources, prompts)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_server_exposes_resources_and_prompts():
+    """The server uses all three primitives, not tools only (ARCH-008)."""
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import mcp
+
+    async with connect(mcp._mcp_server) as client:
+        tools = await client.list_tools()
+        resources = await client.list_resources()
+        prompts = await client.list_prompts()
+
+    assert len(tools.tools) == 8
+    uris = {str(r.uri) for r in resources.resources}
+    assert {
+        "bag://reference/cantons",
+        "bag://reference/disease-categories",
+        "bag://reference/data-licence",
+    } <= uris
+    names = {p.name for p in prompts.prompts}
+    assert {"canton_situation_brief", "outbreak_check"} <= names
+
+
+@pytest.mark.asyncio
+async def test_reference_resources_are_readable_json():
+    """Each reference resource returns valid JSON reference data."""
+    import json
+
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import CANTONS, DATA_LICENSE, DISEASE_CATEGORIES, mcp
+
+    async with connect(mcp._mcp_server) as client:
+        cantons = json.loads(
+            (await client.read_resource("bag://reference/cantons")).contents[0].text
+        )
+        cats = json.loads(
+            (await client.read_resource("bag://reference/disease-categories"))
+            .contents[0].text
+        )
+        lic = json.loads(
+            (await client.read_resource("bag://reference/data-licence")).contents[0].text
+        )
+
+    assert cantons["cantons"] == CANTONS
+    assert set(cats) == set(DISEASE_CATEGORIES)
+    assert lic["license"] == DATA_LICENSE
+
+
+@pytest.mark.asyncio
+async def test_prompts_render_with_arguments():
+    """Prompts render the workflow text and interpolate their arguments."""
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import mcp
+
+    async with connect(mcp._mcp_server) as client:
+        brief = await client.get_prompt("canton_situation_brief", {"canton": "BE"})
+        outbreak = await client.get_prompt(
+            "outbreak_check", {"disease": "measles", "canton": "ZH"}
+        )
+
+    brief_text = brief.messages[0].content.text
+    assert "BE" in brief_text
+    assert "bag_get_canton_situation" in brief_text
+    outbreak_text = outbreak.messages[0].content.text
+    assert "measles" in outbreak_text
+    assert "bag_get_disease_data" in outbreak_text
+
+
+def test_disease_categories_taxonomy_is_source_of_truth():
+    """bag_list_diseases categorises against the shared DISEASE_CATEGORIES map."""
+    from bag_health_mcp.server import DISEASE_CATEGORIES
+
+    # Sanity: the taxonomy covers the well-known school-relevant topics.
+    assert "influenza" in DISEASE_CATEGORIES["respiratory"]
+    assert "measles" in DISEASE_CATEGORIES["vaccine_preventable"]
+    assert "wastewater_surveillance" not in DISEASE_CATEGORIES  # matched by substring

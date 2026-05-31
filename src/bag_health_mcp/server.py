@@ -129,6 +129,35 @@ CANTONS = [
     "TI","UR","VD","VS","ZG","ZH","FL","all",
 ]
 
+# Disease-topic taxonomy: which known IDD topics fall in each category. Used both
+# to categorise bag_list_diseases output and to serve the bag://disease-categories
+# reference resource, so the two never drift (single source of truth).
+DISEASE_CATEGORIES: dict[str, set[str]] = {
+    "respiratory": {
+        "acute_respiratory_infection", "influenza", "influenza-like_illness",
+        "respiratory_pathogens", "covid19",
+    },
+    "enteric": {
+        "campylobacteriosis", "salmonellosis", "ehec", "listeriosis",
+        "hepatitis_a", "hepatitis_e", "shigellosis", "cholera",
+        "typhoidParatyphoidFever", "trichinellosis", "botulism", "qFever",
+    },
+    "sti_and_bloodborne": {
+        "hiv", "aids", "syphilis", "gonorrhea", "chlamydiosis",
+        "hepatitis_b", "hepatitis_c",
+    },
+    "vaccine_preventable": {
+        "measles", "rubella", "pertussis", "diphtheria", "tetanus",
+        "haemophilusInfluenzae", "ipd", "meningo", "herpesZoster",
+        "postZosterNeuralgia",
+    },
+    "vector_borne": {
+        "lyme_borreliosis", "tick-borne_encephalitis", "dengueFever",
+        "malaria", "westnileFever", "chikungunya", "zika", "yellowFever",
+        "hanta", "tularemia",
+    },
+}
+
 # ---------------------------------------------------------------------------
 # HTTP client lifespan (SDK-001)
 # ---------------------------------------------------------------------------
@@ -808,44 +837,22 @@ async def bag_list_diseases(params: ListDiseasesInput) -> ListDiseasesOutput:
 
     topics: set[str] = {s.split("/")[0] for s in all_sets}
 
-    # Categorise for readability
-    respiratory = {t for t in topics if t in {
-        "acute_respiratory_infection", "influenza", "influenza-like_illness",
-        "respiratory_pathogens", "covid19",
-    }}
-    enteric = {t for t in topics if t in {
-        "campylobacteriosis", "salmonellosis", "ehec", "listeriosis",
-        "hepatitis_a", "hepatitis_e", "shigellosis", "cholera",
-        "typhoidParatyphoidFever", "trichinellosis", "botulism", "qFever",
-    }}
-    sti_blood = {t for t in topics if t in {
-        "hiv", "aids", "syphilis", "gonorrhea", "chlamydiosis",
-        "hepatitis_b", "hepatitis_c",
-    }}
-    vaccine_prev = {t for t in topics if t in {
-        "measles", "rubella", "pertussis", "diphtheria", "tetanus",
-        "haemophilusInfluenzae", "ipd", "meningo", "herpesZoster",
-        "postZosterNeuralgia",
-    }}
-    vector_borne = {t for t in topics if t in {
-        "lyme_borreliosis", "tick-borne_encephalitis", "dengueFever",
-        "malaria", "westnileFever", "chikungunya", "zika", "yellowFever",
-        "hanta", "tularemia",
-    }}
+    # Categorise for readability against the shared taxonomy. Wastewater is
+    # matched by substring; whatever is left over lands in 'other'.
+    categories: dict[str, list[str]] = {}
+    classified: set[str] = set()
+    for name, members in DISEASE_CATEGORIES.items():
+        present = {t for t in topics if t in members}
+        categories[name] = sorted(present)
+        classified |= present
     wastewater = {t for t in topics if "wastewater" in t}
-    other = topics - respiratory - enteric - sti_blood - vaccine_prev - vector_borne - wastewater
+    categories["wastewater_surveillance"] = sorted(wastewater)
+    classified |= wastewater
+    categories["other"] = sorted(topics - classified)
 
     return ListDiseasesOutput(
         total_topics=len(topics),
-        categories={
-            "respiratory": sorted(respiratory),
-            "enteric": sorted(enteric),
-            "sti_and_bloodborne": sorted(sti_blood),
-            "vaccine_preventable": sorted(vaccine_prev),
-            "vector_borne": sorted(vector_borne),
-            "wastewater_surveillance": sorted(wastewater),
-            "other": sorted(other),
-        },
+        categories=categories,
         usage=(
             "Use a topic slug with bag_list_series(topic=...) "
             "to see available data series."
@@ -1374,6 +1381,104 @@ async def bag_get_canton_situation(
             "Measles: single case = potential outbreak in low-vaccination schools. "
             "Pertussis: high risk for unvaccinated infants (siblings of school children)."
         ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Resources (ARCH-008)
+# ---------------------------------------------------------------------------
+#
+# Static reference data is exposed as MCP Resources, not tools: it is fixed,
+# read-only and needs no arguments or upstream call, so a Resource (which a host
+# can fetch and cache) is the right primitive. Live, parameterised surveillance
+# data stays behind Tools.
+
+@mcp.resource(
+    "bag://reference/cantons",
+    name="swiss_cantons",
+    description="The Swiss canton codes accepted by the tools (incl. FL and 'all').",
+    mime_type="application/json",
+)
+def cantons_resource() -> str:
+    """The canton allow-list as JSON — reference data for building tool calls."""
+    return json.dumps({"cantons": CANTONS})
+
+
+@mcp.resource(
+    "bag://reference/disease-categories",
+    name="disease_categories",
+    description=(
+        "The disease-topic taxonomy: known IDD topic slugs grouped by category. "
+        "Static reference; use bag_list_diseases for what the live API currently "
+        "serves."
+    ),
+    mime_type="application/json",
+)
+def disease_categories_resource() -> str:
+    return json.dumps(
+        {name: sorted(members) for name, members in DISEASE_CATEGORIES.items()}
+    )
+
+
+@mcp.resource(
+    "bag://reference/data-licence",
+    name="data_licence",
+    description="Data source, attribution and licence terms for the BAG IDD data.",
+    mime_type="application/json",
+)
+def data_licence_resource() -> str:
+    return json.dumps(
+        {"attribution": DATA_ATTRIBUTION, "license": DATA_LICENSE, "source_api": IDD_BASE}
+    )
+
+
+# ---------------------------------------------------------------------------
+# Prompts (ARCH-008)
+# ---------------------------------------------------------------------------
+#
+# Prompts package the recommended multi-tool workflows as reusable, parameterised
+# templates a host can surface to the user (e.g. as slash-commands).
+
+@mcp.prompt(
+    name="canton_situation_brief",
+    title="Canton public-health situation brief",
+    description=(
+        "Draft a structured public-health situation brief for a Swiss canton "
+        "(Schulamt / city-administration use case)."
+    ),
+)
+def canton_situation_brief(canton: str = "ZH") -> str:
+    return (
+        f"Erstelle einen kurzen Public-Health-Lagebericht für den Kanton {canton}.\n\n"
+        "Vorgehen:\n"
+        f"1. Rufe bag_get_canton_situation(canton=\"{canton}\") auf.\n"
+        "2. Fasse je Krankheit den aktuellen Stand, den Trend und die "
+        "Veränderung zur Vorperiode zusammen.\n"
+        "3. Hebe schulrelevante Risiken hervor (Influenza/ARI-Spitzen, "
+        "Masern-Einzelfälle, Pertussis).\n"
+        "4. Nenne Datenstand und Quelle (provenance) am Ende.\n"
+        "Antworte auf Deutsch, prägnant, für eine Schulbehörde."
+    )
+
+
+@mcp.prompt(
+    name="outbreak_check",
+    title="Disease outbreak check",
+    description="Check whether a given disease is currently elevated in Switzerland.",
+)
+def outbreak_check(disease: str = "measles", canton: str = "all") -> str:
+    return (
+        f"Prüfe, ob bei '{disease}' aktuell ein Ausbruch bzw. eine erhöhte "
+        f"Aktivität im Gebiet '{canton}' vorliegt.\n\n"
+        "Vorgehen:\n"
+        f"1. bag_list_series(topic=\"{disease}\") um eine geeignete Serie zu finden.\n"
+        "2. bag_get_series_details(series_id=...) für gültige Filter.\n"
+        f"3. bag_get_disease_data(series_id=..., canton=\"{canton}\") für die "
+        "Zeitreihe.\n"
+        "4. Bewerte den Trend; vergleiche – wenn verfügbar – mit dem 5-Jahres-"
+        "Mittel (Serien mit 'valueMean5y').\n"
+        "Gib eine klare Einschätzung (erhöht / normal / unklar) mit Datenstand "
+        "und Quelle."
     )
 
 
