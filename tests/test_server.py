@@ -1557,3 +1557,23 @@ def test_settings_transport_stdio_overrides_flag(monkeypatch):
     monkeypatch.setenv("MCP_TRANSPORT", "stdio")
     s = server.Settings()
     assert s.wants_http(http_flag=True) is False
+
+
+# ---------------------------------------------------------------------------
+# ARCH-002: structured use-case tags in tool descriptions
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_tool_descriptions_have_usecase_tags():
+    """>=80% of tools carry <use_case>/<important_notes>/<example> tags (ARCH-002)."""
+    from bag_health_mcp.server import mcp
+
+    tools = await mcp.list_tools()
+    tagged = [
+        t for t in tools
+        if all(tag in (t.description or "")
+               for tag in ("<use_case>", "<important_notes>", "<example>"))
+    ]
+    assert len(tagged) / len(tools) >= 0.8
+    # In practice all 8 are tagged.
+    assert len(tagged) == len(tools)
