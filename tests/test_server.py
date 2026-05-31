@@ -745,3 +745,94 @@ async def test_canton_situation_degrades_on_egress_block_no_leak():
     statuses = {k: v.get("status") for k, v in result["diseases"].items()}
     assert all(s == "unavailable" for s in statuses.values())
     assert "LEAK-MUST-NOT-APPEAR" not in repr(result)
+
+
+# ---------------------------------------------------------------------------
+# SEC-018: strict input validation at tool boundaries
+# ---------------------------------------------------------------------------
+
+from pydantic import ValidationError  # noqa: E402
+
+
+def test_input_models_accept_real_world_values():
+    """Constraints must not reject any legitimate IDD value."""
+    from bag_health_mcp.server import (
+        DataSetsInput,
+        DiseaseDataInput,
+        ExportDownloadInput,
+        SeriesDetailsInput,
+    )
+
+    for topic in ["influenza", "covid19", "tick-borne_encephalitis",
+                  "acute_respiratory_infection", "wastewater_viral_load"]:
+        DataSetsInput(topic=topic)
+    for sid in ["influenza/cases/incValue/iso_week",
+                "wastewater_viral_load/NA/value/date"]:
+        SeriesDetailsInput(series_id=sid)
+    for age in ["0 - 4", "5 - 14", "65+"]:
+        DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", age_group=age)
+    for f in ["INFLUENZA_oblig", "COVID19_wastewater_sequencing"]:
+        ExportDownloadInput(file=f)
+
+
+def test_input_models_forbid_extra_fields():
+    """extra='forbid' rejects unexpected fields (SEC-018)."""
+    from bag_health_mcp.server import DataSetsInput
+
+    with pytest.raises(ValidationError):
+        DataSetsInput(topic="influenza", unexpected="x")
+
+
+def test_input_models_are_strict_no_coercion():
+    """strict=True refuses silent type coercion (e.g. str where int declared)."""
+    from bag_health_mcp.server import DiseaseDataInput
+
+    with pytest.raises(ValidationError):
+        DiseaseDataInput.model_validate(
+            {"series_id": "influenza/cases/incValue/iso_week", "limit_weeks": "26"}
+        )
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"topic": "../../etc/passwd"},   # path traversal
+        {"topic": "a/b"},                # slash not allowed in a topic slug
+        {"topic": "a" * 65},             # over max_length
+        {"topic": ""},                   # under min_length
+    ],
+)
+def test_topic_rejects_malicious_or_oversized(kwargs):
+    from bag_health_mcp.server import DataSetsInput
+
+    with pytest.raises(ValidationError):
+        DataSetsInput(**kwargs)
+
+
+def test_series_id_rejects_injection_chars():
+    from bag_health_mcp.server import SeriesDetailsInput
+
+    with pytest.raises(ValidationError):
+        SeriesDetailsInput(series_id="influenza;rm -rf /")
+
+
+def test_export_file_rejects_path_chars():
+    from bag_health_mcp.server import ExportDownloadInput
+
+    with pytest.raises(ValidationError):
+        ExportDownloadInput(file="../secret")
+
+
+@pytest.mark.asyncio
+async def test_input_schema_advertises_constraints():
+    """The advertised JSON inputSchema must carry the pattern/length limits and
+    forbid extra properties, so invalid args are refused at the protocol layer."""
+    import json
+
+    from bag_health_mcp.server import mcp
+
+    tools = {t.name: t for t in await mcp.list_tools()}
+    blob = json.dumps(tools["bag_get_disease_data"].inputSchema)
+    assert "pattern" in blob
+    assert "maxLength" in blob
+    assert '"additionalProperties": false' in blob
