@@ -44,6 +44,33 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 | `bag_download_export` | Download raw CSV/JSON export |
 | `bag_get_data_version` | Current data version (updated every Wednesday) |
 
+## 🧩 MCP Primitives
+
+This server uses all three MCP primitives, each for what it is best at:
+
+**Tools** (8) — live, parameterised actions that call the IDD API (above).
+
+**Resources** — static, read-only reference data a host can fetch and cache, no
+arguments or upstream call needed:
+
+| Resource URI | Description |
+|--------------|-------------|
+| `bag://reference/cantons` | Canton codes accepted by the tools (incl. FL, `all`) |
+| `bag://reference/disease-categories` | Disease-topic taxonomy by category |
+| `bag://reference/data-licence` | Source, attribution and licence terms |
+
+**Prompts** — reusable, parameterised workflows a host can surface (e.g. as
+slash-commands):
+
+| Prompt | Arguments | Purpose |
+|--------|-----------|---------|
+| `canton_situation_brief` | `canton` | Draft a Schulamt public-health situation brief |
+| `outbreak_check` | `disease`, `canton` | Check whether a disease is currently elevated |
+
+Live surveillance data stays behind Tools (it is parameterised and changes
+weekly); fixed reference data is exposed as Resources; recommended multi-tool
+workflows are packaged as Prompts.
+
 ---
 
 ## 🏫 Relevance for Schools & City Administration
