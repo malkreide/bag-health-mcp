@@ -9,6 +9,7 @@ import sys
 import httpx
 import pytest
 import respx
+from mcp.server.fastmcp.exceptions import ToolError
 
 from bag_health_mcp.server import (
     IDD_BASE,
@@ -118,8 +119,10 @@ async def test_bag_list_series_not_found():
     respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
         return_value=httpx.Response(200, json=MOCK_SETS)
     )
-    result = await bag_list_series(DataSetsInput(topic="unknown_disease"))
-    assert "error" in result
+    # Unknown topic is an execution error: raised as ToolError -> isError:true.
+    with pytest.raises(ToolError) as exc:
+        await bag_list_series(DataSetsInput(topic="unknown_disease"))
+    assert "bag_list_diseases" in str(exc.value)
 
 
 @pytest.mark.asyncio
@@ -140,10 +143,11 @@ async def test_bag_get_series_details_ok():
 @pytest.mark.asyncio
 @respx.mock
 async def test_bag_get_series_details_invalid_format():
-    result = await bag_get_series_details(
-        SeriesDetailsInput(series_id="influenza/cases")  # only 2 parts
-    )
-    assert "error" in result
+    with pytest.raises(ToolError) as exc:
+        await bag_get_series_details(
+            SeriesDetailsInput(series_id="influenza/cases")  # only 2 parts
+        )
+    assert "topic/chapter/aggregation/temporality" in str(exc.value)
 
 
 @pytest.mark.asyncio
@@ -173,8 +177,9 @@ async def test_bag_get_disease_data_zh():
 @pytest.mark.asyncio
 @respx.mock
 async def test_disease_data_api_error_does_not_leak_body():
-    """On an upstream error, the raw response body must not reach the model
-    (OBS-002): only the status code and a generic hint are returned."""
+    """On an upstream error the tool raises a ToolError (-> isError:true,
+    OBS-001) whose message carries only the status code and a generic hint —
+    never the raw upstream body (OBS-002)."""
     secret_body = "INTERNAL-STACKTRACE secret upstream detail 0xDEADBEEF"
     respx.get(
         f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
@@ -183,12 +188,13 @@ async def test_disease_data_api_error_does_not_leak_body():
         f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
     ).mock(return_value=httpx.Response(500, text=secret_body))
 
-    result = await bag_get_disease_data(
-        DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
-    )
-    assert result["error"] == "API error 500"
-    assert "detail" not in result
-    assert secret_body not in repr(result)
+    with pytest.raises(ToolError) as exc:
+        await bag_get_disease_data(
+            DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
+        )
+    message = str(exc.value)
+    assert "500" in message
+    assert secret_body not in message
 
 
 @pytest.mark.asyncio
@@ -316,3 +322,112 @@ def test_main_http_respects_mcp_host_env(monkeypatch):
     server.main()
     assert server.mcp.settings.host == "0.0.0.0"
     assert server.mcp.settings.port == 8123
+
+
+# ---------------------------------------------------------------------------
+# OBS-001: protocol vs. execution error contract (in-memory client roundtrip)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_execution_error_surfaces_as_tool_result_iserror():
+    """An upstream failure must reach the model as a tool RESULT with
+    isError:true (execution error) — not as a JSON-RPC protocol error — and
+    must not leak the raw upstream body (OBS-001 + OBS-002)."""
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import mcp
+
+    secret_body = "INTERNAL upstream stacktrace 0xDEADBEEF"
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(500, text=secret_body))
+
+    async with connect(mcp._mcp_server) as client:
+        result = await client.call_tool(
+            "bag_get_disease_data",
+            {"params": {"series_id": "influenza/cases/incValue/iso_week", "canton": "ZH"}},
+        )
+
+    assert result.isError is True
+    text = " ".join(getattr(c, "text", "") for c in result.content)
+    assert "500" in text
+    assert secret_body not in text
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_not_found_surfaces_as_tool_result_iserror():
+    """A semantic not-found (unknown topic) is an execution error: isError:true
+    with an actionable hint, not an empty success result (ARCH-003/OBS-001)."""
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import mcp
+
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
+        return_value=httpx.Response(200, json=MOCK_SETS)
+    )
+
+    async with connect(mcp._mcp_server) as client:
+        result = await client.call_tool(
+            "bag_list_series", {"params": {"topic": "unknown_disease"}}
+        )
+
+    assert result.isError is True
+    text = " ".join(getattr(c, "text", "") for c in result.content)
+    assert "bag_list_diseases" in text
+
+
+@pytest.mark.asyncio
+async def test_schema_invalid_params_are_protocol_errors():
+    """Schema-invalid params (bad enum) are genuine protocol errors handled by
+    the SDK with isError:true at the protocol boundary — validated before any
+    tool body runs (no upstream call mocked, so a leak here would be a bug)."""
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import mcp
+
+    async with connect(mcp._mcp_server) as client:
+        result = await client.call_tool(
+            "bag_get_disease_data",
+            {"params": {"series_id": "influenza/cases/incValue/iso_week",
+                        "canton": "NOT_A_CANTON"}},
+        )
+
+    assert result.isError is True
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_successful_call_is_not_iserror():
+    """A normal successful call must report isError:false (regression guard so
+    the execution-error path doesn't bleed into the happy path)."""
+    from mcp.shared.memory import (
+        create_connected_server_and_client_session as connect,
+    )
+
+    from bag_health_mcp.server import mcp
+
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+
+    async with connect(mcp._mcp_server) as client:
+        result = await client.call_tool(
+            "bag_get_disease_data",
+            {"params": {"series_id": "influenza/cases/incValue/iso_week", "canton": "ZH"}},
+        )
+
+    assert result.isError is False
