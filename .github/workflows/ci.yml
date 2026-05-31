@@ -32,6 +32,9 @@ jobs:
       - name: Lint
         run: python -m ruff check src/ tests/
 
+      - name: Verify tool-definition hashes (SEC-022 rug-pull guard)
+        run: python scripts/tool_hashes.py --check
+
   secret-scan:
     runs-on: ubuntu-latest
     steps:

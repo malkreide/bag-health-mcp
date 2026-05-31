@@ -1,0 +1,13 @@
+{
+  "algorithm": "sha256",
+  "tools": {
+    "bag_download_export": "5faea66714a4f78064c69aedc05d45148fb5838a511b5cfd22663d2c5681d1fc",
+    "bag_get_canton_situation": "cc636a3b734a87bf46f7c542fcccae524a01089e370e2a0e5e365550e08bbfcd",
+    "bag_get_data_version": "657be7231cf217c45f1588c30fbfe377e7002e7b5ea750777e4bd04a32c59443",
+    "bag_get_disease_data": "21738ff8a24a2485b251b2e8fea256c216474b20be34c9d3e3ec39e684b0b0e4",
+    "bag_get_series_details": "47b86d154028caa44ee4c1594982c6bc4ecc26188ac9eb96e3cbef4c83cb6f6d",
+    "bag_list_diseases": "2d28813b0d3efe9a95dda94cbfabe1cf92aa693bb258fe8b77e7ea3d06ce5ae2",
+    "bag_list_export_files": "372ec2d116b025aa0230aefd00f712d6ebf991f4de80bc640a151f2eccd4e069",
+    "bag_list_series": "93aabc362e869fb075b754da5bf48818689f5971af36de37a9600ea44af4259f"
+  }
+}
