@@ -594,6 +594,140 @@ async def test_new_client_registers_egress_guard():
         await client.aclose()
 
 
+# ---------------------------------------------------------------------------
+# SEC-005: outbound DNS-pinning network backend (TOCTOU)
+# ---------------------------------------------------------------------------
+#
+# These exercise the _PinningBackend directly with a fake inner backend, because
+# respx intercepts ABOVE the network backend (verified) and so never reaches it.
+
+class _FakeStream:
+    pass
+
+
+class _RecordingInner:
+    """Stand-in inner network backend that records the address it is asked to
+    dial instead of opening a real socket."""
+
+    def __init__(self):
+        self.connected_to = None
+
+    async def connect_tcp(self, host, port, timeout=None, local_address=None, socket_options=None):
+        self.connected_to = (host, port)
+        return _FakeStream()
+
+    async def connect_unix_socket(self, *a, **k):  # pragma: no cover - not used
+        raise AssertionError("unix socket should never be reached")
+
+    async def sleep(self, seconds):  # pragma: no cover
+        return None
+
+
+@pytest.mark.asyncio
+async def test_new_client_installs_pinning_backend():
+    """The pooled client's connection pool uses the SEC-005 pinning backend."""
+    from bag_health_mcp.server import _new_client, _PinningBackend
+
+    client = _new_client()
+    try:
+        backend = client._transport._pool._network_backend
+        assert isinstance(backend, _PinningBackend)
+    finally:
+        await client.aclose()
+
+
+@pytest.mark.asyncio
+async def test_pinning_backend_connects_to_validated_public_ip(monkeypatch):
+    """The backend resolves the host once and dials the exact validated IP
+    (no second lookup) — closing the resolve-vs-connect TOCTOU window."""
+    import bag_health_mcp.server as server
+    from bag_health_mcp.server import _PinningBackend
+
+    async def _resolve(host):
+        return ["93.184.216.34"]
+
+    monkeypatch.setattr(server, "_resolve_host", _resolve)
+    inner = _RecordingInner()
+    backend = _PinningBackend(inner)
+
+    stream = await backend.connect_tcp("api.idd.bag.admin.ch", 443)
+
+    assert stream is not None
+    # Dialled the resolved IP, not the hostname (proves the pin).
+    assert inner.connected_to == ("93.184.216.34", 443)
+
+
+@pytest.mark.asyncio
+async def test_pinning_backend_blocks_private_resolution(monkeypatch):
+    """If the host resolves to an internal IP, the backend refuses to connect
+    at all (the inner backend is never dialled)."""
+    import bag_health_mcp.server as server
+    from bag_health_mcp.server import EgressNotAllowed, _PinningBackend
+
+    async def _resolve(host):
+        return ["169.254.169.254"]
+
+    monkeypatch.setattr(server, "_resolve_host", _resolve)
+    inner = _RecordingInner()
+    backend = _PinningBackend(inner)
+
+    with pytest.raises(EgressNotAllowed):
+        await backend.connect_tcp("api.idd.bag.admin.ch", 443)
+    assert inner.connected_to is None
+
+
+@pytest.mark.asyncio
+async def test_pinning_backend_validates_literal_ip_without_dns(monkeypatch):
+    """A literal-IP host is validated directly (no DNS) and a private one is
+    refused; a public one is dialled as-is."""
+    import bag_health_mcp.server as server
+    from bag_health_mcp.server import EgressNotAllowed, _PinningBackend
+
+    async def _resolve_should_not_run(host):  # pragma: no cover
+        raise AssertionError("resolver must not run for a literal IP")
+
+    monkeypatch.setattr(server, "_resolve_host", _resolve_should_not_run)
+
+    inner = _RecordingInner()
+    backend = _PinningBackend(inner)
+    with pytest.raises(EgressNotAllowed):
+        await backend.connect_tcp("169.254.169.254", 80)
+    assert inner.connected_to is None
+
+    inner2 = _RecordingInner()
+    backend2 = _PinningBackend(inner2)
+    await backend2.connect_tcp("8.8.8.8", 443)
+    assert inner2.connected_to == ("8.8.8.8", 443)
+
+
+@pytest.mark.asyncio
+async def test_pinning_backend_fails_closed_on_dns_error(monkeypatch):
+    """A resolution failure raises EgressNotAllowed; nothing is dialled."""
+    import bag_health_mcp.server as server
+    from bag_health_mcp.server import EgressNotAllowed, _PinningBackend
+
+    async def _resolve(host):
+        raise OSError("temporary DNS failure")
+
+    monkeypatch.setattr(server, "_resolve_host", _resolve)
+    inner = _RecordingInner()
+    backend = _PinningBackend(inner)
+
+    with pytest.raises(EgressNotAllowed):
+        await backend.connect_tcp("api.idd.bag.admin.ch", 443)
+    assert inner.connected_to is None
+
+
+@pytest.mark.asyncio
+async def test_pinning_backend_refuses_unix_socket():
+    """Unix-socket egress is refused outright (only remote HTTPS is allowed)."""
+    from bag_health_mcp.server import EgressNotAllowed, _PinningBackend
+
+    backend = _PinningBackend(_RecordingInner())
+    with pytest.raises(EgressNotAllowed):
+        await backend.connect_unix_socket("/var/run/whatever.sock")
+
+
 @pytest.mark.asyncio
 @respx.mock
 async def test_canton_situation_degrades_on_egress_block_no_leak():
