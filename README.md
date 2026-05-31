@@ -150,6 +150,20 @@ setting `MCP_HOST=0.0.0.0` explicitly — the provided `Dockerfile` does this.
 RFC 5424 severity) to **stderr** — stdout is reserved for the stdio JSON-RPC
 transport. Set the level with `MCP_LOG_LEVEL` (default `INFO`).
 
+**Tracing (optional):** install the telemetry extra and point the server at an
+OTLP collector to get OpenTelemetry spans per tool-call plus instrumented
+outbound HTTP:
+
+```bash
+pip install "bag-health-mcp[telemetry]"
+export OTEL_EXPORTER_OTLP_ENDPOINT="http://otel-collector:4318"
+# optional: OTEL_SERVICE_NAME=bag-health-mcp
+```
+
+Tracing is a **no-op** unless both the extra is installed and an `OTEL_*`
+endpoint is set. Spans carry only the tool name and (on error) the exception
+class — never tool arguments, cantons or surveillance data.
+
 ---
 
 ## 🗂️ Available Disease Topics

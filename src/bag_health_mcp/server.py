@@ -122,6 +122,119 @@ def _configure_logging(level: str | int | None = None) -> None:
     logger.propagate = False
 
 
+# ---------------------------------------------------------------------------
+# Distributed tracing (OBS-006)
+# ---------------------------------------------------------------------------
+#
+# OpenTelemetry is an *optional* dependency. Tracing stays a complete no-op
+# unless (a) the opentelemetry packages are installed (the `telemetry` extra)
+# and (b) an OTLP endpoint is configured via the standard OTEL_* env vars. With
+# no provider configured, ``trace.get_tracer`` returns the API's no-op tracer,
+# so the per-tool span wrapper and the client instrumentation cost nothing.
+#
+# Spans carry only the tool name and error class — never arguments, cantons or
+# upstream data — so no PII or surveillance content is exported (OBS-002).
+
+try:  # optional: present only with the `telemetry` extra
+    from opentelemetry import trace as _otel_trace
+    from opentelemetry.trace import Status as _OtelStatus
+    from opentelemetry.trace import StatusCode as _OtelStatusCode
+
+    _OTEL_AVAILABLE = True
+except ImportError:  # pragma: no cover - exercised by the base (no-extra) install
+    _OTEL_AVAILABLE = False
+
+# Set to True by _configure_tracing() once a real provider is wired up; gates the
+# httpx client instrumentation so we don't instrument when tracing is off.
+_tracing_enabled = False
+
+
+def _tracer() -> Any:
+    """Return the OTel tracer, or ``None`` when telemetry isn't available.
+
+    Even when available but unconfigured, the returned tracer is OTel's no-op
+    tracer, so wrapping a tool in a span is essentially free.
+    """
+    if not _OTEL_AVAILABLE:
+        return None
+    return _otel_trace.get_tracer("bag_health_mcp")
+
+
+def _configure_tracing() -> bool:
+    """Wire up an OTLP exporter if telemetry is available and configured.
+
+    Enabled only when the opentelemetry packages are installed *and* an endpoint
+    is set (``OTEL_EXPORTER_OTLP_ENDPOINT`` or the traces-specific variant) — the
+    standard OTel convention. Returns whether tracing was enabled. Idempotent and
+    safe to call when telemetry is absent (returns False, no error).
+    """
+    global _tracing_enabled
+    if not _OTEL_AVAILABLE:
+        return False
+    endpoint = os.environ.get("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT") or os.environ.get(
+        "OTEL_EXPORTER_OTLP_ENDPOINT"
+    )
+    if not endpoint:
+        return False
+
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+    service_name = os.environ.get("OTEL_SERVICE_NAME", "bag-health-mcp")
+    provider = TracerProvider(resource=Resource.create({"service.name": service_name}))
+    provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
+    _otel_trace.set_tracer_provider(provider)
+    _tracing_enabled = True
+    logger.info("OpenTelemetry tracing enabled", extra={"otel_endpoint": endpoint})
+    return True
+
+
+def _traced(fn: Any) -> Any:
+    """Wrap an async tool in a span named ``tool/<name>`` (OBS-006).
+
+    No-op overhead when tracing is unconfigured (the no-op tracer). The span
+    records only the tool name and, on failure, the error class — never tool
+    arguments or upstream data (OBS-002). Re-raises so error handling is
+    unchanged.
+    """
+    import functools
+
+    @functools.wraps(fn)
+    async def wrapper(*args: Any, **kwargs: Any) -> Any:
+        tracer = _tracer()
+        if tracer is None:
+            return await fn(*args, **kwargs)
+        with tracer.start_as_current_span(f"tool/{fn.__name__}") as span:
+            span.set_attribute("mcp.tool.name", fn.__name__)
+            try:
+                return await fn(*args, **kwargs)
+            except Exception as exc:
+                span.set_attribute("mcp.tool.is_error", True)
+                span.set_attribute("mcp.tool.error_type", type(exc).__name__)
+                span.set_status(_OtelStatus(_OtelStatusCode.ERROR))
+                raise
+
+    return wrapper
+
+
+def _instrument_client(client: httpx.AsyncClient) -> None:
+    """Instrument the pooled client for per-request HTTP spans, if tracing is on.
+
+    Instruments only this client instance (not global httpx), so nothing happens
+    unless tracing was enabled by :func:`_configure_tracing`.
+    """
+    if not (_OTEL_AVAILABLE and _tracing_enabled):
+        return
+    try:
+        from opentelemetry.instrumentation.httpx import HTTPXClientInstrumentor
+
+        HTTPXClientInstrumentor.instrument_client(client)
+    except Exception as exc:  # pragma: no cover - defensive; never break startup
+        logger.warning("could not instrument httpx client for tracing: %r", exc)
+
+
 # Swiss cantons (incl. FL = Liechtenstein as BAG tracks it)
 CANTONS = [
     "AG","AI","AR","BE","BL","BS","FR","GE","GL","GR",
@@ -387,6 +500,7 @@ async def lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
     global _shared_client
     async with AsyncExitStack() as stack:
         client = await stack.enter_async_context(_new_client())
+        _instrument_client(client)  # per-request HTTP spans when tracing is on (OBS-006)
         _shared_client = client
         logger.info("opened shared httpx client for %s", server.name)
         try:
@@ -830,6 +944,7 @@ READ_ONLY = ToolAnnotations(
     "(respiratory, enteric, STI, vector-borne, wastewater). "
     "Start here to discover what data is available."
 ))
+@_traced
 async def bag_list_diseases(params: ListDiseasesInput) -> ListDiseasesOutput:
     async with _client() as c:
         r = await _get(c, "/api/v1/data/sets", context="listing disease topics")
@@ -865,6 +980,7 @@ async def bag_list_diseases(params: ListDiseasesInput) -> ListDiseasesOutput:
     "Each series is identified by 'topic/chapter/aggregation/temporality'. "
     "Returns series IDs to use with bag_get_series_details and bag_get_disease_data."
 ))
+@_traced
 async def bag_list_series(params: DataSetsInput) -> ListSeriesOutput:
     async with _client() as c:
         r = await _get(c, "/api/v1/data/sets", context="listing data series")
@@ -904,6 +1020,7 @@ async def bag_list_series(params: DataSetsInput) -> ListSeriesOutput:
     "Shows which canton, age group, sex, and other dimensions are available. "
     "Always call this before bag_get_disease_data to know valid filter options."
 ))
+@_traced
 async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOutput:
     parts = params.series_id.split("/")
     if len(parts) != 4:
@@ -963,6 +1080,7 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOut
     "Data updated every Wednesday. "
     "Example: Influenza incidence per 100k population in Zurich by week."
 ))
+@_traced
 async def bag_get_disease_data(
     params: DiseaseDataInput, ctx: Context | None = None
 ) -> DiseaseDataOutput:
@@ -1159,6 +1277,7 @@ async def bag_get_disease_data(
     "e.g. INFLUENZA_oblig, COVID19_wastewater_sequencing, MEASLES_oblig. "
     "Use with bag_download_export to get raw data files."
 ))
+@_traced
 async def bag_list_export_files(params: ExportFilesInput) -> ListExportFilesOutput:
     async with _client() as c:
         r = await _get(
@@ -1184,6 +1303,7 @@ async def bag_list_export_files(params: ExportFilesInput) -> ListExportFilesOutp
     "Returns the raw data content for a specific disease file. "
     "Useful for bulk analysis. Files are updated weekly."
 ))
+@_traced
 async def bag_download_export(params: ExportDownloadInput) -> DownloadExportOutput:
     async with _client() as c:
         r = await _get(
@@ -1219,6 +1339,7 @@ async def bag_download_export(params: ExportDownloadInput) -> DownloadExportOutp
     "Returns the date of the last data update (format YYYYMMDD). "
     "IDD is updated every Wednesday."
 ))
+@_traced
 async def bag_get_data_version(params: DataVersionInput) -> DataVersionOutput:
     async with _client() as c:
         r = await _get(c, "/api/v1/data/version", context="fetching data version")
@@ -1247,6 +1368,7 @@ async def bag_get_data_version(params: DataVersionInput) -> DataVersionOutput:
     "city administration Public Health Reporting. "
     "Anchor query: 'Was ist die aktuelle Grippesituation im Kanton Zürich?'"
 ))
+@_traced
 async def bag_get_canton_situation(
     canton: str = "ZH",
     include_wastewater: bool = False,
@@ -1530,6 +1652,7 @@ def main() -> None:
     ``MCP_HOST=0.0.0.0`` (see Dockerfile).
     """
     _configure_logging()
+    _configure_tracing()  # no-op unless telemetry installed + OTEL endpoint set
     if "--http" in sys.argv:
         if "--port" in sys.argv:
             port = int(sys.argv[sys.argv.index("--port") + 1])

@@ -45,12 +45,23 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Optional OpenTelemetry tracing (OBS-006). Tracing is a no-op unless these are
+# installed AND an OTEL endpoint is configured, so the base install stays lean.
+telemetry = [
+    "opentelemetry-sdk>=1.20",
+    "opentelemetry-exporter-otlp-proto-http>=1.20",
+    "opentelemetry-instrumentation-httpx>=0.40b0",
+]
 dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
     "pytest-cov>=5.0.0",
     "respx>=0.21.0",
     "ruff>=0.4.0",
+    # so the tracing-active path can be exercised offline in tests
+    "opentelemetry-sdk>=1.20",
+    "opentelemetry-exporter-otlp-proto-http>=1.20",
+    "opentelemetry-instrumentation-httpx>=0.40b0",
 ]
 
 [project.scripts]

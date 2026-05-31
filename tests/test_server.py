@@ -1299,3 +1299,111 @@ async def test_tools_still_work_without_context():
         DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
     )
     assert result.topic == "influenza"
+
+
+# ---------------------------------------------------------------------------
+# OBS-006: OpenTelemetry distributed tracing (optional, per-tool spans)
+# ---------------------------------------------------------------------------
+
+import pytest as _pt_otel  # noqa: E402
+
+_otel = _pt_otel.importorskip("opentelemetry.sdk.trace")
+
+
+@_pt_otel.fixture
+def otel_exporter(monkeypatch):
+    """Install an in-memory tracer provider and enable tracing for one test."""
+    from opentelemetry.sdk.resources import Resource
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import SimpleSpanProcessor
+    from opentelemetry.sdk.trace.export.in_memory_span_exporter import (
+        InMemorySpanExporter,
+    )
+
+    import bag_health_mcp.server as server
+
+    exporter = InMemorySpanExporter()
+    provider = TracerProvider(resource=Resource.create({"service.name": "test"}))
+    provider.add_span_processor(SimpleSpanProcessor(exporter))
+    # NB: set_tracer_provider is process-global and one-shot; override the
+    # module's tracer accessor instead so the suite stays isolated.
+    monkeypatch.setattr(server, "_tracer", lambda: provider.get_tracer("test"))
+    monkeypatch.setattr(server, "_tracing_enabled", True)
+    return exporter
+
+
+@_pt_otel.mark.asyncio
+@respx.mock
+async def test_tool_emits_span_with_no_pii(otel_exporter):
+    """A successful tool call emits a tool/<name> span carrying only the tool
+    name — no arguments, canton or upstream data (OBS-006 / OBS-002)."""
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+
+    await bag_get_disease_data(
+        DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
+    )
+
+    spans = [s for s in otel_exporter.get_finished_spans()
+             if s.name == "tool/bag_get_disease_data"]
+    assert len(spans) == 1
+    attrs = dict(spans[0].attributes or {})
+    assert attrs["mcp.tool.name"] == "bag_get_disease_data"
+    # No attribute value leaks the canton or any argument.
+    assert all("ZH" not in str(v) for v in attrs.values())
+
+
+@_pt_otel.mark.asyncio
+@respx.mock
+async def test_tool_span_records_error(otel_exporter):
+    """A failing tool marks its span ERROR with the exception class (OBS-006)."""
+    from opentelemetry.trace import StatusCode
+
+    respx.get(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
+    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.post(
+        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
+    ).mock(return_value=httpx.Response(500, text="boom"))
+
+    with pytest.raises(ToolError):
+        await bag_get_disease_data(
+            DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
+        )
+
+    span = next(s for s in otel_exporter.get_finished_spans()
+                if s.name == "tool/bag_get_disease_data")
+    assert span.status.status_code == StatusCode.ERROR
+    assert span.attributes["mcp.tool.is_error"] is True
+    assert span.attributes["mcp.tool.error_type"] == "ToolError"
+
+
+@_pt_otel.mark.asyncio
+@respx.mock
+async def test_tracing_is_noop_when_unconfigured():
+    """With no tracing provider wired up, tools still work and emit no spans
+    (tracing is opt-in; the base install must behave identically)."""
+    import bag_health_mcp.server as server
+
+    assert server._tracing_enabled is False
+    respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
+        return_value=httpx.Response(200, json={"name": "20260325"})
+    )
+    result = await bag_get_data_version(DataVersionInput())
+    assert result.version == "20260325"
+
+
+def test_configure_tracing_noop_without_endpoint(monkeypatch):
+    """_configure_tracing does nothing (returns False) when no OTEL endpoint is
+    set, even with the telemetry packages installed."""
+    import bag_health_mcp.server as server
+
+    monkeypatch.delenv("OTEL_EXPORTER_OTLP_ENDPOINT", raising=False)
+    monkeypatch.delenv("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT", raising=False)
+    monkeypatch.setattr(server, "_tracing_enabled", False)
+    assert server._configure_tracing() is False
+    assert server._tracing_enabled is False
