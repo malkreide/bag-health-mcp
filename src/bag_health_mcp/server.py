@@ -24,7 +24,7 @@ import httpx
 from mcp.server.fastmcp import FastMCP
 from mcp.server.fastmcp.exceptions import ToolError
 from mcp.types import ToolAnnotations
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -438,35 +438,66 @@ CantonCode = Literal[
 ]
 
 
-class ListDiseasesInput(BaseModel):
+class _StrictInput(BaseModel):
+    """Base for every tool input (SEC-018).
+
+    ``strict=True`` disables silent type coercion (a string is not accepted where
+    an int is declared, etc.) and ``extra='forbid'`` rejects unexpected fields.
+    Both propagate into the JSON inputSchema advertised to clients, so invalid
+    arguments are refused at the protocol boundary before any tool body runs.
+    Free-form string fields that flow into upstream URL paths additionally carry
+    length and pattern constraints below.
+    """
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+
+
+# Slugs (topic, export file) and series ids only ever contain these characters in
+# the real IDD API; constraining them caps unbounded user input before it reaches
+# a URL path (SEC-018). Series ids are 'topic/chapter/aggregation/temporality'.
+_SLUG_PATTERN = r"^[A-Za-z0-9_-]+$"
+_SERIES_ID_PATTERN = r"^[A-Za-z0-9_/-]+$"
+_AGE_GROUP_PATTERN = r"^[0-9 +-]+$"
+
+
+class ListDiseasesInput(_StrictInput):
     pass
 
 
-class DataSetsInput(BaseModel):
+class DataSetsInput(_StrictInput):
     topic: str = Field(
+        min_length=1,
+        max_length=64,
+        pattern=_SLUG_PATTERN,
         description=(
             "Disease topic slug, e.g. 'influenza', 'covid19', 'measles'. "
             "Use bag_list_diseases to get valid values."
-        )
+        ),
     )
 
 
-class SeriesDetailsInput(BaseModel):
+class SeriesDetailsInput(_StrictInput):
     series_id: str = Field(
+        min_length=1,
+        max_length=128,
+        pattern=_SERIES_ID_PATTERN,
         description=(
             "Full series identifier in format 'topic/chapter/aggregation/temporality', "
             "e.g. 'influenza/cases/incValue/iso_week'. "
             "Use bag_list_series to discover available series for a topic."
-        )
+        ),
     )
 
 
-class DiseaseDataInput(BaseModel):
+class DiseaseDataInput(_StrictInput):
     series_id: str = Field(
+        min_length=1,
+        max_length=128,
+        pattern=_SERIES_ID_PATTERN,
         description=(
             "Full series identifier, e.g. 'influenza/cases/incValue/iso_week'. "
             "Use bag_get_series_details to check available filters."
-        )
+        ),
     )
     canton: CantonCode = Field(
         default="all",
@@ -478,6 +509,8 @@ class DiseaseDataInput(BaseModel):
     )
     age_group: str | None = Field(
         default=None,
+        max_length=32,
+        pattern=_AGE_GROUP_PATTERN,
         description=(
             "Age group filter if the series supports it, "
             "e.g. '0 - 4', '5 - 14', '15 - 29', '30 - 64', '65+'. "
@@ -492,19 +525,22 @@ class DiseaseDataInput(BaseModel):
     )
 
 
-class ExportFilesInput(BaseModel):
+class ExportFilesInput(_StrictInput):
     version: Literal["latest", "archived"] = Field(
         default="latest",
         description="'latest' for current data, 'archived' for historical snapshots.",
     )
 
 
-class ExportDownloadInput(BaseModel):
+class ExportDownloadInput(_StrictInput):
     file: str = Field(
+        min_length=1,
+        max_length=128,
+        pattern=_SLUG_PATTERN,
         description=(
             "File name from bag_list_export_files, e.g. 'INFLUENZA_oblig', "
             "'COVID19_wastewater_sequencing'."
-        )
+        ),
     )
     format: Literal["csv", "json"] = Field(
         default="csv",
@@ -512,7 +548,7 @@ class ExportDownloadInput(BaseModel):
     )
 
 
-class DataVersionInput(BaseModel):
+class DataVersionInput(_StrictInput):
     pass
 
 
