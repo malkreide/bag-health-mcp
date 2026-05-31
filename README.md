@@ -136,6 +136,7 @@ setting `MCP_HOST=0.0.0.0` explicitly — the provided `Dockerfile` does this.
 | Aspect | Details |
 |--------|---------|
 | Access | Read-only — no write operations possible |
+| Egress | Code-layer allow-list: the server only contacts the BAG IDD API, HTTPS-only, enforced on every request incl. redirect hops (SSRF/SEC-004 + SEC-021). Network-layer companion policy in [`deploy/networkpolicy.yaml`](deploy/networkpolicy.yaml) |
 | Personal data | None — BAG IDD data is aggregated and anonymised at canton level by law |
 | Rate limits | No published IDD API rate limit; server caps responses at 104 data points per call by default (`limit_weeks` param) |
 | Timeout | 30 s per API call |
