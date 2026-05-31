@@ -105,3 +105,17 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 - **Wöchentlicher Rhythmus**: Keine Echtzeit-Daten; Aktualisierung jeweils mittwochs
 - **Kantonsebene**: Bei seltenen Krankheiten werden Daten aus Datenschutzgründen unterdrückt
 - **Altersgruppen**: Verfügbare Dimensionen variieren je nach Datenserie — `bag_get_series_details` verwenden
+
+## 🧭 Phasenarchitektur & Compliance
+
+Dieser Server ist ein **Phase-1-Server (nur lesend)**; schreibende/sendende
+Funktionen sind bewusst zurückgestellt (Vermeidung der «Lethal Trifecta»). Vor
+einer künftigen Schreib-Phase gelten dokumentierte Voraussetzungen
+(Server-Trennung, AuthN/Z, Neueinstufung, Audit-Trail) — siehe
+[`docs/roadmap.md`](docs/roadmap.md).
+
+- **Sicherheits-Posture** (Lethal-Trifecta-Bewertung, Secret-Management,
+  Netzwerk-Exposition): [`docs/security-posture.md`](docs/security-posture.md)
+- **ISDS-Schutzbedarf / Datenklassifikation Schulamt**:
+  [`docs/isds-klassifikation.md`](docs/isds-klassifikation.md),
+  [`docs/datenklassifikation-schulamt.md`](docs/datenklassifikation-schulamt.md)

@@ -359,6 +359,52 @@ def test_main_transport_env_stdio_overrides_http_flag(monkeypatch):
     assert called == {"args": (), "kwargs": {}}
 
 
+def _capture_bind_warnings(monkeypatch, host_env):
+    """Run main() over HTTP and return the bag_health_mcp WARNING messages.
+
+    main() calls _configure_logging(), which sets propagate=False, so caplog's
+    root handler won't see the records — attach a handler to the package logger
+    directly instead.
+    """
+    import logging
+
+    from bag_health_mcp import server
+
+    records: list[logging.LogRecord] = []
+
+    class _Capture(logging.Handler):
+        def emit(self, record):
+            records.append(record)
+
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp", "--http"])
+    monkeypatch.delenv("MCP_TRANSPORT", raising=False)
+    if host_env is None:
+        monkeypatch.delenv("MCP_HOST", raising=False)
+    else:
+        monkeypatch.setenv("MCP_HOST", host_env)
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: None)
+
+    handler = _Capture(level=logging.WARNING)
+    server.logger.addHandler(handler)
+    try:
+        server.main()
+    finally:
+        server.logger.removeHandler(handler)
+    return [r.getMessage() for r in records]
+
+
+def test_main_http_warns_on_non_localhost_bind(monkeypatch):
+    """Binding HTTP beyond localhost logs a NeighborJack warning (SEC-016)."""
+    msgs = _capture_bind_warnings(monkeypatch, "0.0.0.0")
+    assert any("non-localhost" in m for m in msgs)
+
+
+def test_main_http_no_warning_on_localhost(monkeypatch):
+    """The default localhost bind does not warn."""
+    msgs = _capture_bind_warnings(monkeypatch, None)
+    assert not any("non-localhost" in m for m in msgs)
+
+
 # ---------------------------------------------------------------------------
 # OBS-001: protocol vs. execution error contract (in-memory client roundtrip)
 # ---------------------------------------------------------------------------

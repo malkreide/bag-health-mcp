@@ -1691,7 +1691,18 @@ def main() -> None:
             port = int(os.environ.get("MCP_PORT", "8000"))
         # FastMCP.run() accepts no host/port kwargs — configure them on the
         # instance settings, which the Streamable HTTP runner (uvicorn) reads.
-        mcp.settings.host = os.environ.get("MCP_HOST", "127.0.0.1")
+        host = os.environ.get("MCP_HOST", "127.0.0.1")
+        if host not in ("127.0.0.1", "::1", "localhost"):
+            # NeighborJack awareness (SEC-016): binding beyond localhost exposes
+            # the server on the network; that should only happen in an isolated,
+            # gateway-fronted deployment.
+            logger.warning(
+                "binding HTTP server to non-localhost host %s — ensure this is "
+                "an intended, network-isolated deployment behind a gateway",
+                host,
+                extra={"bind_host": host},
+            )
+        mcp.settings.host = host
         mcp.settings.port = port
         mcp.run(transport="streamable-http")
     else:
