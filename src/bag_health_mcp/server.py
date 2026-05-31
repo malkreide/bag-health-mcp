@@ -1657,19 +1657,34 @@ def outbreak_check(disease: str = "measles", canton: str = "all") -> str:
 # Entry point
 # ---------------------------------------------------------------------------
 
+def _select_http() -> bool:
+    """Decide whether to serve over Streamable HTTP (vs. stdio).
+
+    Selection order (SCALE-001): the ``MCP_TRANSPORT`` env var wins when set
+    (``http``/``streamable-http`` → HTTP, ``stdio`` → stdio), which is what
+    container/cloud deployment manifests should set; otherwise the ``--http``
+    CLI flag is honoured for local/back-compat use. Default is stdio.
+    """
+    transport_env = os.environ.get("MCP_TRANSPORT", "").strip().lower()
+    if transport_env:
+        return transport_env in {"http", "streamable-http", "streamable_http"}
+    return "--http" in sys.argv
+
+
 def main() -> None:
     """Console-script / module entry point.
 
-    Default transport is stdio. Pass ``--http`` (optionally ``--port N``) to
-    serve over Streamable HTTP. Host and port can also be configured via the
-    ``MCP_HOST`` / ``MCP_PORT`` environment variables. The host defaults to
-    ``127.0.0.1`` so a local HTTP server is not exposed to the network;
-    container deployments opt into all-interface binding explicitly by setting
-    ``MCP_HOST=0.0.0.0`` (see Dockerfile).
+    Transport is selected by the ``MCP_TRANSPORT`` env var (``http`` or
+    ``stdio``) when set — the recommended way for container/cloud deployments —
+    otherwise by the ``--http`` CLI flag; the default is stdio. For HTTP, host
+    and port come from ``MCP_HOST`` / ``MCP_PORT`` (or ``--port``). The host
+    defaults to ``127.0.0.1`` so a local HTTP server is not exposed to the
+    network; container deployments opt into all-interface binding explicitly by
+    setting ``MCP_HOST=0.0.0.0`` (see Dockerfile).
     """
     _configure_logging()
     _configure_tracing()  # no-op unless telemetry installed + OTEL endpoint set
-    if "--http" in sys.argv:
+    if _select_http():
         if "--port" in sys.argv:
             port = int(sys.argv[sys.argv.index("--port") + 1])
         else:

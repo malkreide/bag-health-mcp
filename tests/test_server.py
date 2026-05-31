@@ -290,11 +290,12 @@ async def test_all_tools_declare_readonly_annotations():
 
 
 def test_main_stdio_default(monkeypatch):
-    """Without --http, main() runs the default stdio transport."""
+    """Without --http or MCP_TRANSPORT, main() runs the default stdio transport."""
     from bag_health_mcp import server
 
     called = {}
     monkeypatch.setattr(sys, "argv", ["bag-health-mcp"])
+    monkeypatch.delenv("MCP_TRANSPORT", raising=False)
     monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(args=a, kwargs=k))
     server.main()
     # stdio = run() with no transport argument
@@ -309,6 +310,7 @@ def test_main_http_sets_settings_and_no_port_kwarg(monkeypatch):
     called = {}
     monkeypatch.setattr(sys, "argv", ["bag-health-mcp", "--http", "--port", "9001"])
     monkeypatch.delenv("MCP_HOST", raising=False)
+    monkeypatch.delenv("MCP_TRANSPORT", raising=False)
     monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(args=a, kwargs=k))
     server.main()
     assert called["kwargs"] == {"transport": "streamable-http"}
@@ -322,12 +324,39 @@ def test_main_http_respects_mcp_host_env(monkeypatch):
     from bag_health_mcp import server
 
     monkeypatch.setattr(sys, "argv", ["bag-health-mcp", "--http"])
+    monkeypatch.delenv("MCP_TRANSPORT", raising=False)
     monkeypatch.setenv("MCP_HOST", "0.0.0.0")
     monkeypatch.setenv("MCP_PORT", "8123")
     monkeypatch.setattr(server.mcp, "run", lambda *a, **k: None)
     server.main()
     assert server.mcp.settings.host == "0.0.0.0"
     assert server.mcp.settings.port == 8123
+
+
+def test_main_transport_env_selects_http_without_flag(monkeypatch):
+    """MCP_TRANSPORT=http selects Streamable HTTP without the --http flag
+    (SCALE-001: deployments configure transport via env)."""
+    from bag_health_mcp import server
+
+    called = {}
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp"])
+    monkeypatch.setenv("MCP_TRANSPORT", "http")
+    monkeypatch.delenv("MCP_HOST", raising=False)
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(kwargs=k))
+    server.main()
+    assert called["kwargs"] == {"transport": "streamable-http"}
+
+
+def test_main_transport_env_stdio_overrides_http_flag(monkeypatch):
+    """MCP_TRANSPORT=stdio wins even if --http is on the command line."""
+    from bag_health_mcp import server
+
+    called = {}
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp", "--http"])
+    monkeypatch.setenv("MCP_TRANSPORT", "stdio")
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(args=a, kwargs=k))
+    server.main()
+    assert called == {"args": (), "kwargs": {}}
 
 
 # ---------------------------------------------------------------------------
