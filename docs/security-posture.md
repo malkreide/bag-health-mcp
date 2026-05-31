@@ -61,10 +61,17 @@ default), and this document updated.
   for network-isolated container/cluster deployments behind a gateway and a
   `NetworkPolicy` (see [`deploy/`](../deploy/)). Binding to a non-localhost host
   is logged as a warning at startup (NeighborJack awareness).
-- The server is **unauthenticated by design** (it serves only public data);
-  *who may invoke it* should be controlled at an edge gateway, not by the server
-  (see the [deployment & scaling guide](deployment-scaling.md), MCP-gateway
-  section).
+- The server serves only public data, so data sensitivity does not require
+  authentication. **Who may invoke it** can still be controlled:
+  - **In-server (SEC-009):** set `MCP_AUTH_TOKEN` to require an
+    `Authorization: Bearer <token>` on every HTTP request (401 otherwise),
+    compared in constant time. Unset = no auth (stdio/local). This is a
+    shared-secret gate, not a per-user identity system.
+  - **CORS (SDK-004):** `MCP_CORS_ORIGINS` is an explicit origin allow-list
+    (never a wildcard) for browser MCP clients; the `Mcp-Session-Id` header is
+    exposed so stateful sessions work.
+  - For real per-user identity/authorisation, front the server with an edge
+    gateway (see the [deployment & scaling guide](deployment-scaling.md)).
 
 ---
 

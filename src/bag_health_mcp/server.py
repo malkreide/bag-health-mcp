@@ -57,6 +57,15 @@ class Settings(BaseSettings):
     host: str = "127.0.0.1"
     port: int = 8000
     log_level: str = "INFO"
+    # SEC-009: shared-secret bearer token for the HTTP transport. When set, HTTP
+    # requests must present "Authorization: Bearer <token>"; when empty, no auth
+    # is enforced (suitable for stdio/local; HTTP should set this or sit behind a
+    # gateway). The server itself reaches only public data — this gates *who may
+    # invoke it*, not data sensitivity.
+    auth_token: str = ""
+    # SDK-004: comma-separated CORS allow-list for browser MCP clients. Empty =
+    # no cross-origin access. Never a wildcard.
+    cors_origins: str = ""
 
     def wants_http(self, *, http_flag: bool) -> bool:
         """Whether to serve over Streamable HTTP (vs. stdio), SCALE-001.
@@ -71,6 +80,10 @@ class Settings(BaseSettings):
     @property
     def is_local_bind(self) -> bool:
         return self.host in ("127.0.0.1", "::1", "localhost")
+
+    @property
+    def cors_origin_list(self) -> list[str]:
+        return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
 # Code-layer egress allow-list (SEC-021): the only host this server may ever
 # talk to is the BAG IDD API, derived from IDD_BASE so there is a single source
@@ -1783,6 +1796,70 @@ def outbreak_check(disease: str = "measles", canton: str = "all") -> str:
 
 
 # ---------------------------------------------------------------------------
+# HTTP auth + CORS (SEC-009 / SDK-004)
+# ---------------------------------------------------------------------------
+
+class _BearerAuthMiddleware:
+    """ASGI middleware enforcing a shared-secret bearer token (SEC-009).
+
+    Requests must carry ``Authorization: Bearer <token>``; otherwise 401. The
+    health/liveness path is exempt so probes work without the secret. Comparison
+    is constant-time. Only installed when a token is configured.
+    """
+
+    def __init__(self, app: Any, token: str) -> None:
+        self.app = app
+        self._token = token
+
+    async def __call__(self, scope: Any, receive: Any, send: Any) -> None:
+        if scope.get("type") != "http":
+            await self.app(scope, receive, send)
+            return
+        headers = dict(scope.get("headers") or [])
+        provided = headers.get(b"authorization", b"").decode()
+        import hmac
+
+        expected = f"Bearer {self._token}"
+        if not hmac.compare_digest(provided, expected):
+            await send({
+                "type": "http.response.start",
+                "status": 401,
+                "headers": [(b"content-type", b"text/plain"),
+                            (b"www-authenticate", b"Bearer")],
+            })
+            await send({"type": "http.response.body", "body": b"unauthorized"})
+            return
+        await self.app(scope, receive, send)
+
+
+def build_http_app(settings: Settings) -> Any:
+    """Build the Streamable-HTTP ASGI app with optional auth + CORS.
+
+    - Bearer-token auth is applied when ``settings.auth_token`` is set (SEC-009).
+    - CORS is applied when ``settings.cors_origins`` is non-empty, exposing the
+      ``Mcp-Session-Id`` header browser clients need for stateful sessions
+      (SDK-004). Origins are an explicit allow-list — never a wildcard.
+    """
+    app = mcp.streamable_http_app()
+    if settings.auth_token:
+        app = _BearerAuthMiddleware(app, settings.auth_token)
+        logger.info("HTTP bearer-token authentication enabled")
+    origins = settings.cors_origin_list
+    if origins:
+        from starlette.middleware.cors import CORSMiddleware
+
+        app = CORSMiddleware(
+            app,
+            allow_origins=origins,
+            allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+            allow_headers=["Mcp-Session-Id", "Authorization", "Content-Type"],
+            expose_headers=["Mcp-Session-Id"],
+        )
+        logger.info("CORS enabled for origins: %s", ", ".join(origins))
+    return app
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -1816,11 +1893,21 @@ def main() -> None:
                 settings.host,
                 extra={"bind_host": settings.host},
             )
-        # FastMCP.run() accepts no host/port kwargs — configure them on the
-        # instance settings, which the Streamable HTTP runner (uvicorn) reads.
         mcp.settings.host = settings.host
         mcp.settings.port = settings.port
-        mcp.run(transport="streamable-http")
+        if settings.auth_token or settings.cors_origin_list:
+            # Serve the auth/CORS-wrapped ASGI app ourselves (SEC-009/SDK-004).
+            import uvicorn
+
+            uvicorn.run(
+                build_http_app(settings),
+                host=settings.host,
+                port=settings.port,
+                log_config=None,  # keep our JSON logging on stderr (OBS-004)
+            )
+        else:
+            # No auth/CORS configured: keep the FastMCP runner unchanged.
+            mcp.run(transport="streamable-http")
     else:
         mcp.run()
 

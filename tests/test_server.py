@@ -1642,3 +1642,88 @@ async def test_tool_hashes_match_snapshot():
     current = await mod.current_hashes()
     expected = json.loads(snapshot_path.read_text())["tools"]
     assert current == expected
+
+
+# ---------------------------------------------------------------------------
+# SEC-009 / SDK-004: HTTP bearer auth + CORS
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_bearer_auth_middleware_rejects_and_allows():
+    """_BearerAuthMiddleware returns 401 without/with a wrong token and passes
+    through a correct one (SEC-009)."""
+    import httpx
+
+    from bag_health_mcp.server import _BearerAuthMiddleware
+
+    async def inner(scope, receive, send):
+        await send({"type": "http.response.start", "status": 200,
+                    "headers": [(b"content-type", b"text/plain")]})
+        await send({"type": "http.response.body", "body": b"ok"})
+
+    app = _BearerAuthMiddleware(inner, token="s3cr3t")
+    tr = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=tr, base_url="http://t") as c:
+        assert (await c.get("/mcp")).status_code == 401
+        assert (await c.get("/mcp", headers={"Authorization": "Bearer wrong"})).status_code == 401
+        r = await c.get("/mcp", headers={"Authorization": "Bearer s3cr3t"})
+        assert r.status_code == 200
+        assert r.text == "ok"
+
+
+def test_build_http_app_unconfigured_is_plain(monkeypatch):
+    """With no auth token and no CORS origins, build_http_app returns the bare
+    Starlette app (no behaviour change vs today)."""
+    from starlette.applications import Starlette
+
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(Settings(auth_token="", cors_origins=""))
+    assert isinstance(app, Starlette)
+
+
+def test_build_http_app_wraps_auth_when_token_set():
+    """A configured token wraps the app so unauthenticated calls get 401."""
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(Settings(auth_token="tok", cors_origins=""))
+    from starlette.applications import Starlette
+    assert not isinstance(app, Starlette)  # wrapped
+
+
+@pytest.mark.asyncio
+async def test_cors_exposes_session_id_header():
+    """CORS (when origins configured) echoes an allowed origin and exposes the
+    Mcp-Session-Id header browser clients need (SDK-004); a disallowed origin is
+    not echoed."""
+    import httpx
+
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(Settings(auth_token="", cors_origins="https://a.example"))
+    tr = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=tr, base_url="http://t") as c:
+        pre = await c.options(
+            "/mcp",
+            headers={"Origin": "https://a.example",
+                     "Access-Control-Request-Method": "POST",
+                     "Access-Control-Request-Headers": "mcp-session-id"},
+        )
+        assert pre.headers.get("access-control-allow-origin") == "https://a.example"
+        evil = await c.options(
+            "/mcp",
+            headers={"Origin": "https://evil.example",
+                     "Access-Control-Request-Method": "POST"},
+        )
+        assert evil.headers.get("access-control-allow-origin") is None
+
+
+def test_settings_auth_and_cors_from_env(monkeypatch):
+    """MCP_AUTH_TOKEN and MCP_CORS_ORIGINS populate Settings."""
+    from bag_health_mcp.server import Settings
+
+    monkeypatch.setenv("MCP_AUTH_TOKEN", "abc")
+    monkeypatch.setenv("MCP_CORS_ORIGINS", "https://a.example, https://b.example")
+    s = Settings()
+    assert s.auth_token == "abc"
+    assert s.cors_origin_list == ["https://a.example", "https://b.example"]
