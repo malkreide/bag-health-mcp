@@ -482,35 +482,83 @@ async def test_tools_reuse_pooled_client_under_lifespan():
 # SEC-021 / SEC-004: egress allow-list + HTTPS enforcement
 # ---------------------------------------------------------------------------
 
-def test_assert_egress_allows_idd_host():
-    """The configured BAG IDD host over HTTPS is permitted."""
+@pytest.mark.asyncio
+async def test_assert_egress_allows_idd_host():
+    """The configured BAG IDD host over HTTPS (resolving to a public IP) is OK."""
     from bag_health_mcp.server import _assert_egress_allowed
 
-    _assert_egress_allowed(httpx.URL("https://api.idd.bag.admin.ch/api/v1/data/version"))
+    await _assert_egress_allowed(httpx.URL("https://api.idd.bag.admin.ch/api/v1/data/version"))
 
 
-def test_assert_egress_blocks_other_host():
+@pytest.mark.asyncio
+async def test_assert_egress_blocks_other_host():
     """Any host outside the allow-list is refused (SEC-021)."""
     from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
 
     with pytest.raises(EgressNotAllowed):
-        _assert_egress_allowed(httpx.URL("https://evil.example.com/steal"))
+        await _assert_egress_allowed(httpx.URL("https://evil.example.com/steal"))
 
 
-def test_assert_egress_blocks_internal_ip():
-    """The cloud metadata endpoint (and any non-allow-listed IP) is refused."""
+@pytest.mark.asyncio
+async def test_assert_egress_blocks_internal_ip_host():
+    """The cloud metadata endpoint as a literal host is refused (not allow-listed)."""
     from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
 
     with pytest.raises(EgressNotAllowed):
-        _assert_egress_allowed(httpx.URL("http://169.254.169.254/latest/meta-data"))
+        await _assert_egress_allowed(httpx.URL("http://169.254.169.254/latest/meta-data"))
 
 
-def test_assert_egress_blocks_non_https_scheme():
+@pytest.mark.asyncio
+async def test_assert_egress_blocks_non_https_scheme():
     """Plain HTTP to the allowed host is still refused (SEC-004 scheme enforce)."""
     from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
 
     with pytest.raises(EgressNotAllowed):
-        _assert_egress_allowed(httpx.URL("http://api.idd.bag.admin.ch/api/v1/data/version"))
+        await _assert_egress_allowed(httpx.URL("http://api.idd.bag.admin.ch/api/v1/data/version"))
+
+
+@pytest.mark.asyncio
+async def test_assert_egress_blocks_allowed_host_resolving_to_private_ip(monkeypatch):
+    """SEC-004 IP-blocklist: even the allow-listed host is refused if DNS returns
+    a private/internal address (SSRF via a poisoned/rebound record)."""
+    import bag_health_mcp.server as server
+    from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
+
+    async def _resolve_internal(host: str) -> list[str]:
+        return ["169.254.169.254"]
+
+    monkeypatch.setattr(server, "_resolve_host", _resolve_internal)
+    with pytest.raises(EgressNotAllowed):
+        await _assert_egress_allowed(httpx.URL("https://api.idd.bag.admin.ch/api/v1/data/version"))
+
+
+@pytest.mark.asyncio
+async def test_assert_egress_blocks_when_any_resolved_ip_is_private(monkeypatch):
+    """If a host resolves to a mix of public and private IPs, fail closed —
+    a public answer must not mask an internal one."""
+    import bag_health_mcp.server as server
+    from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
+
+    async def _resolve_mixed(host: str) -> list[str]:
+        return ["93.184.216.34", "10.0.0.5"]
+
+    monkeypatch.setattr(server, "_resolve_host", _resolve_mixed)
+    with pytest.raises(EgressNotAllowed):
+        await _assert_egress_allowed(httpx.URL("https://api.idd.bag.admin.ch/api/v1/data/version"))
+
+
+@pytest.mark.asyncio
+async def test_assert_egress_blocks_on_dns_failure(monkeypatch):
+    """A resolution failure fails closed (no request proceeds on unknown IP)."""
+    import bag_health_mcp.server as server
+    from bag_health_mcp.server import EgressNotAllowed, _assert_egress_allowed
+
+    async def _resolve_fail(host: str) -> list[str]:
+        raise OSError("temporary DNS failure")
+
+    monkeypatch.setattr(server, "_resolve_host", _resolve_fail)
+    with pytest.raises(EgressNotAllowed):
+        await _assert_egress_allowed(httpx.URL("https://api.idd.bag.admin.ch/api/v1/data/version"))
 
 
 @pytest.mark.asyncio
