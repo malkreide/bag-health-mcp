@@ -431,3 +431,48 @@ async def test_successful_call_is_not_iserror():
         )
 
     assert result.isError is False
+
+
+# ---------------------------------------------------------------------------
+# SDK-001: lifespan-managed shared httpx client (connection pooling)
+# ---------------------------------------------------------------------------
+
+@pytest.mark.asyncio
+async def test_lifespan_shares_single_pooled_client():
+    """The lifespan opens ONE pooled client shared across tools; exiting the
+    per-call _client() context must not close it, and the lifespan shutdown
+    must close it (SDK-001)."""
+    from bag_health_mcp import server
+
+    async with server.lifespan(server.mcp) as ctx:
+        pooled = ctx["http_client"]
+        # Every _client() acquisition yields the same pooled instance ...
+        async with server._client() as a, server._client() as b:
+            assert a is b is pooled
+        # ... and exiting the _client() context does NOT close it.
+        assert pooled.is_closed is False
+
+    # Lifespan shutdown closes the pooled client and clears the module slot.
+    assert pooled.is_closed is True
+    assert server._shared_client is None
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_tools_reuse_pooled_client_under_lifespan():
+    """Two tool calls within one lifespan must reuse the same client object
+    (no client-per-call), and still work end to end."""
+    from bag_health_mcp import server
+
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
+        return_value=httpx.Response(200, json=MOCK_SETS)
+    )
+
+    async with server.lifespan(server.mcp) as ctx:
+        pooled = ctx["http_client"]
+        r1 = await bag_list_diseases(ListDiseasesInput())
+        r2 = await bag_list_series(DataSetsInput(topic="influenza"))
+        # Both calls ran against the single pooled client.
+        assert server._shared_client is pooled
+        assert r1["total_topics"] > 0
+        assert r2["topic"] == "influenza"

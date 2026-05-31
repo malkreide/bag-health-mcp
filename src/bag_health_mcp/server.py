@@ -11,6 +11,8 @@ from __future__ import annotations
 import logging
 import os
 import sys
+from collections.abc import AsyncIterator
+from contextlib import AsyncExitStack, asynccontextmanager
 from typing import Any, Literal, NoReturn
 
 import httpx
@@ -38,6 +40,55 @@ CANTONS = [
 ]
 
 # ---------------------------------------------------------------------------
+# HTTP client lifespan (SDK-001)
+# ---------------------------------------------------------------------------
+#
+# A single pooled httpx.AsyncClient is opened for the server's whole lifetime
+# and shared across every tool, instead of opening a new client (new TCP/TLS
+# connection) per call. Its lifetime is owned by the FastMCP lifespan below;
+# an AsyncExitStack manages teardown so additional async resources can be added
+# later with the same guaranteed-cleanup semantics.
+
+# Process-wide pooled client, owned by ``lifespan``. ``None`` whenever no
+# lifespan is running; in that case ``_client`` falls back to a per-call client
+# (see below), so this global is only ever the lifespan-managed instance.
+_shared_client: httpx.AsyncClient | None = None
+
+
+def _new_client() -> httpx.AsyncClient:
+    return httpx.AsyncClient(
+        base_url=IDD_BASE,
+        timeout=TIMEOUT,
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json",
+        },
+        follow_redirects=True,
+    )
+
+
+@asynccontextmanager
+async def lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
+    """Open one pooled httpx.AsyncClient for the server's lifetime (SDK-001).
+
+    The client is also exposed in the lifespan context (``http_client``) for
+    inspection / future Context injection. ``AsyncExitStack`` guarantees the
+    client — and any further resources entered on the stack — are closed on
+    shutdown even if startup of a later resource fails.
+    """
+    global _shared_client
+    async with AsyncExitStack() as stack:
+        client = await stack.enter_async_context(_new_client())
+        _shared_client = client
+        logger.info("opened shared httpx client for %s", server.name)
+        try:
+            yield {"http_client": client}
+        finally:
+            _shared_client = None
+            logger.info("closed shared httpx client for %s", server.name)
+
+
+# ---------------------------------------------------------------------------
 # FastMCP setup
 # ---------------------------------------------------------------------------
 
@@ -52,6 +103,7 @@ mcp = FastMCP(
         "bag_get_series_details to understand available filters, then "
         "bag_get_disease_data to retrieve time-series values."
     ),
+    lifespan=lifespan,
 )
 
 
@@ -95,19 +147,25 @@ def _ensure_ok(r: httpx.Response, *, context: str) -> None:
 
 
 # ---------------------------------------------------------------------------
-# HTTP client
+# HTTP client accessor
 # ---------------------------------------------------------------------------
 
-def _client() -> httpx.AsyncClient:
-    return httpx.AsyncClient(
-        base_url=IDD_BASE,
-        timeout=TIMEOUT,
-        headers={
-            "User-Agent": USER_AGENT,
-            "Accept": "application/json",
-        },
-        follow_redirects=True,
-    )
+@asynccontextmanager
+async def _client() -> AsyncIterator[httpx.AsyncClient]:
+    """Yield an httpx client for a tool call (connection pooling, SDK-001).
+
+    Under the server :func:`lifespan` this yields the process-wide pooled client
+    and does **not** close it on exit — its lifetime is owned by the lifespan, so
+    connections are reused across calls. With no lifespan active (a unit test
+    calling a tool directly) it falls back to a per-call client that is created
+    and closed here, matching the pre-pooling behaviour. Call sites keep using
+    ``async with _client() as c:`` unchanged.
+    """
+    if _shared_client is not None:
+        yield _shared_client
+    else:
+        async with _new_client() as client:
+            yield client
 
 
 async def _get(
