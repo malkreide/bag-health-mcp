@@ -44,6 +44,22 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 | `bag_download_export` | Download raw CSV/JSON export |
 | `bag_get_data_version` | Current data version (updated every Wednesday) |
 
+### Tool annotations
+
+All tools carry MCP [tool annotations](https://modelcontextprotocol.io/) so a
+host can reason about them without calling. Every tool is identical here — it
+only ever reads from the public BAG IDD API:
+
+| Annotation | Value | Meaning |
+|------------|-------|---------|
+| `readOnlyHint` | `true` | No tool mutates any state. |
+| `destructiveHint` | `false` | No destructive side effects. |
+| `idempotentHint` | `true` | Repeating a call has no additional effect. |
+| `openWorldHint` | `true` | Tools reach an external system (the IDD API). |
+
+A host may therefore treat all calls as safe, cacheable reads. The values are
+declared once as `READ_ONLY` in `server.py` and applied to all 8 tools.
+
 ## 🧩 MCP Primitives
 
 This server uses all three MCP primitives, each for what it is best at:
