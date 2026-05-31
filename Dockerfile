@@ -1,11 +1,29 @@
-FROM python:3.12-slim
+# syntax=docker/dockerfile:1
 
-WORKDIR /app
+# --- Build stage: produce a wheel; build tooling stays out of the final image.
+FROM python:3.12-slim AS builder
 
+WORKDIR /build
+
+# Only the files needed to build the wheel.
 COPY pyproject.toml README.md LICENSE ./
 COPY src/ ./src/
 
-RUN pip install --no-cache-dir -e .
+# Build a wheel for the package (no deps here; they are resolved in the final
+# stage so pip can cache and the build layer stays small).
+RUN pip install --no-cache-dir build \
+    && python -m build --wheel --outdir /dist
+
+# --- Final stage: a clean runtime image with only the installed package.
+FROM python:3.12-slim AS runtime
+
+WORKDIR /app
+
+# Install the built wheel plus its runtime dependencies — no source tree, no
+# editable install, no build backend in the final image.
+COPY --from=builder /dist/*.whl /tmp/
+RUN pip install --no-cache-dir /tmp/*.whl \
+    && rm -f /tmp/*.whl
 
 EXPOSE 8000
 
@@ -23,4 +41,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 RUN useradd --create-home --uid 10001 appuser
 USER appuser
 
-CMD ["python", "-m", "bag_health_mcp.server", "--http", "--port", "8000"]
+# Use the installed console script (no source tree / module path needed).
+CMD ["bag-health-mcp", "--http", "--port", "8000"]
