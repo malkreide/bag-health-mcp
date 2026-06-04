@@ -1,9 +1,13 @@
 # 🏥 bag-health-mcp
 
 [![PyPI](https://img.shields.io/pypi/v/bag-health-mcp)](https://pypi.org/project/bag-health-mcp/)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Swiss Public Data MCP Portfolio](https://img.shields.io/badge/Portfolio-Swiss%20Public%20Data%20MCP-red)](https://github.com/malkreide)
 
 > Teil des [Swiss Public Data MCP Portfolios](https://github.com/malkreide) — KI-Modelle mit Schweizer Öffentlichen Daten verbinden.
+
+**[🇬🇧 English version](README.md)**
 
 MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts für Gesundheit (BAG). Zugriff auf epidemiologische Überwachungsdaten für 51 Krankheitserreger — darunter Grippe, COVID-19, Masern, Abwasser-Surveillance und mehr.
 
@@ -119,3 +123,5 @@ einer künftigen Schreib-Phase gelten dokumentierte Voraussetzungen
 - **ISDS-Schutzbedarf / Datenklassifikation Schulamt**:
   [`docs/isds-klassifikation.md`](docs/isds-klassifikation.md),
   [`docs/datenklassifikation-schulamt.md`](docs/datenklassifikation-schulamt.md)
+- **Schwachstellen melden**: siehe die [Sicherheitsrichtlinie](SECURITY.de.md), wie
+  Sicherheitsprobleme vertraulich gemeldet werden.

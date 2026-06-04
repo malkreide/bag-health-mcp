@@ -7,6 +7,8 @@
 
 > Part of the [Swiss Public Data MCP Portfolio](https://github.com/malkreide) — connecting AI models to Swiss public data sources.
 
+**[🇩🇪 Deutsche Version](README.de.md)**
+
 MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Disease Dashboard (IDD)**. Access epidemiological surveillance data for 51 pathogens across Switzerland — including influenza, COVID-19, measles, wastewater surveillance, and more.
 
 ---
@@ -267,6 +269,8 @@ class — never tool arguments, cantons or surveillance data.
 - **Phase architecture:** this is a **Phase 1 (read-only)** server; write/send
   capabilities are deferred behind documented prerequisites. See
   [`docs/roadmap.md`](docs/roadmap.md).
+- **Reporting vulnerabilities:** see the [security policy](SECURITY.md) for how to
+  report security issues privately.
 
 ---
 
