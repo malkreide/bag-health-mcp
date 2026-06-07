@@ -288,3 +288,5 @@ reusing the data; see [Data sources & licences](#datenquellen--lizenzen--data-so
 - [`swiss-statistics-mcp`](https://github.com/malkreide/swiss-statistics-mcp) — BFS demographic data
 - [`bag-epl-mcp`](https://github.com/malkreide/bag-epl-mcp) — BAG medication reimbursement list
 - [`zurich-opendata-mcp`](https://github.com/malkreide/zurich-opendata-mcp) — City of Zurich open data
+
+<!-- mcp-name: io.github.malkreide/bag-health-mcp -->

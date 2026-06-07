@@ -71,7 +71,6 @@ dev = [
 bag-health-mcp = "bag_health_mcp.server:main"
 
 [project.urls]
-"mcp-name" = "io.github.malkreide/bag-health-mcp"
 Homepage   = "https://github.com/malkreide/bag-health-mcp"
 Repository = "https://github.com/malkreide/bag-health-mcp"
 Issues     = "https://github.com/malkreide/bag-health-mcp/issues"
