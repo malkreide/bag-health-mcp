@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name        = "bag-health-mcp"
-version     = "0.2.2"
+version     = "0.2.3"
 description = "MCP server for Swiss Federal Office of Public Health (BAG) infectious disease surveillance — IDD API"
 readme      = "README.md"
 license     = { file = "LICENSE" }
