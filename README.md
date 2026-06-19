@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/malkreide-bag-health-mcp-badge.png)](https://mseep.ai/app/malkreide-bag-health-mcp)
+
 # 🏥 bag-health-mcp
 
 [![PyPI](https://img.shields.io/pypi/v/bag-health-mcp)](https://pypi.org/project/bag-health-mcp/)
