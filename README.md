@@ -28,12 +28,28 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 
 "Welche Krankheitsdaten stellt das BAG aktuell bereit?"
 → bag_health_mcp__list_diseases()
+
+"Wie hat sich der Alkoholkonsum bei 15-Jährigen seit 2010 entwickelt?"   # 🎯 anchor query
+→ bag_health_mcp__search_health_indicators(source="suchtschweiz", topic="alkohol")
+→ bag_health_mcp__get_indicator_series(source="suchtschweiz",
+      indicator_id="monam/alkoholkonsum-alter-11-15", region="ZH", year_from=2010)
 → More use cases by audience →
 ```
+
+> **🎯 Anchor demo query** — *«Wie hat sich der Alkoholkonsum bei 15-Jährigen im
+> Kanton Zürich seit 2010 entwickelt, und wie steht der Kanton im Schweizer
+> Vergleich da?»* The HBSC youth series (via Obsan) answers the **Switzerland-wide**
+> trend since 2010 with 95% confidence intervals; it is **national only**, so the
+> response includes a `region_note` explaining that a canton-vs-Switzerland
+> comparison is not available from this survey (HBSC is not cantonally
+> representative). These are **aggregated population statistics — not individual
+> advice.** See [`docs/tool-design-health-indicators.md`](docs/tool-design-health-indicators.md).
 
 ---
 
 ## 🔧 Tools
+
+Infectious-disease surveillance (BAG IDD):
 
 | Tool | Description |
 |------|-------------|
@@ -45,6 +61,23 @@ MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Dise
 | `bag_health_mcp__list_export_files` | List available complete export datasets |
 | `bag_health_mcp__download_export` | Download raw CSV/JSON export |
 | `bag_health_mcp__get_data_version` | Current data version (updated every Wednesday) |
+
+Health indicators — Obsan, Versorgungsatlas & Sucht Schweiz (multi-source):
+
+| Tool | Description |
+|------|-------------|
+| `bag_health_mcp__search_health_indicators` | Search indicators by `source` (`obsan` / `versorgungsatlas` / `suchtschweiz`), topic, region, year range |
+| `bag_health_mcp__get_indicator_series` | Fetch one indicator's national time series (with 95% CIs where available) |
+
+> ⚠️ **Aggregated population statistics only.** The indicator tools serve
+> population-level aggregates (prevalences/metrics by age/sex/region) — **not
+> individual advice, diagnosis or case assessment, and no personal data.** This is
+> stated in both tool descriptions and every response (`aggregate_statistics_notice`),
+> and matters especially for `suchtschweiz` (HBSC), which touches prevention topics
+> in a school context. Sources: Obsan `ind.obsan.admin.ch` (clean JSON API); Sucht
+> Schweiz HBSC via the Obsan mirror; Versorgungsatlas returns indicator metadata +
+> dimensions (its numeric values live only in the interactive atlas). See the
+> per-source [probe notes](docs/) for details.
 
 ### Tool annotations
 
@@ -60,13 +93,13 @@ only ever reads from the public BAG IDD API:
 | `openWorldHint` | `true` | Tools reach an external system (the IDD API). |
 
 A host may therefore treat all calls as safe, cacheable reads. The values are
-declared once as `READ_ONLY` in `server.py` and applied to all 8 tools.
+declared once as `READ_ONLY` in `server.py` and applied to all 10 tools.
 
 ## 🧩 MCP Primitives
 
 This server uses all three MCP primitives, each for what it is best at:
 
-**Tools** (8) — live, parameterised actions that call the IDD API (above).
+**Tools** (10) — live, parameterised actions that call the IDD API (above).
 
 **Resources** — static, read-only reference data a host can fetch and cache, no
 arguments or upstream call needed:
@@ -120,18 +153,23 @@ workflows are packaged as Prompts.
 | Source | Provider | Licence | Attribution required |
 |--------|----------|---------|----------------------|
 | Infectious Disease Dashboard (IDD) | Federal Office of Public Health (FOPH / BAG) | [opendata.swiss](https://opendata.swiss) Open Government Data — *free use, source attribution required* (Swiss OGD terms, CC BY-equivalent) | Yes |
+| Health indicators | Obsan — Swiss Health Observatory (`ind.obsan.admin.ch`) | No explicit machine-readable licence; treat as Swiss OGD practice — *free use, cite the per-indicator source* | Yes |
+| Health-care supply atlas | Versorgungsatlas (BAG/Obsan, `versorgungsatlas.ch`) | Same (Swiss OGD practice, cite source) | Yes |
+| HBSC youth survey | Sucht Schweiz — HBSC, obtained via the Obsan mirror | Same (Swiss OGD practice, cite «Sucht Schweiz — HBSC») | Yes |
 
 **Required citation:** *Federal Office of Public Health FOPH — Infectious Disease
-Dashboard (IDD), open data via opendata.swiss.* Every tool response carries this
-in a `provenance` block (`attribution` + `license` fields) so downstream
-consumers can surface it automatically.
+Dashboard (IDD), open data via opendata.swiss.* For the indicator tools, each
+response's `provenance.source` names the concrete upstream (e.g. «Sucht Schweiz —
+HBSC» via Obsan). Every tool response carries attribution in a `provenance` block
+(`attribution` + `license` fields) so downstream consumers can surface it
+automatically.
 
 ```
 Architecture:
-                    ┌─────────────────┐
-  MCP Host          │  bag-health-mcp │
-  (Claude, etc.) ──▶│  MCP SDK        │──▶ api.idd.bag.admin.ch
-                    │  8 Tools        │    (IDD API, no auth)
+                    ┌─────────────────┐    api.idd.bag.admin.ch (IDD API, no auth)
+  MCP Host          │  bag-health-mcp │──▶ ind.obsan.admin.ch   (Obsan JSON API)
+  (Claude, etc.) ──▶│  MCP SDK        │──▶ versorgungsatlas.ch  (indicator catalogue)
+                    │  10 Tools       │    all HTTPS, egress allow-listed, no auth
                     └─────────────────┘
 ```
 

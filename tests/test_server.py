@@ -279,7 +279,7 @@ async def test_all_tools_declare_readonly_annotations():
     from bag_health_mcp.server import mcp
 
     tools = await mcp.list_tools()
-    assert len(tools) == 8
+    assert len(tools) == 10
     for t in tools:
         ann = t.annotations
         assert ann is not None, f"{t.name} has no annotations"
@@ -1083,7 +1083,7 @@ async def test_all_tools_advertise_output_schema():
     from bag_health_mcp.server import mcp
 
     tools = await mcp.list_tools()
-    assert len(tools) == 8
+    assert len(tools) == 10
     for t in tools:
         assert t.outputSchema is not None, f"{t.name} has no outputSchema"
 
@@ -1183,7 +1183,7 @@ async def test_server_exposes_resources_and_prompts():
         resources = await client.list_resources()
         prompts = await client.list_prompts()
 
-    assert len(tools.tools) == 8
+    assert len(tools.tools) == 10
     uris = {str(r.uri) for r in resources.resources}
     assert {
         "bag://reference/cantons",
@@ -1577,7 +1577,7 @@ async def test_tool_descriptions_have_usecase_tags():
                for tag in ("<use_case>", "<important_notes>", "<example>"))
     ]
     assert len(tagged) / len(tools) >= 0.8
-    # In practice all 8 are tagged.
+    # In practice all 10 are tagged.
     assert len(tagged) == len(tools)
 
 

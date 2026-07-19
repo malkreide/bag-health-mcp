@@ -138,6 +138,105 @@ class DataVersionInput(_StrictInput):
 
 
 # ---------------------------------------------------------------------------
+# Health-indicator inputs (multi-source extension)
+# ---------------------------------------------------------------------------
+#
+# Two source-agnostic tools cover three additional Swiss health-data providers
+# behind a single input shape (see docs/tool-design-health-indicators.md).
+# ``indicator_id`` and ``region`` flow into upstream URL paths, so both carry
+# strict length + pattern constraints (SEC-018); ``topic`` is only used for local
+# substring filtering of a cached catalogue, so it needs a length cap, not a path
+# pattern.
+
+HealthSource = Literal["obsan", "versorgungsatlas", "suchtschweiz"]
+
+# Obsan indicator ids come as either the internal id ("_330") or the navigable
+# "<topic>/<slug>" path ("monam/alkoholkonsum-alter-11-15"); Versorgungsatlas as
+# "<id>/<aspect>" ("_003/b"). This pattern covers all three.
+_INDICATOR_ID_PATTERN = r"^[A-Za-z0-9_/-]+$"
+_REGION_PATTERN = r"^[A-Za-z]{2,3}$"
+
+
+class SearchHealthIndicatorsInput(_StrictInput):
+    source: HealthSource = Field(
+        description=(
+            "Which Swiss health-data source to search: 'obsan' (Swiss Health "
+            "Observatory indicators, incl. the HBSC youth-survey series), "
+            "'versorgungsatlas' (Swiss health-care supply atlas, ~124 indicators), "
+            "or 'suchtschweiz' (addiction/HBSC series — served via Obsan's mirror)."
+        ),
+    )
+    topic: str = Field(
+        default="",
+        max_length=80,
+        description=(
+            "Free-text filter matched against indicator titles/topics/slugs "
+            "(e.g. 'alkohol', 'impfung', 'kosten'). Empty returns the top of the "
+            "catalogue."
+        ),
+    )
+    region: str | None = Field(
+        default=None,
+        max_length=3,
+        pattern=_REGION_PATTERN,
+        description=(
+            "Optional canton code (e.g. 'ZH') or 'CH'. Note: most indicators here "
+            "are national only; a canton hint is recorded but may not narrow "
+            "results — see each indicator's regional dimension."
+        ),
+    )
+    year_from: int | None = Field(
+        default=None, ge=1900, le=2100,
+        description="Optional lower bound (year) — a hint for downstream series retrieval.",
+    )
+    year_to: int | None = Field(
+        default=None, ge=1900, le=2100,
+        description="Optional upper bound (year) — a hint for downstream series retrieval.",
+    )
+    language: Language = Field(default="de", description="Result language for labels.")
+    limit: int = Field(
+        default=25, ge=1, le=100,
+        description="Maximum number of matching indicators to return.",
+    )
+
+
+class GetIndicatorSeriesInput(_StrictInput):
+    source: HealthSource = Field(
+        description="Source the indicator_id belongs to (as returned by search_health_indicators).",
+    )
+    indicator_id: str = Field(
+        min_length=1,
+        max_length=128,
+        pattern=_INDICATOR_ID_PATTERN,
+        description=(
+            "Indicator identifier from search_health_indicators. Obsan: internal id "
+            "'_330' or path 'monam/alkoholkonsum-alter-11-15'. Versorgungsatlas: "
+            "'<id>/<aspect>', e.g. '_003/b'."
+        ),
+    )
+    region: str | None = Field(
+        default=None,
+        max_length=3,
+        pattern=_REGION_PATTERN,
+        description=(
+            "Optional canton (e.g. 'ZH') or 'CH'. If the indicator has no regional "
+            "dimension (most youth-survey/HBSC series), the national series is "
+            "returned with a note — a canton-vs-Switzerland comparison is then not "
+            "available from this indicator."
+        ),
+    )
+    year_from: int | None = Field(
+        default=None, ge=1900, le=2100,
+        description="Optional lower year bound; points before it are dropped.",
+    )
+    year_to: int | None = Field(
+        default=None, ge=1900, le=2100,
+        description="Optional upper year bound; points after it are dropped.",
+    )
+    language: Language = Field(default="de", description="Language for labels/units.")
+
+
+# ---------------------------------------------------------------------------
 # Output models (SDK-002)
 # ---------------------------------------------------------------------------
 #
@@ -285,5 +384,92 @@ class CantonSituationOutput(BaseModel):
     diseases: dict[str, CantonDiseaseStatus | CantonDiseaseData]
     note: str
     school_relevance: str
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+# ---------------------------------------------------------------------------
+# Health-indicator outputs (multi-source extension)
+# ---------------------------------------------------------------------------
+#
+# Per-source attribution/licence, since the extension reaches beyond the BAG IDD.
+# No source below advertises a formal machine-readable licence on its data
+# objects; reuse follows Swiss OGD practice (free use with source attribution).
+OBSAN_ATTRIBUTION = "Obsan — Swiss Health Observatory, indicator collection (ind.obsan.admin.ch)"
+VERSORGUNGSATLAS_ATTRIBUTION = (
+    "Versorgungsatlas — Swiss Atlas of Health Care Supply, a BAG/Obsan project "
+    "(versorgungsatlas.ch)"
+)
+SUCHTSCHWEIZ_ATTRIBUTION = (
+    "Sucht Schweiz — «Health Behaviour in School-aged Children» (HBSC) survey, "
+    "obtained via the Obsan indicator mirror"
+)
+INDICATOR_LICENSE = (
+    "No explicit machine-readable licence published on the data objects. Treat as "
+    "Swiss Open Government Data practice: free use with mandatory source "
+    "attribution. Always cite the per-indicator 'source' field."
+)
+
+# The mandated safeguard label (task requirement): these tools serve AGGREGATED
+# population statistics — never individual advice. Surfaced both in the tool
+# descriptions and inside every response envelope, in German (school-context
+# audience) and English.
+AGGREGATE_STATISTICS_NOTICE = (
+    "Aggregierte Bevölkerungsstatistik (Prävalenzen/Kennzahlen nach "
+    "Alter/Geschlecht/Region) — KEINE individuelle Beratung, Diagnose oder "
+    "Fallbeurteilung, kein Personenbezug. Aggregated population statistics, not "
+    "individual advice or diagnosis."
+)
+
+
+class IndicatorSummary(BaseModel):
+    """One matching indicator from a catalogue search."""
+
+    source: str
+    indicator_id: str
+    title: str
+    topic: str | None = None
+    subtitle: str | None = None
+    description: str | None = None
+    regional_dimension: str | None = None  # e.g. "national" | "canton" | "unknown"
+
+
+class IndicatorSearchOutput(BaseModel):
+    source: str
+    query: dict[str, str | int | None]
+    total_matches: int
+    indicators: list[IndicatorSummary]
+    usage: str
+    aggregate_statistics_notice: str = AGGREGATE_STATISTICS_NOTICE
+    provenance: Provenance = Field(default_factory=Provenance)
+
+
+class IndicatorSeriesPoint(BaseModel):
+    """One observation. Dimension ids (sex/category) are passed through as the
+    source encodes them; see the series ``dimensions`` block for their meaning."""
+
+    year: int | None = None
+    period: str | None = None
+    value: float | None = None
+    value_lower_ci: float | None = None
+    value_upper_ci: float | None = None
+    sample_size: int | None = None
+    sex_id: int | None = None
+    category_id: int | None = None
+
+
+class IndicatorSeriesOutput(BaseModel):
+    source: str
+    indicator_id: str
+    title: str
+    unit: str | None = None
+    region: str | None = None
+    region_note: str | None = None
+    values_available: bool = True
+    dimensions: dict[str, str] = Field(default_factory=dict)
+    total_points: int = 0
+    points: list[IndicatorSeriesPoint] = Field(default_factory=list)
+    interpretation: str = ""
+    aggregate_statistics_notice: str = AGGREGATE_STATISTICS_NOTICE
+    note: str | None = None
     provenance: Provenance = Field(default_factory=Provenance)
 
