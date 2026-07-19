@@ -47,7 +47,7 @@ Begründung (entspricht der Vorgabe):
 | Quelle | ARCH | Zugriff im Server |
 |---|---|---|
 | **Obsan** | A (Live-API) | `sitemap.xml` (Katalog, gecacht) → SSR-Seite `__NEXT_DATA__` (id-Auflösung) → `GET /api/<id>/g/json` (Fallback `/gum/json`). Voll funktionsfähig, mit 95%-CI. |
-| **Versorgungsatlas** | C (File-first) | `search/search_<lang>.json` (Katalog, gecacht) für Suche; SSR-Seite für Metadaten/Dimensionen. **Numerische Werte** liegen nur im interaktiven Atlas → `get_indicator_series` liefert Metadaten + Verweis (Graceful Degradation, dokumentierte Grenze). |
+| **Versorgungsatlas** | C (File-first) | `search/search_<lang>.json` (Katalog, gecacht) für Suche; pro Indikator-Aspekt drei statische Dateien `/data/<id><aspect>_<suffix>.json` (per Network-Trace bestätigt): `_ad` (Definition/Einheit/Quelle), `_rz` (**regional**: 26 Kantone + `CH`-Total, mit 95%-CI und Verhältnis `rr` zum Landeswert), `_ag` (national nach Altersklasse). `get_indicator_series` liefert die **kantonale** Reihe (Default `CH`) inkl. Kanton-vs-Schweiz-Vergleich. |
 | **Sucht Schweiz** | via Obsan | HBSC-Jugendreihen werden von Obsan mit Provenienz gespiegelt → `source='suchtschweiz'` nutzt den Obsan-Pfad, auf das `monam`-Monitoring beschränkt und mit Sucht-Schweiz-Attribution. Der `zahlen-fakten`-Host (Tableau/PDF, bei Probe HTTP 526) wird bewusst nicht angebunden. |
 
 ## 4. 🎯 Anchor Demo Query
@@ -91,7 +91,10 @@ Descriptions **und** jede Response tragen den Hinweis
 
 ## 7. Bekannte Grenzen
 
-- Versorgungsatlas: keine maschinenlesbaren Werte (nur Metadaten + Atlas-Link),
-  bis die `/data/`-Basis via Headless-Trace fixiert ist (Folgearbeit).
 - Obsan: nicht jeder Indikator hat `/g/json`; Fallback auf `/gum/json` implementiert.
-- HBSC/Obsan: national, keine Kantonsauflösung (siehe Anchor-Query-Hinweis).
+- HBSC/Obsan: national, keine Kantonsauflösung (siehe Anchor-Query-Hinweis). Für
+  **kantonale** Versorgungskennzahlen liefert hingegen der Versorgungsatlas Werte
+  (`_rz`, 26 Kantone + CH).
+- Versorgungsatlas: Werte-Layer via Network-Trace gelöst (`_ad`/`_rz`/`_ag`); die
+  `_ad`-`version`/`date_export` markieren den Datenstand (jährliche Tarifpool-Basis).
+  Indikatoren ohne `_rz` fallen sauber auf die nationale Altersreihe (`_ag`) zurück.

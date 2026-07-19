@@ -392,7 +392,7 @@ async def _va_search(params: SearchHealthIndicatorsInput) -> IndicatorSearchOutp
                 subtitle=entry.get("aspect_title"),
                 topic=entry.get("topic"),
                 description=(entry.get("description") or "")[:280] or None,
-                regional_dimension="canton / MedStat region",
+                regional_dimension="canton (kt): 26 cantons + CH national",
             )
         )
         if len(matches) >= params.limit:
@@ -406,8 +406,8 @@ async def _va_search(params: SearchHealthIndicatorsInput) -> IndicatorSearchOutp
         indicators=matches,
         usage=(
             "Pass an indicator_id (e.g. '_003/b') to bag_health_mcp__get_indicator_series"
-            "(source='versorgungsatlas', indicator_id=...) for indicator metadata "
-            "and dimensions."
+            "(source='versorgungsatlas', indicator_id=..., region='ZH') for a cantonal "
+            "time series with 95% CIs and a canton-vs-Switzerland comparison."
         ),
         provenance=Provenance(
             source=VERSORGUNGSATLAS_ATTRIBUTION,
@@ -416,68 +416,201 @@ async def _va_search(params: SearchHealthIndicatorsInput) -> IndicatorSearchOutp
     )
 
 
+# Versorgungsatlas serves three JSON files per indicator-aspect, keyed
+# "/data/<id><aspect>_<suffix>.json" (URL scheme confirmed by a network trace):
+#   _ad = aspect definition/metadata (var1_label, datasource, population, remark)
+#   _rz = by region — one row per (year, region); region_name is a canton code
+#         (geo="kt") plus a "CH" national total, with 95% CI and a rate ratio (rr)
+#   _ag = by age group — national, one row per (year, ageclass, sex)
+# The regional file makes a real canton-vs-Switzerland comparison possible.
+_VA_VAR_LABELS = {
+    "std_costs": "age/sex-standardised costs (CHF per capita)",
+    "costs": "costs (CHF per capita)",
+    "rate": "rate",
+    "share": "share (%)",
+    "prev": "prevalence (%)",
+}
+
+
+async def _va_fetch_data(base: str, suffix: str) -> Any | None:
+    """Fetch one Versorgungsatlas data file, or ``None`` if it does not exist."""
+    async with _client() as c:
+        r = await _get_with_retry(
+            c, f"{VERSORGUNGSATLAS_BASE}/data/{base}_{suffix}.json",
+            context=f"fetching Versorgungsatlas data '{base}_{suffix}'",
+            allow_404=True,
+        )
+    if r.status_code == 404:
+        return None
+    return r.json()
+
+
+async def _va_lookup_title(ind_id: str, aspect: str, lang: Language) -> tuple[str, str | None]:
+    """Title + subtitle for an indicator/aspect from the cached catalogue."""
+    for e in await _va_catalogue(lang):
+        if e.get("id") == ind_id and (not aspect or e.get("aspect") == aspect):
+            return e.get("title", ind_id), e.get("aspect_title")
+    return f"{ind_id}/{aspect}" if aspect else ind_id, None
+
+
 async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
     lang = params.language
     parts = params.indicator_id.split("/")
     ind_id = parts[0]
     aspect = parts[1] if len(parts) > 1 else ""
+    base = f"{ind_id}{aspect}"
 
-    page_path = f"/indicator/{ind_id}/{aspect}" if aspect else f"/indicator/{ind_id}"
-    async with _client() as c:
-        r = await _get_with_retry(
-            c, f"{VERSORGUNGSATLAS_BASE}{page_path}",
-            context=f"fetching Versorgungsatlas indicator '{params.indicator_id}'",
-            allow_404=True,
+    title, subtitle = await _va_lookup_title(ind_id, aspect, lang)
+    meta = await _va_fetch_data(base, "ad")
+    if meta is None:
+        _fail_not_found(
+            "Versorgungsatlas indicator", params.indicator_id, [],
+            "Use bag_health_mcp__search_health_indicators(source='versorgungsatlas', ...).",
         )
-        if r.status_code == 404:
-            _fail_not_found(
-                "Versorgungsatlas indicator", params.indicator_id, [],
-                "Use bag_health_mcp__search_health_indicators(source='versorgungsatlas', ...).",
-            )
-    data = _extract_next_data(r.text)
-    indicator = (data.get("props", {}).get("pageProps", {}) or {}).get("indicator", {})
-    labels = indicator.get("labels", {}) if isinstance(indicator, dict) else {}
-    title = labels.get(lang) or labels.get("de") or params.indicator_id
 
+    var_label = meta.get("var1_label", "")
+    unit = _VA_VAR_LABELS.get(var_label, var_label or None)
+    population = (meta.get("population") or {}).get(lang) or (meta.get("population") or {}).get("de")
     dims: dict[str, str] = {}
-    for asp in indicator.get("aspects", []) or []:
-        if not aspect or asp.get("aspect_id") == aspect:
-            geos = ", ".join(asp.get("geos", []) or [])
-            if geos:
-                dims["geos"] = geos  # e.g. "kt" = canton
-            if asp.get("hasAG"):
-                dims["age_groups"] = "available"
-            sub = asp.get("subtitle", {})
-            if isinstance(sub, dict) and sub.get(lang):
-                dims["subtitle"] = sub[lang]
-            break
+    if subtitle:
+        dims["subtitle"] = subtitle
+    if population:
+        dims["population"] = population
+    dims["value_lower_ci/value_upper_ci"] = "95% confidence interval bounds"
 
+    prov = Provenance(
+        source=f"{VERSORGUNGSATLAS_ATTRIBUTION}; data source: {meta.get('datasource', 'Tarifpool')}",
+        data_version=str(meta.get("version") or "") or None,
+        source_date=meta.get("date_export"),
+        attribution=VERSORGUNGSATLAS_ATTRIBUTION,
+        license=INDICATOR_LICENSE,
+    )
+
+    region = (params.region or "CH").upper()
+    regional = await _va_fetch_data(base, "rz")
+
+    if regional:
+        available = sorted({r.get("region_name") for r in regional if r.get("region_name")})
+        rows = [r for r in regional if r.get("region_name") == region]
+        if not rows:
+            _fail(
+                f"Region '{region}' is not available for this indicator. "
+                f"Available: {', '.join(available)}."
+            )
+        points = _apply_year_filter(
+            [
+                IndicatorSeriesPoint(
+                    year=r.get("year"),
+                    value=r.get("var1"),
+                    value_lower_ci=r.get("lci1"),
+                    value_upper_ci=r.get("uci1"),
+                    sex_id=r.get("sex"),
+                )
+                for r in rows
+                if r.get("var1") is not None
+            ],
+            params.year_from, params.year_to,
+        )
+        dims["regions_available"] = ", ".join(available)
+
+        # Canton-vs-Switzerland comparison from the latest shared year (rr = ratio
+        # to the national value, provided by the source).
+        region_note = None
+        if region != "CH":
+            ch_by_year = {r["year"]: r.get("var1") for r in regional
+                          if r.get("region_name") == "CH"}
+            latest = max((r["year"] for r in rows), default=None)
+            rr = next((r.get("rr") for r in rows if r.get("year") == latest), None)
+            ch_val = ch_by_year.get(latest)
+            can_val = next((r.get("var1") for r in rows if r.get("year") == latest), None)
+            if latest is not None and ch_val is not None and can_val is not None:
+                direction = "above" if can_val > ch_val else "below" if can_val < ch_val else "at"
+                region_note = (
+                    f"Canton-vs-Switzerland ({latest}): {region}={can_val}, CH={ch_val}"
+                    + (f", ratio rr={rr}" if rr is not None else "")
+                    + f" — {region} is {direction} the national value. Call again with "
+                    "region='CH' for the full national series."
+                )
+
+        return IndicatorSeriesOutput(
+            source=params.source,
+            indicator_id=params.indicator_id,
+            title=title,
+            unit=unit,
+            region=region,
+            region_note=region_note,
+            values_available=bool(points),
+            dimensions=dims,
+            total_points=len(points),
+            points=points,
+            interpretation=(
+                f"'{title}'. Values are '{var_label}' ({unit}); denominator: "
+                f"{meta.get('denominator', 'n/a')}. Regional series (geo='kt') for "
+                f"'{region}', with 95% CIs. Source: {meta.get('datasource', 'Tarifpool')} "
+                "via Versorgungsatlas (BAG/Obsan)."
+            ),
+            provenance=prov,
+        )
+
+    # No regional file: fall back to the national age-group series (_ag).
+    age = await _va_fetch_data(base, "ag")
+    if age:
+        points = _apply_year_filter(
+            [
+                IndicatorSeriesPoint(
+                    year=r.get("year"),
+                    value=r.get("var1"),
+                    value_lower_ci=r.get("lci1"),
+                    value_upper_ci=r.get("uci1"),
+                    sex_id=r.get("sex"),
+                    category_id=r.get("ageclass"),
+                )
+                for r in age
+                if r.get("var1") is not None
+            ],
+            params.year_from, params.year_to,
+        )
+        dims["category_id"] = "age class (see 'age' labels in the atlas)"
+        return IndicatorSeriesOutput(
+            source=params.source,
+            indicator_id=params.indicator_id,
+            title=title,
+            unit=unit,
+            region="CH",
+            region_note=(
+                "This indicator has no regional file; the national age-group series "
+                "is returned (category_id = age class)."
+                if params.region and params.region.upper() != "CH" else None
+            ),
+            values_available=bool(points),
+            dimensions=dims,
+            total_points=len(points),
+            points=points,
+            interpretation=(
+                f"'{title}'. Values are '{var_label}' ({unit}), national by age class. "
+                f"Source: {meta.get('datasource', 'Tarifpool')} via Versorgungsatlas."
+            ),
+            provenance=prov,
+        )
+
+    # Metadata only (no data files) — graceful degradation.
     return IndicatorSeriesOutput(
         source=params.source,
         indicator_id=params.indicator_id,
         title=title,
-        unit=None,
-        region=params.region.upper() if params.region else None,
+        unit=unit,
+        region=region,
         region_note=None,
         values_available=False,
         dimensions=dims,
         total_points=0,
         points=[],
         interpretation=(
-            "Versorgungsatlas indicator metadata. This source serves numeric values "
-            "only inside its interactive atlas (the per-aspect value files sit behind "
-            "the web runtime and are not retrievable as a stable machine endpoint), so "
-            "no time series is returned here — see the atlas view for the figures."
+            f"'{title}'. Definition available, but this indicator exposes no regional "
+            "or age-group data file — see the interactive atlas for the figures."
         ),
-        note=(
-            f"Open the interactive chart at {VERSORGUNGSATLAS_BASE}{page_path}. "
-            "Dimensions (canton/MedStat region, age groups) are listed above; the "
-            "atlas is updated roughly annually from the Tarifpool (SASIS AG)."
-        ),
-        provenance=Provenance(
-            source=VERSORGUNGSATLAS_ATTRIBUTION,
-            attribution=VERSORGUNGSATLAS_ATTRIBUTION, license=INDICATOR_LICENSE,
-        ),
+        note=f"Open the interactive chart at {VERSORGUNGSATLAS_BASE}/indicator/{ind_id}/{aspect}.",
+        provenance=prov,
     )
 
 
@@ -519,19 +652,22 @@ async def bag_search_health_indicators(
 @mcp.tool(name="bag_health_mcp__get_indicator_series", annotations=READ_ONLY_INDICATORS, description=(
     "Fetch one health indicator's time series from Obsan, the Versorgungsatlas or "
     "Sucht Schweiz (HBSC). Use an indicator_id from bag_health_mcp__search_health_indicators. "
-    "Obsan/suchtschweiz return year/value points (with 95% confidence intervals and "
-    "sex/category dimensions where available); versorgungsatlas returns indicator "
-    "metadata + dimensions (its numeric values live only in the interactive atlas). "
+    "Obsan/suchtschweiz return national year/value points (with 95% confidence "
+    "intervals and sex/category dimensions where available); versorgungsatlas returns "
+    "a cantonal year/value series (26 cantons + a 'CH' national total, with 95% CIs "
+    "and a canton-vs-Switzerland ratio) — pass region='ZH' for a canton. "
     "IMPORTANT: AGGREGATED population statistics only — NOT individual advice, "
     "diagnosis or case assessment, no personal data. For 'suchtschweiz' (school-context "
     "prevention topics) the values are national HBSC survey aggregates by age/sex. "
-    "<use_case>Get a national trend, e.g. youth alcohol prevalence since 2010.</use_case>"
-    "<important_notes>If you pass a canton for a national-only indicator, the national "
-    "series is returned with a note — a canton-vs-Switzerland comparison is then not "
-    "available from that indicator.</important_notes>"
-    "<example>bag_health_mcp__get_indicator_series(source='suchtschweiz', "
-    "indicator_id='monam/alkoholkonsum-alter-11-15', year_from=2010) -> Swiss HBSC "
-    "alcohol-prevalence series (11-15y), by sex, with CIs.</example>"
+    "<use_case>Get a national trend (obsan/suchtschweiz) or a cantonal series with a "
+    "Switzerland comparison (versorgungsatlas).</use_case>"
+    "<important_notes>obsan/suchtschweiz indicators are national — passing a canton "
+    "returns the national series with an explanatory note (HBSC is not cantonally "
+    "representative). versorgungsatlas supports cantons: region='ZH' returns ZH plus a "
+    "canton-vs-CH comparison.</important_notes>"
+    "<example>bag_health_mcp__get_indicator_series(source='versorgungsatlas', "
+    "indicator_id='_003/b', region='ZH') -> ZH cantonal series with 95% CIs and its "
+    "ratio to the Swiss average.</example>"
 ))
 @_traced
 async def bag_get_indicator_series(
