@@ -67,17 +67,17 @@ Health indicators — Obsan, Versorgungsatlas & Sucht Schweiz (multi-source):
 | Tool | Description |
 |------|-------------|
 | `bag_health_mcp__search_health_indicators` | Search indicators by `source` (`obsan` / `versorgungsatlas` / `suchtschweiz`), topic, region, year range |
-| `bag_health_mcp__get_indicator_series` | Fetch one indicator's national time series (with 95% CIs where available) |
+| `bag_health_mcp__get_indicator_series` | Fetch one indicator's time series (national with 95% CIs; Versorgungsatlas also **cantonal**, with a canton-vs-Switzerland comparison) |
 
 > ⚠️ **Aggregated population statistics only.** The indicator tools serve
 > population-level aggregates (prevalences/metrics by age/sex/region) — **not
 > individual advice, diagnosis or case assessment, and no personal data.** This is
 > stated in both tool descriptions and every response (`aggregate_statistics_notice`),
 > and matters especially for `suchtschweiz` (HBSC), which touches prevention topics
-> in a school context. Sources: Obsan `ind.obsan.admin.ch` (clean JSON API); Sucht
-> Schweiz HBSC via the Obsan mirror; Versorgungsatlas returns indicator metadata +
-> dimensions (its numeric values live only in the interactive atlas). See the
-> per-source [probe notes](docs/) for details.
+> in a school context. Sources: Obsan `ind.obsan.admin.ch` (clean JSON API, national);
+> Sucht Schweiz HBSC via the Obsan mirror (national); **Versorgungsatlas** returns a
+> **cantonal** year/value series (26 cantons + a `CH` national total, with 95% CIs and
+> a canton-vs-CH ratio) from the Tarifpool. See the per-source [probe notes](docs/).
 
 ### Tool annotations
 

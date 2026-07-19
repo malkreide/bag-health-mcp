@@ -16,10 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Sources: **Obsan** (`ind.obsan.admin.ch`) via its clean JSON API
     `/api/<id>/g/json` (fallback `/gum/json`) — the workhorse, with 95% confidence
     intervals; **Versorgungsatlas** via its static catalogue `search/search_<lang>.json`
-    (search + metadata; numeric values live only in the interactive atlas, so series
-    calls degrade gracefully to metadata + a pointer); **Sucht Schweiz** HBSC youth
-    series through Obsan's official mirror (the `zahlen-fakten` host serves only
-    Tableau/PDF and was unreachable at probe time).
+    (search) plus the per-aspect data files `/data/<id><aspect>_{ad,rz,ag}.json` — the
+    `_rz` file returns a **cantonal** year/value series (26 cantons + a `CH` national
+    total, with 95% CIs and a canton-vs-CH ratio), with a national age-group fallback
+    (`_ag`); **Sucht Schweiz** HBSC youth series through Obsan's official mirror (the
+    `zahlen-fakten` host serves only Tableau/PDF and was unreachable at probe time).
   - Anchor demo query: *«Wie hat sich der Alkoholkonsum bei 15-Jährigen … seit 2010
     entwickelt …»* — answered at national level; a `region_note` states honestly
     that HBSC has no cantonal breakdown.
@@ -36,9 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Known findings
 - Obsan: not every indicator exposes `/g/json`; the server falls back to `/gum/json`.
-- Versorgungsatlas: per-aspect value files sit behind the SPA runtime and are not a
-  stable machine endpoint — series calls return metadata + an atlas link until the
-  `/data/` base is pinned via a headless trace.
+- Versorgungsatlas: the value-file scheme was pinned via a headless network trace —
+  `/data/<id><aspect>_{ad,rz,ag}.json` (the earlier `_kt` guess was wrong only in the
+  third token). Files are served at the web root and fetch fine over `httpx`; the trace
+  itself needed a direct connection because Chromium's `CONNECT` through the egress
+  proxy reset. Cantonal values are now returned by `get_indicator_series`.
 
 ## [0.2.0] - 2026-05-31
 

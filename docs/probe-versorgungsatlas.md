@@ -11,7 +11,7 @@
 | **Offizielles REST-API** | Nein. `versorgungsatlas.ch` ist eine Next.js-SSG-App (**gleicher Vendor wie Obsan** — geteilter Chunk `363-…`). |
 | **Auth** | Keine. Öffentlich. |
 | **Rate-Limit** | Keines beobachtet (statische Assets). |
-| **Offene Frage** | Der numerische **Daten-Filestore** (`/data/…json`) antwortet am Web-Root mit `404` → exakte Base/Rewrite muss per Headless-Fetch fixiert werden (siehe „Offener Punkt"). Katalog + volle Indikator-Metadaten sind **jetzt schon** direkt abrufbar. |
+| **Werte-Layer (gelöst)** | Ein Headless-Network-Trace (Direktverbindung, da der Egress-Proxy `CONNECT` des Browsers zurückwies) zeigt das reale Schema: `/data/<id><aspect>_<suffix>.json` mit `suffix ∈ {ad, ag, rz}`. `_rz` enthält **26 Kantone + `CH`-Total** mit 95%-CI → kantonale Reihen sind maschinenlesbar. Meine früheren `_003b_kt`-Rateversuche waren nur im dritten Token falsch. |
 
 ---
 
@@ -74,18 +74,21 @@ Damit sind Raumeinheit + Dimensionen je Indikator **maschinell auslesbar**, bevo
 | `/search/search_de.json` | 200 | ✅ funktioniert | 285 Aspekte / 124 IDs | vollständiger Katalog, DE/FR/EN |
 | `/sitemap.xml` | 200 | ✅ funktioniert | 889 locs | Indikator-Pfade `indicator/_003/a` … |
 | `/indicator/_003/b` (`__NEXT_DATA__`) | 200 | ✅ funktioniert | 1 (mit `aspects[]`) | SSR-Metadaten inkl. `geos`, `hasAG` |
-| `/data/_003b_kt.json` (+ Varianten) | 404 | ⚠️ leer | – | Pattern korrekt, Base/Rewrite offen |
-| `/geo/_003.geojson`, `/def/_003.json`, `/md/_003_b.md` | 404 | ⚠️ leer | – | analog — nicht am Web-Root |
-| `/robots.txt` | 404 | ❌ | – | keiner vorhanden |
+| `/data/_003b_ad.json` | 200 | ✅ funktioniert | Definition | var1_label, datasource, population, remark |
+| `/data/_003b_rz.json` | 200 | ✅ funktioniert | 270 (27 Regionen × 10 J.) | **26 Kantone + `CH`**, mit 95%-CI und `rr` |
+| `/data/_003b_ag.json` | 200 | ✅ funktioniert | 90 | national nach Altersklasse × Geschlecht |
+| `/geo/kt.geojson` | 200 | ✅ funktioniert | Geometrie | geo-Level-Datei (nicht pro Indikator) |
+| `/data/_003b_kt.json` (frühere Rateversuche) | 404 | ❌ falscher Token | – | dritter Token ist `ad`/`ag`/`rz`, nicht `kt` |
 | `/api/_003/…` (Obsan-Muster) | 404 | ❌ | – | VA nutzt **nicht** Obsans `/api/`-Backend |
 
-**Fundstück (Known finding):** Obwohl `/search/search_de.json` als echte statische Datei am Web-Root
-ausgeliefert wird, liefern `/data/`, `/def/`, `/geo/`, `/md/` durchgängig die SPA-`404`-Seite — trotz
-korrekt rekonstruiertem Datei-Token (`id`+`aspect`+`geo`, z. B. `_003b_kt`) und Referer/XHR-Headern.
-Das deutet auf einen **separaten Asset-Base / Rewrite** (assetPrefix) oder Auslieferung nur im
-SPA-Runtime-Kontext. Für die exakte Werte-URL ist ein **Headless-Browser-Trace** (Network-Tab) nötig —
-bewusst nicht Teil dieser Live-Probe (Phase 1). Der **Katalog und die vollen Metadaten je Indikator
-sind ohne diesen Schritt vollständig zugänglich.**
+**Fundstück (Known finding):** Der Werte-Layer ist gelöst. Die Datei-Funktion `t(e,n,r) =
+/data/${e}${n}_${r}.json` wird mit `e=<id>`, `n=<aspect>`, `r ∈ {ad, ag, rz}` aufgerufen — nicht
+mit dem Geo-Code. `_rz` liefert die kantonalen Werte (`region_name` = Kantonskürzel bzw. `CH`), `_ag`
+die nationale Altersreihe, `_ad` die Definition. Die Dateien liegen sehr wohl am Web-Root und sind per
+`httpx`/`curl` abrufbar; mein früheres `404` kam allein vom falsch geratenen dritten Token. Der Trace
+gelang nur über eine **Direktverbindung** (ohne Egress-Proxy), da Chromium dessen `CONNECT` mit
+`ERR_CONNECTION_RESET` quittierte — die eigentlichen Datei-Requests laufen im Server aber normal über
+`httpx` (Proxy).
 
 ## Reality-Check gegen Homepage
 
@@ -114,8 +117,9 @@ für transiente 5xx.
 
 ## Empfehlung
 
-**ARCH C (Dump-first) mit File-Layer**: Den Katalog `/search/search_<lang>.json` **einmal ziehen und
-cachen** (deckt Discovery + Suche vollständig ab), Metadaten je Indikator aus `__NEXT_DATA__` der
-`/indicator/<id>/<aspect>`-Seite. Für die **numerischen Werte** ist ein Folge-Schritt nötig
-(Headless-Network-Trace, um die `/data/`-Base zu fixieren) — dieser gehört in Phase 2, nicht in die
-Live-Probe. **Nicht blockiert**, aber der Werte-Layer ist noch nicht 1:1 per `curl` reproduziert.
+**ARCH C (File-first), vollständig umgesetzt:** Katalog `/search/search_<lang>.json` **einmal ziehen und
+cachen** (Discovery + Suche), und je Indikator-Aspekt die drei Werte-Dateien
+`/data/<id><aspect>_{ad,rz,ag}.json` abrufen: `_ad` für Einheit/Quelle/Datenstand, `_rz` für die
+**kantonale** Reihe (26 Kantone + `CH`, mit 95%-CI und `rr`), `_ag` als nationaler Alters-Fallback.
+Der Werte-Layer ist per `httpx` reproduziert und im Tool `get_indicator_series(source='versorgungsatlas')`
+implementiert. **Nicht blockiert.**

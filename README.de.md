@@ -71,16 +71,17 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 | Tool | Beschreibung |
 |------|-------------|
 | `bag_health_mcp__search_health_indicators` | Indikatoren suchen nach `source` (`obsan` / `versorgungsatlas` / `suchtschweiz`), Thema, Region, Jahresbereich |
-| `bag_health_mcp__get_indicator_series` | Nationale Zeitreihe eines Indikators (mit 95%-CI, wo vorhanden) |
+| `bag_health_mcp__get_indicator_series` | Zeitreihe eines Indikators (national mit 95%-CI; Versorgungsatlas auch **kantonal**, mit Kanton-vs-Schweiz-Vergleich) |
 
 > ⚠️ **Nur aggregierte Bevölkerungsstatistik** (Prävalenzen/Kennzahlen nach
 > Alter/Geschlecht/Region) — **keine individuelle Beratung, Diagnose oder
 > Fallbeurteilung, kein Personenbezug.** Dies steht in beiden Tool-Beschreibungen
 > und in jeder Antwort (`aggregate_statistics_notice`) und ist besonders für
 > `suchtschweiz` (HBSC) relevant, da diese Daten Präventionsthemen im Schulkontext
-> berühren. Quellen: Obsan (`ind.obsan.admin.ch`, JSON-API); Sucht Schweiz HBSC
-> über den Obsan-Spiegel; Versorgungsatlas liefert Indikator-Metadaten + Dimensionen
-> (numerische Werte nur im interaktiven Atlas). Siehe `docs/tool-design-health-indicators.md`.
+> berühren. Quellen: Obsan (`ind.obsan.admin.ch`, JSON-API, national); Sucht Schweiz
+> HBSC über den Obsan-Spiegel (national); **Versorgungsatlas** liefert eine
+> **kantonale** Zeitreihe (26 Kantone + CH-Total, mit 95%-CI und Kanton-vs-CH-Verhältnis)
+> aus dem Tarifpool. Siehe `docs/tool-design-health-indicators.md`.
 
 ---
 
