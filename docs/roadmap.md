@@ -8,7 +8,7 @@ the next is enabled. Write/mutating capabilities are deliberately deferred.
 
 | Phase | Scope | Status |
 |-------|-------|--------|
-| **Phase 1 — Read-only wrapper** | Read-only access to the public BAG IDD API: list/inspect diseases & series, fetch time-series data, canton overview, exports, data version. 8 tools, all `readOnlyHint=true`. | ✅ **Active** |
+| **Phase 1 — Read-only wrapper** | Read-only access to public Swiss health data: the BAG IDD API (list/inspect diseases & series, time-series data, canton overview, exports, data version) plus a multi-source indicator layer (Obsan, Versorgungsatlas, Sucht-Schweiz/HBSC — search + series). 10 tools, all `readOnlyHint=true`; egress pinned to a fixed 3-host allow-list. | ✅ **Active** |
 | **Phase 2 — Enrichment / analysis** *(planned)* | Read-only value-adds: outbreak heuristics, 5-year-mean comparison, cross-series correlation. Still no writes. | ⏳ Not started |
 | **Phase 3 — Write / send capabilities** *(not planned)* | Any mutating or outbound-communicating tool (e.g. alerting, report delivery). | ⛔ Deferred — see prerequisites |
 

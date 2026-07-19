@@ -38,17 +38,20 @@ veröffentlichte Version oder einen Git-Tag festlegen.
 
 Der Server folgt einem Design **ausschliesslich öffentlicher Daten, nur lesend**:
 
-- **Keine Authentifizierung / keine Secrets** — er greift nur auf die öffentliche
-  BAG-IDD-Open-Government-Data-API zu, die keinen API-Schlüssel und keine
-  Zugangsdaten erfordert.
+- **Keine Authentifizierung / keine Secrets** — er greift nur auf öffentliche
+  Schweizer Open-Government-Data-APIs zu (BAG IDD, Obsan, Versorgungsatlas), die
+  keinen API-Schlüssel und keine Zugangsdaten erfordern. Sucht-Schweiz/HBSC-Reihen
+  werden über den Obsan-Spiegel bezogen.
 - **Nur lesende Operationen** — jedes Tool führt ausschliesslich HTTPS-`GET`-
-  Anfragen aus; es gibt keine Schreib-, Sende- oder Ausführungsfunktionen.
-- **Keine Personendaten** — BAG-IDD-Daten sind gesetzlich auf Kantonsebene
-  aggregiert und anonymisiert, kleine Fallzahlen werden an der Quelle unterdrückt.
-- **Egress-Allow-List** — der Server kontaktiert ausschliesslich den einzelnen
-  BAG-IDD-Host, nur über HTTPS, durchgesetzt bei jeder Anfrage inklusive
-  Redirect-Hops (SSRF-Schutz), mit einer ergänzenden Richtlinie auf Netzwerkebene
-  in [`deploy/networkpolicy.yaml`](deploy/networkpolicy.yaml).
+  bzw. `POST`-Abfragen aus; es gibt keine Schreib-, Sende- oder Ausführungsfunktionen.
+- **Keine Personendaten** — alle Daten sind an der Quelle aggregiert/anonymisiert:
+  BAG IDD auf Kantonsebene mit Unterdrückung kleiner Fallzahlen; die Indikatoren
+  sind Bevölkerungs-Aggregate nach Alter/Geschlecht/Region.
+- **Egress-Allow-List** — der Server kontaktiert ausschliesslich eine feste Liste
+  von drei öffentlichen Datenhosts (`api.idd.bag.admin.ch`, `ind.obsan.admin.ch`,
+  `www.versorgungsatlas.ch`), nur über HTTPS, durchgesetzt bei jeder Anfrage
+  inklusive Redirect-Hops (SSRF-Schutz), mit einer ergänzenden Richtlinie auf
+  Netzwerkebene in [`deploy/networkpolicy.yaml`](deploy/networkpolicy.yaml).
 - **Netzwerk-Exposition** — der Standard-Transport stdio hat keine Netzwerkfläche;
   HTTP bindet standardmässig an `127.0.0.1` und bindet alle Interfaces nur nach
   ausdrücklicher Aktivierung (`MCP_HOST=0.0.0.0`) für netzwerkisolierte

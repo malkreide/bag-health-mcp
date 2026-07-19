@@ -2,10 +2,10 @@
 #
 # Defense-in-depth companion to the code-layer egress allow-list enforced in
 # src/bag_health_mcp/server.py (_assert_egress_allowed): the server may only
-# contact the BAG IDD API, over HTTPS. Kubernetes NetworkPolicies match on
-# IP/port, not hostname, so this policy restricts egress to DNS + HTTPS while
-# the code layer pins the exact host. Together they bound what a compromised
-# process can reach.
+# contact its three public data hosts (BAG IDD, Obsan, Versorgungsatlas), over
+# HTTPS. Kubernetes NetworkPolicies match on IP/port, not hostname, so this policy
+# restricts egress to DNS + HTTPS while the code layer pins the exact hosts.
+# Together they bound what a compromised process can reach.
 #
 # Apply with: kubectl apply -f deploy/networkpolicy.yaml
 # Requires a CNI that enforces NetworkPolicy (Calico, Cilium, etc.).
@@ -31,10 +31,10 @@ spec:
           port: 53
         - protocol: TCP
           port: 53
-    # Allow outbound HTTPS only. The exact destination host (the BAG IDD API)
-    # is enforced at the code layer; this caps the network surface to 443 and
-    # blocks plaintext egress and link-local / metadata endpoints reached over
-    # other ports.
+    # Allow outbound HTTPS only. The exact destination hosts (BAG IDD, Obsan,
+    # Versorgungsatlas) are enforced at the code layer; this caps the network
+    # surface to 443 and blocks plaintext egress and link-local / metadata
+    # endpoints reached over other ports.
     - to:
         - ipBlock:
             cidr: 0.0.0.0/0

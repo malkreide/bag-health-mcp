@@ -101,7 +101,7 @@ Grundwert relevanten Schutzziele ab. (Referenzen = Audit-Findings / PRs.)
 
 | Schutzziel | Massnahme | Umgesetzt (Referenz) |
 |------------|-----------|----------------------|
-| Integrität / SSRF | HTTPS erzwungen, Egress-Allow-List (nur BAG-IDD-Host), auf jedem Redirect-Hop geprüft | SEC-021, SEC-004 |
+| Integrität / SSRF | HTTPS erzwungen, Egress-Allow-List (feste 3-Host-Liste: BAG IDD, Obsan, Versorgungsatlas), auf jedem Redirect-Hop geprüft | SEC-021, SEC-004 |
 | Integrität / SSRF | Resolved-IP-Blocklist (private/link-local/Metadata blockiert) | SEC-004 |
 | Integrität / SSRF | Ausgehendes DNS-Pinning gegen TOCTOU/Rebinding | SEC-005 |
 | Integrität | Strikte Input-Validierung an den Tool-Grenzen (Pydantic strict, Pattern/Längen) | SEC-018 |

@@ -20,14 +20,14 @@ An agent server is dangerous when it holds **all three legs**. This server holds
 
 | Leg | Present? | Why |
 |-----|----------|-----|
-| Private/sensitive data | **No** | Only public BAG IDD Open Government Data, aggregated/anonymised at canton level. No personal data, no secrets, no internal systems. |
+| Private/sensitive data | **No** | Only public Swiss Open Government Data, aggregated/anonymised (BAG IDD at canton level; Obsan/Versorgungsatlas/Sucht-Schweiz HBSC indicators are population aggregates by age/sex/region). No personal data, no secrets, no internal systems. |
 | Untrusted content | Partially | Upstream API responses are parsed, but never executed; raw bodies/exceptions are never surfaced to the model (OBS-002). |
-| Exfiltration / external action / write | **No** | The server is **strictly read-only**. The only outbound network call goes to the single allow-listed BAG IDD host, enforced on every hop (egress allow-list + IP-blocklist + DNS-pinning, SEC-004/005/021). No write tools, no send/email/exec, no second destination. |
+| Exfiltration / external action / write | **No** | The server is **strictly read-only**. Outbound calls go only to a **fixed allow-list of three public data hosts** (`api.idd.bag.admin.ch`, `ind.obsan.admin.ch`, `www.versorgungsatlas.ch`), enforced on every hop (egress allow-list + IP-blocklist + DNS-pinning, SEC-004/005/021). No write tools, no send/email/exec, no arbitrary destination. |
 
 **Conclusion:** ≤ 1 leg → the lethal-trifecta risk does **not** apply. The
 read-vs-write/send separation is structural: there are no write or
-communication tools to separate out, and outbound egress is pinned to one
-public data host. Should write-capable tools ever be added (see
+communication tools to separate out, and outbound egress is pinned to a fixed
+allow-list of public data hosts. Should write-capable tools ever be added (see
 [roadmap](roadmap.md)), they must run in a **separate server/process** from any
 component handling untrusted content, and this assessment must be redone.
 

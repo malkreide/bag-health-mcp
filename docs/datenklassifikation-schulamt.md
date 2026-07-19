@@ -31,11 +31,11 @@ Dashboard (IDD).
 
 | Kriterium | Befund |
 |-----------|--------|
-| Datenherkunft | BAG IDD, Open Government Data (opendata.swiss) — bereits **publiziert** |
-| Personenbezug | **Keiner.** Daten sind gesetzlich auf **Kantonsebene aggregiert und anonymisiert**; das BAG **unterdrückt kleine Fallzahlen an der Quelle** (Schutz vor Re-Identifikation) |
-| Granularität im Server | Gröbste/feinste Ebene ist der **Kanton**; der Server aggregiert nie unterhalb dessen, was die OGD-API liefert (`MIN_AGGREGATION_LEVEL = "canton"`) |
+| Datenherkunft | BAG IDD sowie die Indikatoren-Quellen **Obsan**, **Versorgungsatlas** und **Sucht Schweiz (HBSC)** — alle öffentlich publizierte Schweizer Open Government Data |
+| Personenbezug | **Keiner.** BAG-IDD-Daten sind auf **Kantonsebene aggregiert und anonymisiert** (kleine Fallzahlen an der Quelle unterdrückt); die Indikatoren sind **Bevölkerungs-Aggregate** nach Alter/Geschlecht/Region (nationale Prävalenzen mit Konfidenzintervallen bzw. kantonale Kennzahlen des Versorgungsatlas). Kein Individualbezug |
+| Granularität im Server | BAG IDD: feinste Ebene **Kanton** (`MIN_AGGREGATION_LEVEL = "canton"`). Indikatoren: national bzw. Kanton (Versorgungsatlas: 26 Kantone + CH); der Server aggregiert nie unterhalb dessen, was die Quelle liefert |
 | Schreibvorgänge | Keine (read-only) |
-| Folgerung | Es werden **keine** VERTRAULICH- oder STRENG-VERTRAULICH-Daten verarbeitet. Höchste Stufe: **BUI**. |
+| Folgerung | Es werden **keine** VERTRAULICH- oder STRENG-VERTRAULICH-Daten verarbeitet. Höchste Stufe: **BUI**. Sucht-Schweiz/HBSC-Daten berühren Präventionsthemen im Schulkontext, bleiben aber aggregierte Bevölkerungsstatistik — jede Tool-Antwort trägt den Hinweis `aggregate_statistics_notice` (keine individuelle Beratung) |
 
 Im Code ist die Einstufung als `DATA_CLASSIFICATION = "ÖFFENTLICH / BUI"`
 hinterlegt und wird im Resultat des aggregierenden Tools
