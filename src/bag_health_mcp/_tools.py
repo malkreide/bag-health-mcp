@@ -1,8 +1,9 @@
 """MCP tools, resources and prompts for bag-health-mcp.
 
-Split out of server.py (ARCH-011). Importing this module registers all 8 tools,
-3 resources and 2 prompts on the shared ``mcp`` instance from
-``bag_health_mcp.server``. server.py imports this module at the end of its own
+Split out of server.py (ARCH-011). Importing this module registers the 8 BAG IDD
+tools, 3 resources and 2 prompts on the shared ``mcp`` instance from
+``bag_health_mcp.server`` (the 2 multi-source indicator tools live in
+``_health_indicators.py``). server.py imports this module at the end of its own
 definitions (after ``mcp`` and the helpers exist) to perform that registration;
 the tool functions are re-exported from server for backward-compatible imports.
 """

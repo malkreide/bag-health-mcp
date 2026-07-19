@@ -9,7 +9,7 @@
 
 **[🇬🇧 English version](README.md)**
 
-MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts für Gesundheit (BAG). Zugriff auf epidemiologische Überwachungsdaten für 51 Krankheitserreger — darunter Grippe, COVID-19, Masern, Abwasser-Surveillance und mehr.
+MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts für Gesundheit (BAG) — epidemiologische Überwachung für 51 Krankheitserreger (Grippe, COVID-19, Masern, Abwasser-Surveillance u. a.) — erweitert um eine **quellenübergreifende Indikatoren-Schicht** über das Schweizerische Gesundheitsobservatorium (**Obsan**), den **Versorgungsatlas** (mit kantonalen Reihen) und **Sucht Schweiz** (HBSC-Jugendbefragung). Alles read-only, öffentliche Open Government Data.
 
 ---
 

@@ -9,7 +9,7 @@
 
 **[🇩🇪 Deutsche Version](README.de.md)**
 
-MCP server for the Swiss Federal Office of Public Health (BAG) **Infectious Disease Dashboard (IDD)**. Access epidemiological surveillance data for 51 pathogens across Switzerland — including influenza, COVID-19, measles, wastewater surveillance, and more.
+MCP server for Swiss public health data. Its core is the Swiss Federal Office of Public Health (BAG) **Infectious Disease Dashboard (IDD)** — epidemiological surveillance for 51 pathogens (influenza, COVID-19, measles, wastewater surveillance, and more) — extended with a **multi-source health-indicator layer** over the Swiss Health Observatory (**Obsan**), the **Versorgungsatlas** (health-care supply atlas, with cantonal series) and **Sucht Schweiz** (HBSC youth survey). All read-only, public Open Government Data.
 
 ---
 
@@ -83,14 +83,15 @@ Health indicators — Obsan, Versorgungsatlas & Sucht Schweiz (multi-source):
 
 All tools carry MCP [tool annotations](https://modelcontextprotocol.io/) so a
 host can reason about them without calling. Every tool is identical here — it
-only ever reads from the public BAG IDD API:
+only ever reads from the public, allow-listed data sources (BAG IDD, Obsan,
+Versorgungsatlas):
 
 | Annotation | Value | Meaning |
 |------------|-------|---------|
 | `readOnlyHint` | `true` | No tool mutates any state. |
 | `destructiveHint` | `false` | No destructive side effects. |
 | `idempotentHint` | `true` | Repeating a call has no additional effect. |
-| `openWorldHint` | `true` | Tools reach an external system (the IDD API). |
+| `openWorldHint` | `true` | Tools reach an external system (the upstream data APIs). |
 
 A host may therefore treat all calls as safe, cacheable reads. The values are
 declared once as `READ_ONLY` in `server.py` and applied to all 10 tools.
@@ -269,8 +270,8 @@ class — never tool arguments, cantons or surveillance data.
 | Aspect | Details |
 |--------|---------|
 | Access | Read-only — no write operations possible |
-| Egress | Code-layer allow-list: the server only contacts the BAG IDD API, HTTPS-only, enforced on every request incl. redirect hops (SSRF/SEC-004 + SEC-021). Network-layer companion policy in [`deploy/networkpolicy.yaml`](deploy/networkpolicy.yaml) |
-| Personal data | None — BAG IDD data is aggregated and anonymised at canton level by law |
+| Egress | Code-layer allow-list: the server only contacts three public data hosts (`api.idd.bag.admin.ch`, `ind.obsan.admin.ch`, `www.versorgungsatlas.ch`), HTTPS-only, enforced on every request incl. redirect hops (SSRF/SEC-004 + SEC-021). Network-layer companion policy in [`deploy/networkpolicy.yaml`](deploy/networkpolicy.yaml) |
+| Personal data | None — all sources are aggregated/anonymised (BAG IDD at canton level by law; indicators are population aggregates by age/sex/region) |
 | Rate limits | No published IDD API rate limit; server caps responses at 104 data points per call by default (`limit_weeks` param) |
 | Timeout | 30 s per API call |
 | Authentication | No API keys required — all data publicly accessible |

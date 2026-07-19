@@ -417,7 +417,8 @@ async def _assert_egress_allowed(url: httpx.URL) -> None:
         logger.warning("blocked egress to disallowed target: %s", url)
         raise EgressNotAllowed(
             f"refused to contact a non-allow-listed endpoint ({url.scheme} host); "
-            "this server may only reach the BAG IDD API"
+            "this server may only reach its allow-listed public data hosts "
+            "(BAG IDD, Obsan, Versorgungsatlas)"
         )
 
     host = url.host

@@ -106,7 +106,7 @@ directly. Front it with an MCP gateway (or API gateway) that provides:
 - **Authentication & authorization** in front of the (unauthenticated) server —
   the server itself reaches only public OGD data, but *who may invoke it* should
   be controlled at the edge.
-- A **tool allow-list** if only a subset of the 8 tools should be reachable in a
+- A **tool allow-list** if only a subset of the 10 tools should be reachable in a
   given deployment.
 - **Audit-log export to a SIEM** — the server emits structured JSON logs on
   stderr (OBS-003) and optional OpenTelemetry traces (OBS-006); ship both to

@@ -38,15 +38,19 @@ production deployments.
 
 The server follows a **public-data-only, read-only** design:
 
-- **No authentication / no secrets** — it accesses only the public BAG IDD Open
-  Government Data API, which requires no API key or credentials.
-- **Read-only operations** — every tool performs HTTPS `GET` requests only; there
-  are no write, send or execute capabilities.
-- **No personal data** — BAG IDD data is aggregated and anonymised at canton level
-  by law, with small cells suppressed at source.
-- **Egress allow-list** — the server only ever contacts the single BAG IDD host,
-  HTTPS-only, enforced on every request including redirect hops (SSRF protection),
-  with a network-layer companion policy in [`deploy/networkpolicy.yaml`](deploy/networkpolicy.yaml).
+- **No authentication / no secrets** — it accesses only public Swiss Open
+  Government Data APIs (BAG IDD, Obsan, Versorgungsatlas), which require no API key
+  or credentials. Sucht-Schweiz/HBSC series are obtained via the Obsan mirror.
+- **Read-only operations** — every tool performs HTTPS `GET`/`POST`-query requests
+  only; there are no write, send or execute capabilities.
+- **No personal data** — all data is aggregated/anonymised at source: BAG IDD at
+  canton level with small cells suppressed; the indicator sources are population
+  aggregates by age/sex/region.
+- **Egress allow-list** — the server only ever contacts a fixed allow-list of three
+  public data hosts (`api.idd.bag.admin.ch`, `ind.obsan.admin.ch`,
+  `www.versorgungsatlas.ch`), HTTPS-only, enforced on every request including
+  redirect hops (SSRF protection), with a network-layer companion policy in
+  [`deploy/networkpolicy.yaml`](deploy/networkpolicy.yaml).
 - **Network exposure** — the default stdio transport has no network surface; HTTP
   binds to `127.0.0.1` by default and only binds all interfaces on explicit
   opt-in (`MCP_HOST=0.0.0.0`) for network-isolated deployments.
