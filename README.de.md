@@ -18,8 +18,21 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 ```
 "Wie ist die aktuelle Grippesituation im Kanton Zürich?"
 → bag_health_mcp__get_canton_situation(canton="ZH")
+
+"Wie hat sich der Alkoholkonsum bei 15-Jährigen im Kanton Zürich seit 2010
+ entwickelt, und wie steht der Kanton im Schweizer Vergleich da?"
+→ bag_health_mcp__search_health_indicators(source="suchtschweiz", topic="alkohol")
+→ bag_health_mcp__get_indicator_series(source="suchtschweiz",
+      indicator_id="monam/alkoholkonsum-alter-11-15", region="ZH", year_from=2010)
 → Weitere Anwendungsbeispiele nach Zielgruppe →
 ```
+
+> **Hinweis zur Ankerquery:** Die HBSC-Jugendreihe (über Obsan) beantwortet den
+> **gesamtschweizerischen** Verlauf seit 2010 (mit 95%-Konfidenzintervallen). Sie
+> ist **national, nicht kantonal** — die Antwort enthält daher eine `region_note`,
+> die erklärt, dass ein «Kanton ZH vs. Schweiz»-Vergleich auf dieser Befragung
+> nicht möglich ist (HBSC ist nicht kantonal repräsentativ). Es handelt sich um
+> **aggregierte Bevölkerungsstatistik — keine individuelle Beratung.**
 
 ---
 
@@ -52,6 +65,22 @@ MCP-Server für das **Infektionskrankheiten-Dashboard (IDD)** des Bundesamts fü
 | `bag_health_mcp__list_export_files` | Exportdateien auflisten |
 | `bag_health_mcp__download_export` | CSV/JSON-Export herunterladen |
 | `bag_health_mcp__get_data_version` | Aktueller Datenstand (jeweils Mittwoch) |
+
+**Gesundheitsindikatoren — Obsan, Versorgungsatlas & Sucht Schweiz:**
+
+| Tool | Beschreibung |
+|------|-------------|
+| `bag_health_mcp__search_health_indicators` | Indikatoren suchen nach `source` (`obsan` / `versorgungsatlas` / `suchtschweiz`), Thema, Region, Jahresbereich |
+| `bag_health_mcp__get_indicator_series` | Nationale Zeitreihe eines Indikators (mit 95%-CI, wo vorhanden) |
+
+> ⚠️ **Nur aggregierte Bevölkerungsstatistik** (Prävalenzen/Kennzahlen nach
+> Alter/Geschlecht/Region) — **keine individuelle Beratung, Diagnose oder
+> Fallbeurteilung, kein Personenbezug.** Dies steht in beiden Tool-Beschreibungen
+> und in jeder Antwort (`aggregate_statistics_notice`) und ist besonders für
+> `suchtschweiz` (HBSC) relevant, da diese Daten Präventionsthemen im Schulkontext
+> berühren. Quellen: Obsan (`ind.obsan.admin.ch`, JSON-API); Sucht Schweiz HBSC
+> über den Obsan-Spiegel; Versorgungsatlas liefert Indikator-Metadaten + Dimensionen
+> (numerische Werte nur im interaktiven Atlas). Siehe `docs/tool-design-health-indicators.md`.
 
 ---
 

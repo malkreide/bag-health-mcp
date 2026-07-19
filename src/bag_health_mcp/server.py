@@ -33,8 +33,15 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 # ---------------------------------------------------------------------------
 
 IDD_BASE = "https://api.idd.bag.admin.ch"
+# Additional Swiss health-data sources reached by the multi-source indicator
+# tools (see docs/tool-design-health-indicators.md). Obsan exposes a clean
+# JSON API; Versorgungsatlas a static JSON catalogue + SSR indicator pages.
+# Sucht Schweiz's HBSC series are obtained via the Obsan mirror, so no separate
+# host is needed for it.
+OBSAN_BASE = "https://ind.obsan.admin.ch"
+VERSORGUNGSATLAS_BASE = "https://www.versorgungsatlas.ch"
 TIMEOUT = 30.0
-USER_AGENT = "bag-health-mcp/0.1.0 (https://github.com/malkreide/bag-health-mcp)"
+USER_AGENT = "bag-health-mcp/0.2.0 (https://github.com/malkreide/bag-health-mcp)"
 
 
 # ---------------------------------------------------------------------------
@@ -83,11 +90,20 @@ class Settings(BaseSettings):
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
 
-# Code-layer egress allow-list (SEC-021): the only host this server may ever
-# talk to is the BAG IDD API, derived from IDD_BASE so there is a single source
-# of truth. Enforced on every outbound request — including redirect hops — by
-# the egress guard below, and only over HTTPS (SEC-004 scheme enforcement).
-ALLOWED_HOSTS = frozenset({urlsplit(IDD_BASE).hostname or ""})
+# Code-layer egress allow-list (SEC-021): the only hosts this server may ever
+# talk to are the BAG IDD API plus the two additional public health-data hosts
+# used by the indicator tools, derived from their base URLs so there is a single
+# source of truth. Enforced on every outbound request — including redirect hops —
+# by the egress guard below, and only over HTTPS (SEC-004 scheme enforcement).
+ALLOWED_HOSTS = frozenset(
+    h
+    for h in (
+        urlsplit(IDD_BASE).hostname,
+        urlsplit(OBSAN_BASE).hostname,
+        urlsplit(VERSORGUNGSATLAS_BASE).hostname,
+    )
+    if h
+)
 ALLOWED_SCHEMES = frozenset({"https"})
 
 # Logs go to stderr (stdout is reserved for the stdio JSON-RPC channel).
@@ -717,6 +733,65 @@ async def _get(
     return r
 
 
+# Exponential-backoff base (seconds); overridden to 0 in tests so retry paths run
+# instantly. Attempt N waits RETRY_BACKOFF_BASE * 2**N (2s, 4s, 8s) before retry.
+RETRY_BACKOFF_BASE = 2.0
+RETRY_ATTEMPTS = 4  # 1 initial + 3 retries
+
+
+async def _get_with_retry(
+    client: httpx.AsyncClient,
+    url: str,
+    *,
+    context: str,
+    allow_404: bool = False,
+) -> httpx.Response:
+    """GET with exponential backoff for transient failures (resilience default).
+
+    Retries up to :data:`RETRY_ATTEMPTS` times on network errors and 5xx/429
+    responses, waiting ``RETRY_BACKOFF_BASE * 2**attempt`` seconds between tries
+    (2s, 4s, 8s). A 4xx other than 429 is not retried — it will not fix itself.
+    On ``allow_404`` a 404 is returned to the caller (for domain not-found
+    messages). After the final attempt a safe ToolError is raised; raw upstream
+    detail is logged server-side only (OBS-002).
+
+    Used by the multi-source indicator tools, whose upstreams (Obsan dynamic JSON,
+    the Versorgungsatlas static store) can return transient 5xx under load — the
+    skill's non-negotiable retry default.
+    """
+    last_detail: str | None = None
+    for attempt in range(RETRY_ATTEMPTS):
+        if attempt > 0:
+            await asyncio.sleep(RETRY_BACKOFF_BASE * (2**attempt))
+        try:
+            r = await client.get(url)
+        except EgressNotAllowed as exc:
+            _fail(f"Request blocked: {exc}.")
+        except httpx.HTTPError as exc:
+            last_detail = repr(exc)
+            logger.warning("transient fetch error (%s) attempt %d: %r", context, attempt, exc)
+            continue
+        if allow_404 and r.status_code == 404:
+            return r
+        if r.is_success:
+            return r
+        # Non-2xx: retry only transient classes (5xx, 429).
+        if r.status_code >= 500 or r.status_code == 429:
+            last_detail = r.text[:500]
+            logger.warning(
+                "transient upstream %s while %s (attempt %d)",
+                r.status_code, context, attempt,
+            )
+            continue
+        # Permanent client error — do not retry.
+        _ensure_ok(r, context=context)
+    _fail(
+        f"Upstream source unreachable while {context} after {RETRY_ATTEMPTS} attempts. "
+        "The service may be temporarily unavailable; retry later.",
+        detail=last_detail,
+    )
+
+
 async def _post(
     client: httpx.AsyncClient, url: str, *, json: Any, context: str
 ) -> httpx.Response:
@@ -756,8 +831,13 @@ def _fmt_year(x: int) -> str:
 # Defined in _models.py; re-exported here so existing imports
 # (from bag_health_mcp.server import DiseaseDataInput, ...) keep working.
 from bag_health_mcp._models import (  # noqa: E402,F401
+    AGGREGATE_STATISTICS_NOTICE,
     DATA_ATTRIBUTION,
     DATA_LICENSE,
+    INDICATOR_LICENSE,
+    OBSAN_ATTRIBUTION,
+    SUCHTSCHWEIZ_ATTRIBUTION,
+    VERSORGUNGSATLAS_ATTRIBUTION,
     CantonCode,
     CantonDiseaseData,
     CantonDiseaseStatus,
@@ -773,12 +853,19 @@ from bag_health_mcp._models import (  # noqa: E402,F401
     DownloadExportOutput,
     ExportDownloadInput,
     ExportFilesInput,
+    GetIndicatorSeriesInput,
+    HealthSource,
+    IndicatorSearchOutput,
+    IndicatorSeriesOutput,
+    IndicatorSeriesPoint,
+    IndicatorSummary,
     Language,
     ListDiseasesInput,
     ListDiseasesOutput,
     ListExportFilesOutput,
     ListSeriesOutput,
     Provenance,
+    SearchHealthIndicatorsInput,
     SeriesDetailsInput,
     SeriesDetailsOutput,
 )
@@ -920,6 +1007,13 @@ bag_list_export_files = _tools.bag_list_export_files
 bag_download_export = _tools.bag_download_export
 bag_get_data_version = _tools.bag_get_data_version
 bag_get_canton_situation = _tools.bag_get_canton_situation
+
+# Multi-source health-indicator tools (Obsan / Versorgungsatlas / Sucht Schweiz).
+# Imported after _tools so all shared helpers exist; registers 2 more tools.
+from bag_health_mcp import _health_indicators  # noqa: E402
+
+bag_search_health_indicators = _health_indicators.bag_search_health_indicators
+bag_get_indicator_series = _health_indicators.bag_get_indicator_series
 
 
 if __name__ == "__main__":

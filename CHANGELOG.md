@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Multi-source health indicators (2 new tools, 10 total — budget of 18 kept).**
+  A single generic tool pair spans three additional Swiss health-data providers
+  via a `source` parameter, instead of three source-specific tool families:
+  - `bag_health_mcp__search_health_indicators(source, topic, region, year_from, year_to, …)`
+  - `bag_health_mcp__get_indicator_series(source, indicator_id, region, year_from, year_to, …)`
+  - Sources: **Obsan** (`ind.obsan.admin.ch`) via its clean JSON API
+    `/api/<id>/g/json` (fallback `/gum/json`) — the workhorse, with 95% confidence
+    intervals; **Versorgungsatlas** via its static catalogue `search/search_<lang>.json`
+    (search + metadata; numeric values live only in the interactive atlas, so series
+    calls degrade gracefully to metadata + a pointer); **Sucht Schweiz** HBSC youth
+    series through Obsan's official mirror (the `zahlen-fakten` host serves only
+    Tableau/PDF and was unreachable at probe time).
+  - Anchor demo query: *«Wie hat sich der Alkoholkonsum bei 15-Jährigen … seit 2010
+    entwickelt …»* — answered at national level; a `region_note` states honestly
+    that HBSC has no cantonal breakdown.
+  - Every response and both tool descriptions carry an `aggregate_statistics_notice`:
+    aggregated population statistics, **not** individual advice (school-context safeguard).
+- Live-probe notes for all three sources under `docs/probe-*.md` and the design
+  rationale under `docs/tool-design-health-indicators.md`.
+
+### Changed
+- Egress allow-list (SEC-021) extended to `ind.obsan.admin.ch` and
+  `www.versorgungsatlas.ch` (still a fixed HTTPS-only list with SSRF blocklist and
+  DNS pinning); added `_get_with_retry` (exponential backoff 2s/4s/8s on 5xx/429/network)
+  as the resilience default for the new upstreams.
+
+### Known findings
+- Obsan: not every indicator exposes `/g/json`; the server falls back to `/gum/json`.
+- Versorgungsatlas: per-aspect value files sit behind the SPA runtime and are not a
+  stable machine endpoint — series calls return metadata + an atlas link until the
+  `/data/` base is pinned via a headless trace.
+
 ## [0.2.0] - 2026-05-31
 
 This release lands the full remediation of a 40-point security/quality audit
