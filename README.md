@@ -313,6 +313,15 @@ class — never tool arguments, cantons or surveillance data.
 
 ---
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) ([Deutsch](CONTRIBUTING.de.md)).
+
+## Security
+
+See [SECURITY.md](SECURITY.md) ([Deutsch](SECURITY.de.md)) for the security
+posture and how to report a vulnerability confidentially.
+
 ## 📄 License
 
 **Code:** MIT (see [LICENSE](LICENSE)).
@@ -321,6 +330,10 @@ class — never tool arguments, cantons or surveillance data.
 under *free use with mandatory source attribution* (Swiss OGD terms, CC BY-equivalent)
 — **not** public domain. Cite the Federal Office of Public Health FOPH (IDD) when
 reusing the data; see [Data sources & licences](#datenquellen--lizenzen--data-sources--licences).
+
+## Author
+
+**Hayal Oezkan** · [github.com/malkreide](https://github.com/malkreide)
 
 ## 🔗 Related Portfolio Servers
 
