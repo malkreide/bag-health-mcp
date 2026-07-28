@@ -1,4 +1,4 @@
-# 🏥 bag-health-mcp
+# bag-health-mcp
 
 [![PyPI](https://img.shields.io/pypi/v/bag-health-mcp)](https://pypi.org/project/bag-health-mcp/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
@@ -13,7 +13,7 @@ MCP server for Swiss public health data. Its core is the Swiss Federal Office of
 
 ---
 
-## 🎯 What You Can Do
+## What You Can Do
 
 ```
 "Wie ist die aktuelle Grippesituation im Kanton Zürich verglichen mit den letzten Wochen?"
@@ -47,7 +47,7 @@ MCP server for Swiss public health data. Its core is the Swiss Federal Office of
 
 ---
 
-## 🔧 Tools
+## Tools
 
 Infectious-disease surveillance (BAG IDD):
 
@@ -96,7 +96,7 @@ Versorgungsatlas):
 A host may therefore treat all calls as safe, cacheable reads. The values are
 declared once as `READ_ONLY` in `server.py` and applied to all 10 tools.
 
-## 🧩 MCP Primitives
+## MCP Primitives
 
 This server uses all three MCP primitives, each for what it is best at:
 
@@ -125,7 +125,7 @@ workflows are packaged as Prompts.
 
 ---
 
-## 🏫 Relevance for Schools & City Administration
+## Relevance for Schools & City Administration
 
 **Schulamt / Kreisschulbehörden:**
 - Monitor influenza and ARI incidence in your canton
@@ -142,7 +142,7 @@ workflows are packaged as Prompts.
 
 ---
 
-## 📡 Data Source
+## Data Source
 
 - **IDD API**: `https://api.idd.bag.admin.ch` — No authentication required
 - **Update cycle**: Every Wednesday
@@ -176,7 +176,7 @@ Architecture:
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Claude Desktop (stdio)
 
@@ -244,7 +244,7 @@ class — never tool arguments, cantons or surveillance data.
 
 ---
 
-## 🗂️ Available Disease Topics
+## Available Disease Topics
 
 | Category | Topics |
 |----------|--------|
@@ -257,7 +257,7 @@ class — never tool arguments, cantons or surveillance data.
 
 ---
 
-## 🖼️ Demo
+## Demo
 
 ![Demo: Claude queries BAG IDD via bag-health-mcp](assets/demo.svg)
 
@@ -265,7 +265,7 @@ class — never tool arguments, cantons or surveillance data.
 
 ---
 
-## 🔒 Safety & Limits
+## Safety & Limits
 
 | Aspect | Details |
 |--------|---------|
@@ -280,7 +280,7 @@ class — never tool arguments, cantons or surveillance data.
 
 ---
 
-## ⚠️ Known Limitations
+## Known Limitations
 
 - **Beta API**: IDD API is labelled `v0.1 beta` — schema may change without notice
 - **Weekly cadence**: Data is not real-time; updated Wednesdays only
@@ -289,7 +289,7 @@ class — never tool arguments, cantons or surveillance data.
 
 ---
 
-## 🇨🇭 Compliance
+## Compliance
 
 - **ISDS (Stadt Zürich):** a draft information-security protection-needs
   classification (Schutzbedarfsanalyse per Grundwert + measures mapping) is in
@@ -322,7 +322,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) ([Deutsch](CONTRIBUTING.de.md)).
 See [SECURITY.md](SECURITY.md) ([Deutsch](SECURITY.de.md)) for the security
 posture and how to report a vulnerability confidentially.
 
-## 📄 License
+## License
 
 **Code:** MIT (see [LICENSE](LICENSE)).
 
@@ -335,7 +335,7 @@ reusing the data; see [Data sources & licences](#datenquellen--lizenzen--data-so
 
 **Hayal Oezkan** · [github.com/malkreide](https://github.com/malkreide)
 
-## 🔗 Related Portfolio Servers
+## Related Portfolio Servers
 
 - [`swiss-statistics-mcp`](https://github.com/malkreide/swiss-statistics-mcp) — BFS demographic data
 - [`bag-epl-mcp`](https://github.com/malkreide/bag-epl-mcp) — BAG medication reimbursement list
