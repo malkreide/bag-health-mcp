@@ -155,3 +155,27 @@ einer künftigen Schreib-Phase gelten dokumentierte Voraussetzungen
   [`docs/datenklassifikation-schulamt.md`](docs/datenklassifikation-schulamt.md)
 - **Schwachstellen melden**: siehe die [Sicherheitsrichtlinie](SECURITY.de.md), wie
   Sicherheitsprobleme vertraulich gemeldet werden.
+
+---
+
+## Mitwirken
+
+Siehe [CONTRIBUTING.de.md](CONTRIBUTING.de.md) ([English](CONTRIBUTING.md)).
+
+## Sicherheit
+
+Siehe [SECURITY.de.md](SECURITY.de.md) ([English](SECURITY.md)) für die
+Sicherheitslage und die vertrauliche Meldung von Schwachstellen.
+
+## Lizenz
+
+**Code:** MIT — siehe [LICENSE](LICENSE).
+
+**Daten:** Die BAG-IDD-Daten sind Open Government Data auf
+[opendata.swiss](https://opendata.swiss) unter *freier Nutzung mit
+Quellenangabe* (Schweizer OGD-Bedingungen, CC-BY-äquivalent) — **nicht**
+gemeinfrei. Bei Weiterverwendung das Bundesamt für Gesundheit BAG (IDD) nennen.
+
+## Autor
+
+**Hayal Oezkan** · [github.com/malkreide](https://github.com/malkreide)
