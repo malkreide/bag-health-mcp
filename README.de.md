@@ -1,4 +1,4 @@
-# 🏥 bag-health-mcp
+# bag-health-mcp
 
 [![PyPI](https://img.shields.io/pypi/v/bag-health-mcp)](https://pypi.org/project/bag-health-mcp/)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
@@ -13,7 +13,7 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## 🎯 Ankerquery
+## Ankerquery
 
 ```
 "Wie ist die aktuelle Grippesituation im Kanton Zürich?"
@@ -36,7 +36,7 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## 🏫 Relevanz für Schulen & Stadtverwaltung
+## Relevanz für Schulen & Stadtverwaltung
 
 **Schulamt / Kreisschulbehörden:**
 - Grippe- und ARI-Inzidenz im eigenen Kanton überwachen
@@ -53,7 +53,7 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## 🔧 Verfügbare Tools
+## Verfügbare Tools
 
 | Tool | Beschreibung |
 |------|-------------|
@@ -85,7 +85,7 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## 📡 Datenquelle
+## Datenquelle
 
 - **IDD API**: `https://api.idd.bag.admin.ch` — kein API-Schlüssel erforderlich
 - **Aktualisierung**: Jeden Mittwoch
@@ -94,7 +94,7 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## 🚀 Installation
+## Installation
 
 ### Claude Desktop (stdio)
 
@@ -111,7 +111,7 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## 🖼️ Demo
+## Demo
 
 ![Demo: Claude fragt BAG IDD über bag-health-mcp](assets/demo.svg)
 
@@ -119,7 +119,7 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## 🔒 Safety & Limits
+## Safety & Limits
 
 | Aspekt | Details |
 |--------|---------|
@@ -133,14 +133,14 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 
 ---
 
-## ⚠️ Bekannte Einschränkungen
+## Bekannte Einschränkungen
 
 - **Beta-API**: Das IDD-API ist als `v0.1 beta` gekennzeichnet — Schema kann sich ohne Vorankündigung ändern
 - **Wöchentlicher Rhythmus**: Keine Echtzeit-Daten; Aktualisierung jeweils mittwochs
 - **Kantonsebene**: Bei seltenen Krankheiten werden Daten aus Datenschutzgründen unterdrückt
 - **Altersgruppen**: Verfügbare Dimensionen variieren je nach Datenserie — `bag_health_mcp__get_series_details` verwenden
 
-## 🧭 Phasenarchitektur & Compliance
+## Phasenarchitektur & Compliance
 
 Dieser Server ist ein **Phase-1-Server (nur lesend)**; schreibende/sendende
 Funktionen sind bewusst zurückgestellt (Vermeidung der «Lethal Trifecta»). Vor
