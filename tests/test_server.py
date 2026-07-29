@@ -339,18 +339,22 @@ def test_main_http_respects_mcp_host_env(monkeypatch):
     assert called["kwargs"]["port"] == 8123
 
 
-def test_settings_no_longer_carries_host_port(monkeypatch):
+@pytest.mark.parametrize("field", ["host", "port"])
+def test_settings_no_longer_carries_host_port(field):
     """Regression guard for the mcp 1.x -> 2.x migration.
 
-    ``mcp.settings.host = ...`` silently did nothing under 2.x (Settings is a
-    plain BaseModel without those fields), which would have left every HTTP
-    deployment on the SDK default bind. Assert the fields really are gone, so
-    a reintroduced ``mcp.settings.host`` assignment fails loudly here.
+    ``MCPServer.settings`` dropped these fields; the bind address is a ``run()``
+    kwarg now. ``Settings`` is a pydantic v2 model, so a reintroduced
+    ``mcp.settings.host = ...`` raises rather than being quietly dropped — but
+    it only raises once the HTTP path runs, which is why the contract is
+    asserted here directly instead of relying on an integration test happening
+    to reach it.
     """
     from bag_health_mcp import server
 
-    assert not hasattr(server.mcp.settings, "host")
-    assert not hasattr(server.mcp.settings, "port")
+    assert not hasattr(server.mcp.settings, field)
+    with pytest.raises(ValueError, match=f'has no field "{field}"'):
+        setattr(server.mcp.settings, field, "sentinel")
 
 
 def test_main_transport_env_selects_http_without_flag(monkeypatch):
