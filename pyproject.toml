@@ -30,13 +30,17 @@ classifiers = [
 ]
 
 # Upper bounds pin the supply chain against breaking major releases.
-# The `mcp` SDK pin also governs the advertised MCP protocol revision
-# (verified: mcp 1.27.x advertises 2025-11-25); FastMCP exposes no separate
-# protocol-version setting, so the SDK range is the pin point. A future
-# `mcp` 2.x may advertise a different revision, so it is excluded here and
-# rolled forward deliberately (tracked via Dependabot) rather than silently.
+# The `mcp` SDK pin also governs the advertised MCP protocol revision;
+# MCPServer exposes no separate protocol-version setting, so the SDK range is
+# the pin point. Verified on mcp 2.0.0: the `initialize` handshake still caps at
+# 2025-11-25 (unchanged from 1.x), and the added 2026-07-28 revision is reachable
+# only over the SDK's separate "modern" path. The floor is 2.0.0,
+# not a wider range: the server API moved from `mcp.server.fastmcp` to
+# `mcp.server.mcpserver` in 2.0.0 with no compatibility shim, so this package
+# cannot import under 1.x. A future `mcp` 3.x may shift the revision again and
+# is excluded here, to be rolled forward deliberately (tracked via Dependabot).
 dependencies = [
-    "mcp[cli]>=1.28.1,<2",
+    "mcp[cli]>=2.0.0,<3",
     "httpx>=0.27.0,<1",
     # Imported directly for the SEC-005 outbound DNS-pinning network backend
     # (httpx's transport layer; httpx already depends on httpcore).

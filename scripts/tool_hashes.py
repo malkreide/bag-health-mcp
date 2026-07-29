@@ -30,12 +30,19 @@ SNAPSHOT = Path(__file__).resolve().parent.parent / "tool-hashes.json"
 
 
 def _tool_hash(tool) -> str:
-    """Stable SHA-256 of a tool's observable contract."""
+    """Stable SHA-256 of a tool's observable contract.
+
+    The payload keys are the *wire* names (``inputSchema``/``outputSchema``),
+    deliberately kept even though mcp 2.x renamed the Python attributes to
+    snake_case: the snapshot commits to what clients observe over the protocol,
+    not to the SDK's local spelling. Hashes therefore survive the 1.x -> 2.x
+    migration unchanged, and a drift still means a real contract change.
+    """
     payload = {
         "name": tool.name,
         "description": tool.description or "",
-        "inputSchema": tool.inputSchema,
-        "outputSchema": getattr(tool, "outputSchema", None),
+        "inputSchema": tool.input_schema,
+        "outputSchema": getattr(tool, "output_schema", None),
     }
     blob = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()

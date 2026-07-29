@@ -8,7 +8,7 @@ failure. Run unit tests: pytest -m "not live".
 import httpx
 import pytest
 import respx
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver.exceptions import ToolError
 
 import bag_health_mcp.server as srv
 from bag_health_mcp import _health_indicators as hi
