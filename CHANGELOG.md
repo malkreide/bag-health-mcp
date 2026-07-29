@@ -40,9 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     `FastMCP` is now `MCPServer`. No compatibility shim exists, so the package no
     longer imports under `mcp` 1.x — hence the hard `>=2.0.0` floor.
   - `MCPServer.settings` no longer carries `host`/`port`. The bind address is a
-    `run()` kwarg; assigning `mcp.settings.host` would now silently do nothing,
-    so `main()` passes host/port explicitly and a regression test asserts the
-    fields are really gone.
+    `run()` kwarg, so `main()` passes host/port explicitly. `Settings` is a
+    pydantic v2 model, so a leftover `mcp.settings.host = ...` raises
+    `ValueError: "Settings" object has no field "host"` — loud, but only once
+    the HTTP path actually executes, so it surfaces in CI for a server whose
+    HTTP path is tested and at first HTTP startup for one whose isn't. A
+    regression test asserts both the absence of the fields and the raise.
   - `mcp_types` 2.x renamed every model attribute to snake_case
     (`inputSchema` → `input_schema`, `isError` → `is_error`,
     `readOnlyHint` → `read_only_hint`, …). The **wire format is unchanged** —
