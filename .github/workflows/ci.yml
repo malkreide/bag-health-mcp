@@ -35,6 +35,9 @@ jobs:
       - name: Verify tool-definition hashes (SEC-022 rug-pull guard)
         run: python scripts/tool_hashes.py --check
 
+      - name: Versions-Sync (pyproject ↔ server.json / README / src)
+        run: python scripts/check_version_sync.py
+
   secret-scan:
     runs-on: ubuntu-latest
     steps:
