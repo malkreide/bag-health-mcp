@@ -24,8 +24,8 @@ from urllib.parse import urlsplit
 
 import httpcore
 import httpx
-from mcp.server.fastmcp import FastMCP
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # ---------------------------------------------------------------------------
@@ -353,7 +353,7 @@ DISEASE_CATEGORIES: dict[str, set[str]] = {
 #
 # A single pooled httpx.AsyncClient is opened for the server's whole lifetime
 # and shared across every tool, instead of opening a new client (new TCP/TLS
-# connection) per call. Its lifetime is owned by the FastMCP lifespan below;
+# connection) per call. Its lifetime is owned by the MCPServer lifespan below;
 # an AsyncExitStack manages teardown so additional async resources can be added
 # later with the same guaranteed-cleanup semantics.
 
@@ -566,7 +566,7 @@ def _new_client() -> httpx.AsyncClient:
 
 
 @asynccontextmanager
-async def lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
+async def lifespan(server: MCPServer) -> AsyncIterator[dict[str, Any]]:
     """Open one pooled httpx.AsyncClient for the server's lifetime (SDK-001).
 
     The client is also exposed in the lifespan context (``http_client``) for
@@ -588,10 +588,10 @@ async def lifespan(server: FastMCP) -> AsyncIterator[dict[str, Any]]:
 
 
 # ---------------------------------------------------------------------------
-# FastMCP setup
+# MCPServer setup
 # ---------------------------------------------------------------------------
 
-mcp = FastMCP(
+mcp = MCPServer(
     name="bag-health-mcp",
     instructions=(
         "Access Swiss Federal Office of Public Health (BAG) infectious disease "
@@ -915,8 +915,15 @@ def build_http_app(settings: Settings) -> Any:
     - CORS is applied when ``settings.cors_origins`` is non-empty, exposing the
       ``Mcp-Session-Id`` header browser clients need for stateful sessions
       (SDK-004). Origins are an explicit allow-list — never a wildcard.
+
+    ``host`` is handed to the SDK rather than left at its default: on a
+    localhost bind the SDK auto-enables DNS-rebinding protection (Host/Origin
+    allow-list of ``127.0.0.1`` / ``localhost`` / ``[::1]``), which is the
+    inbound counterpart to the outbound DNS pinning in ``_new_client``
+    (SEC-005). On a non-localhost bind it stays off — such a deployment sits
+    behind a gateway that terminates and validates Host itself (SEC-016).
     """
-    app = mcp.streamable_http_app()
+    app = mcp.streamable_http_app(host=settings.host)
     if settings.auth_token:
         app = _BearerAuthMiddleware(app, settings.auth_token)
         logger.info("HTTP bearer-token authentication enabled")
@@ -969,8 +976,6 @@ def main() -> None:
                 settings.host,
                 extra={"bind_host": settings.host},
             )
-        mcp.settings.host = settings.host
-        mcp.settings.port = settings.port
         if settings.auth_token or settings.cors_origin_list:
             # Serve the auth/CORS-wrapped ASGI app ourselves (SEC-009/SDK-004).
             import uvicorn
@@ -982,8 +987,15 @@ def main() -> None:
                 log_config=None,  # keep our JSON logging on stderr (OBS-004)
             )
         else:
-            # No auth/CORS configured: keep the FastMCP runner unchanged.
-            mcp.run(transport="streamable-http")
+            # No auth/CORS configured: let the SDK run the server. Since mcp
+            # 2.x the bind address is a run() kwarg — MCPServer.settings no
+            # longer carries host/port, so passing them here is the only way
+            # to bind anywhere other than the SDK default of 127.0.0.1:8000.
+            mcp.run(
+                transport="streamable-http",
+                host=settings.host,
+                port=settings.port,
+            )
     else:
         mcp.run()
 

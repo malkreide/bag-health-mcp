@@ -30,6 +30,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   rationale under `docs/tool-design-health-indicators.md`.
 
 ### Changed
+- **Migrated to the `mcp` Python SDK 2.x** (`mcp[cli]>=2.0.0,<3`, was `>=1.28.1,<2`).
+  Protocol-wise this is a no-op for existing clients (ARCH-012): the `initialize`
+  handshake still negotiates at most `2025-11-25`, exactly as under 1.x. 2.x adds
+  the `2026-07-28` "modern" revision, which is *not* reachable through the
+  handshake and only applies to clients using the new modern path — verified
+  against a live server (stdio negotiated `2025-11-25`). Breaking changes handled:
+  - Server API moved from `mcp.server.fastmcp` to `mcp.server.mcpserver`;
+    `FastMCP` is now `MCPServer`. No compatibility shim exists, so the package no
+    longer imports under `mcp` 1.x — hence the hard `>=2.0.0` floor.
+  - `MCPServer.settings` no longer carries `host`/`port`. The bind address is a
+    `run()` kwarg; assigning `mcp.settings.host` would now silently do nothing,
+    so `main()` passes host/port explicitly and a regression test asserts the
+    fields are really gone.
+  - `mcp_types` 2.x renamed every model attribute to snake_case
+    (`inputSchema` → `input_schema`, `isError` → `is_error`,
+    `readOnlyHint` → `read_only_hint`, …). The **wire format is unchanged** —
+    these are pydantic aliases — so the SEC-022 tool-definition hashes in
+    `tool-hashes.json` are byte-identical before and after the migration.
+  - `mcp.shared.memory.create_connected_server_and_client_session` was removed;
+    the in-process test client is now `mcp.client.Client(mcp)`.
+  - `streamable_http_app()` takes the bind host directly and auto-enables
+    DNS-rebinding protection (Host/Origin allow-list) on a localhost bind — an
+    inbound complement to the existing outbound DNS pinning (SEC-005). Non-local
+    binds are unaffected and stay gateway-fronted (SEC-016).
+  - Note: `ctx.info`/`ctx.warning` (SDK-003) now emit an `MCPDeprecationWarning`
+    — SEP-2577 deprecates the server-to-client logging capability in the
+    `2026-07-28` revision. The calls still work and have no replacement API, so
+    the behaviour is unchanged; `ctx.report_progress` is unaffected.
 - Egress allow-list (SEC-021) extended to `ind.obsan.admin.ch` and
   `www.versorgungsatlas.ch` (still a fixed HTTPS-only list with SSRF blocklist and
   DNS pinning); added `_get_with_retry` (exponential backoff 2s/4s/8s on 5xx/429/network)

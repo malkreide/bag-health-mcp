@@ -32,7 +32,7 @@ local/Claude-Desktop use.
 
 ## 2. Session affinity (SCALE-002, SCALE-003)
 
-Streamable HTTP / SSE sessions are held **in pod memory** (FastMCP has no shared
+Streamable HTTP / SSE sessions are held **in pod memory** (the SDK has no shared
 session backend). With more than one replica, a client's requests must keep
 reaching the **same pod** for the life of its session, or the session breaks on
 a pod switch. Two options, simplest first:
@@ -75,8 +75,14 @@ need failover semantics. Either way, set a session **TTL** (≥ expected session
 length) so stale entries expire.
 
 > A fully stateless horizontal scale-out would require a shared session store
-> (e.g. Redis) behind FastMCP, which the SDK does not provide out of the box —
+> (e.g. Redis) behind the SDK, which it does not provide out of the box —
 > out of scope here; affinity is the pragmatic answer for this workload.
+>
+> `mcp` 2.x narrows this slightly but does not close it: `MCPServer` accepts a
+> `subscriptions=` bus (fan out resource/tool change events across replicas) and
+> `streamable_http_app(event_store=...)` (resumable SSE streams). The session
+> table itself is still a per-process dict in `StreamableHTTPSessionManager`, so
+> affinity remains required.
 
 ---
 

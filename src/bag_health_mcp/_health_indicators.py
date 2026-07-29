@@ -32,7 +32,7 @@ import time
 from html import unescape
 from typing import Any
 
-from mcp.server.fastmcp import Context
+from mcp.server.mcpserver import Context
 from mcp.types import ToolAnnotations
 
 from bag_health_mcp._models import (
@@ -62,10 +62,10 @@ from bag_health_mcp.server import (
 
 # Read-only, idempotent, open-world — same posture as the IDD tools (ARCH-009).
 READ_ONLY_INDICATORS = ToolAnnotations(
-    readOnlyHint=True,
-    destructiveHint=False,
-    idempotentHint=True,
-    openWorldHint=True,
+    read_only_hint=True,
+    destructive_hint=False,
+    idempotent_hint=True,
+    open_world_hint=True,
 )
 
 

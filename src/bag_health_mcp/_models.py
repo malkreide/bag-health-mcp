@@ -240,7 +240,7 @@ class GetIndicatorSeriesInput(_StrictInput):
 # Output models (SDK-002)
 # ---------------------------------------------------------------------------
 #
-# Tools return typed Pydantic models rather than bare dict[str, Any], so FastMCP
+# Tools return typed Pydantic models rather than bare dict[str, Any], so MCPServer
 # advertises a precise outputSchema in tools/list and emits structuredContent.
 # Every output carries a shared Provenance block (consistent envelope) naming the
 # data source and licence attribution; the loose source/source_date/version

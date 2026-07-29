@@ -9,7 +9,7 @@ import sys
 import httpx
 import pytest
 import respx
-from mcp.server.fastmcp.exceptions import ToolError
+from mcp.server.mcpserver.exceptions import ToolError
 
 from bag_health_mcp.server import (
     DATA_ATTRIBUTION,
@@ -283,10 +283,10 @@ async def test_all_tools_declare_readonly_annotations():
     for t in tools:
         ann = t.annotations
         assert ann is not None, f"{t.name} has no annotations"
-        assert ann.readOnlyHint is True, t.name
-        assert ann.destructiveHint is False, t.name
-        assert ann.idempotentHint is True, t.name
-        assert ann.openWorldHint is True, t.name
+        assert ann.read_only_hint is True, t.name
+        assert ann.destructive_hint is False, t.name
+        assert ann.idempotent_hint is True, t.name
+        assert ann.open_world_hint is True, t.name
 
 
 def test_main_stdio_default(monkeypatch):
@@ -302,9 +302,13 @@ def test_main_stdio_default(monkeypatch):
     assert called == {"args": (), "kwargs": {}}
 
 
-def test_main_http_sets_settings_and_no_port_kwarg(monkeypatch):
-    """--http must configure host/port on settings and call run() WITHOUT a
-    port kwarg (regression guard: FastMCP.run() raises TypeError on port=)."""
+def test_main_http_passes_host_and_port_to_run(monkeypatch):
+    """--http must hand the bind address to run() as kwargs.
+
+    Since mcp 2.x ``MCPServer.settings`` no longer carries host/port; the bind
+    address is a run() kwarg, so passing it is now the *only* way to bind
+    anywhere other than the SDK default (127.0.0.1:8000).
+    """
     from bag_health_mcp import server
 
     called = {}
@@ -313,24 +317,40 @@ def test_main_http_sets_settings_and_no_port_kwarg(monkeypatch):
     monkeypatch.delenv("MCP_TRANSPORT", raising=False)
     monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(args=a, kwargs=k))
     server.main()
-    assert called["kwargs"] == {"transport": "streamable-http"}
-    assert "port" not in called["kwargs"]
-    assert server.mcp.settings.port == 9001
-    assert server.mcp.settings.host == "127.0.0.1"  # safe default, no MCP_HOST
+    assert called["kwargs"] == {
+        "transport": "streamable-http",
+        "host": "127.0.0.1",  # safe default, no MCP_HOST
+        "port": 9001,
+    }
 
 
 def test_main_http_respects_mcp_host_env(monkeypatch):
     """Container deployments set MCP_HOST=0.0.0.0 to bind all interfaces."""
     from bag_health_mcp import server
 
+    called = {}
     monkeypatch.setattr(sys, "argv", ["bag-health-mcp", "--http"])
     monkeypatch.delenv("MCP_TRANSPORT", raising=False)
     monkeypatch.setenv("MCP_HOST", "0.0.0.0")
     monkeypatch.setenv("MCP_PORT", "8123")
-    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: None)
+    monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(kwargs=k))
     server.main()
-    assert server.mcp.settings.host == "0.0.0.0"
-    assert server.mcp.settings.port == 8123
+    assert called["kwargs"]["host"] == "0.0.0.0"
+    assert called["kwargs"]["port"] == 8123
+
+
+def test_settings_no_longer_carries_host_port(monkeypatch):
+    """Regression guard for the mcp 1.x -> 2.x migration.
+
+    ``mcp.settings.host = ...`` silently did nothing under 2.x (Settings is a
+    plain BaseModel without those fields), which would have left every HTTP
+    deployment on the SDK default bind. Assert the fields really are gone, so
+    a reintroduced ``mcp.settings.host`` assignment fails loudly here.
+    """
+    from bag_health_mcp import server
+
+    assert not hasattr(server.mcp.settings, "host")
+    assert not hasattr(server.mcp.settings, "port")
 
 
 def test_main_transport_env_selects_http_without_flag(monkeypatch):
@@ -344,7 +364,7 @@ def test_main_transport_env_selects_http_without_flag(monkeypatch):
     monkeypatch.delenv("MCP_HOST", raising=False)
     monkeypatch.setattr(server.mcp, "run", lambda *a, **k: called.update(kwargs=k))
     server.main()
-    assert called["kwargs"] == {"transport": "streamable-http"}
+    assert called["kwargs"]["transport"] == "streamable-http"
 
 
 def test_main_transport_env_stdio_overrides_http_flag(monkeypatch):
@@ -415,9 +435,7 @@ async def test_execution_error_surfaces_as_tool_result_iserror():
     """An upstream failure must reach the model as a tool RESULT with
     isError:true (execution error) — not as a JSON-RPC protocol error — and
     must not leak the raw upstream body (OBS-001 + OBS-002)."""
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import mcp
 
@@ -429,13 +447,13 @@ async def test_execution_error_surfaces_as_tool_result_iserror():
         f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
     ).mock(return_value=httpx.Response(500, text=secret_body))
 
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         result = await client.call_tool(
             "bag_health_mcp__get_disease_data",
             {"params": {"series_id": "influenza/cases/incValue/iso_week", "canton": "ZH"}},
         )
 
-    assert result.isError is True
+    assert result.is_error is True
     text = " ".join(getattr(c, "text", "") for c in result.content)
     assert "500" in text
     assert secret_body not in text
@@ -446,9 +464,7 @@ async def test_execution_error_surfaces_as_tool_result_iserror():
 async def test_not_found_surfaces_as_tool_result_iserror():
     """A semantic not-found (unknown topic) is an execution error: isError:true
     with an actionable hint, not an empty success result (ARCH-003/OBS-001)."""
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import mcp
 
@@ -456,12 +472,12 @@ async def test_not_found_surfaces_as_tool_result_iserror():
         return_value=httpx.Response(200, json=MOCK_SETS)
     )
 
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         result = await client.call_tool(
             "bag_health_mcp__list_series", {"params": {"topic": "unknown_disease"}}
         )
 
-    assert result.isError is True
+    assert result.is_error is True
     text = " ".join(getattr(c, "text", "") for c in result.content)
     assert "bag_health_mcp__list_diseases" in text
 
@@ -471,20 +487,18 @@ async def test_schema_invalid_params_are_protocol_errors():
     """Schema-invalid params (bad enum) are genuine protocol errors handled by
     the SDK with isError:true at the protocol boundary — validated before any
     tool body runs (no upstream call mocked, so a leak here would be a bug)."""
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import mcp
 
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         result = await client.call_tool(
             "bag_health_mcp__get_disease_data",
             {"params": {"series_id": "influenza/cases/incValue/iso_week",
                         "canton": "NOT_A_CANTON"}},
         )
 
-    assert result.isError is True
+    assert result.is_error is True
 
 
 @pytest.mark.asyncio
@@ -492,9 +506,7 @@ async def test_schema_invalid_params_are_protocol_errors():
 async def test_successful_call_is_not_iserror():
     """A normal successful call must report isError:false (regression guard so
     the execution-error path doesn't bleed into the happy path)."""
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import mcp
 
@@ -505,13 +517,13 @@ async def test_successful_call_is_not_iserror():
         f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
     ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
 
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         result = await client.call_tool(
             "bag_health_mcp__get_disease_data",
             {"params": {"series_id": "influenza/cases/incValue/iso_week", "canton": "ZH"}},
         )
 
-    assert result.isError is False
+    assert result.is_error is False
 
 
 # ---------------------------------------------------------------------------
@@ -914,7 +926,7 @@ async def test_input_schema_advertises_constraints():
     from bag_health_mcp.server import mcp
 
     tools = {t.name: t for t in await mcp.list_tools()}
-    blob = json.dumps(tools["bag_health_mcp__get_disease_data"].inputSchema)
+    blob = json.dumps(tools["bag_health_mcp__get_disease_data"].input_schema)
     assert "pattern" in blob
     assert "maxLength" in blob
     assert '"additionalProperties": false' in blob
@@ -1085,29 +1097,27 @@ async def test_all_tools_advertise_output_schema():
     tools = await mcp.list_tools()
     assert len(tools) == 10
     for t in tools:
-        assert t.outputSchema is not None, f"{t.name} has no outputSchema"
+        assert t.output_schema is not None, f"{t.name} has no outputSchema"
 
 
 @pytest.mark.asyncio
 @respx.mock
 async def test_call_through_client_yields_structured_content():
     """An in-memory client call returns structuredContent with provenance."""
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import mcp
 
     respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
         return_value=httpx.Response(200, json={"name": "20260325"})
     )
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         result = await client.call_tool("bag_health_mcp__get_data_version", {"params": {}})
 
-    assert result.isError is False
-    assert result.structuredContent is not None
-    assert result.structuredContent["version"] == "20260325"
-    assert "provenance" in result.structuredContent
+    assert result.is_error is False
+    assert result.structured_content is not None
+    assert result.structured_content["version"] == "20260325"
+    assert "provenance" in result.structured_content
 
 
 @pytest.mark.asyncio
@@ -1160,7 +1170,7 @@ async def test_license_advertised_in_output_schema():
     from bag_health_mcp.server import mcp
 
     for t in await mcp.list_tools():
-        blob = json.dumps(t.outputSchema)
+        blob = json.dumps(t.output_schema)
         assert "license" in blob, f"{t.name} outputSchema lacks license"
         assert "attribution" in blob, f"{t.name} outputSchema lacks attribution"
 
@@ -1172,13 +1182,11 @@ async def test_license_advertised_in_output_schema():
 @pytest.mark.asyncio
 async def test_server_exposes_resources_and_prompts():
     """The server uses all three primitives, not tools only (ARCH-008)."""
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import mcp
 
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         tools = await client.list_tools()
         resources = await client.list_resources()
         prompts = await client.list_prompts()
@@ -1199,13 +1207,11 @@ async def test_reference_resources_are_readable_json():
     """Each reference resource returns valid JSON reference data."""
     import json
 
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import CANTONS, DATA_LICENSE, DISEASE_CATEGORIES, mcp
 
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         cantons = json.loads(
             (await client.read_resource("bag://reference/cantons")).contents[0].text
         )
@@ -1225,13 +1231,11 @@ async def test_reference_resources_are_readable_json():
 @pytest.mark.asyncio
 async def test_prompts_render_with_arguments():
     """Prompts render the workflow text and interpolate their arguments."""
-    from mcp.shared.memory import (
-        create_connected_server_and_client_session as connect,
-    )
+    from mcp.client import Client
 
     from bag_health_mcp.server import mcp
 
-    async with connect(mcp._mcp_server) as client:
+    async with Client(mcp) as client:
         brief = await client.get_prompt("canton_situation_brief", {"canton": "BE"})
         outbreak = await client.get_prompt(
             "outbreak_check", {"disease": "measles", "canton": "ZH"}
@@ -1260,7 +1264,7 @@ def test_disease_categories_taxonomy_is_source_of_truth():
 # ---------------------------------------------------------------------------
 
 class _RecordingCtx:
-    """Minimal stand-in for FastMCP Context capturing log/progress calls."""
+    """Minimal stand-in for MCPServer Context capturing log/progress calls."""
 
     def __init__(self):
         self.infos: list[str] = []
@@ -1291,7 +1295,7 @@ def test_context_param_not_in_input_schema():
     # Use a fresh loop run to avoid interfering with pytest-asyncio.
     tools = asyncio.run(_get())
     for name in ("bag_health_mcp__get_disease_data", "bag_health_mcp__get_canton_situation"):
-        blob = json.dumps(tools[name].inputSchema)
+        blob = json.dumps(tools[name].input_schema)
         assert '"ctx"' not in blob
         assert "Context" not in blob
 

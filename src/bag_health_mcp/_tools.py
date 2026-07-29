@@ -13,7 +13,7 @@ import asyncio
 import json
 
 import httpx
-from mcp.server.fastmcp import Context
+from mcp.server.mcpserver import Context
 from mcp.types import ToolAnnotations
 
 from bag_health_mcp._models import (
@@ -67,10 +67,10 @@ from bag_health_mcp.server import (
 # Every tool only reads from the public BAG IDD API: no mutations (read-only),
 # safe to repeat (idempotent), and reaches an external system (open world).
 READ_ONLY = ToolAnnotations(
-    readOnlyHint=True,
-    destructiveHint=False,
-    idempotentHint=True,
-    openWorldHint=True,
+    read_only_hint=True,
+    destructive_hint=False,
+    idempotent_hint=True,
+    open_world_hint=True,
 )
 
 
@@ -251,6 +251,13 @@ async def bag_get_disease_data(
 
     # This tool makes two round-trips (details, then data); surface progress and
     # structured logging to the client when a Context is injected (SDK-003).
+    #
+    # ctx.info/warning emit an MCPDeprecationWarning under mcp 2.x: SEP-2577
+    # deprecates the server->client *logging* capability in the 2026-07-28
+    # revision. It still works and there is no replacement API, so the SDK-003
+    # behaviour is kept as-is; revisit if the capability is actually removed.
+    # report_progress is unaffected (only client-to-server progress is
+    # deprecated).
     if ctx:
         await ctx.info(f"Resolving filters for '{params.series_id}'")
         await ctx.report_progress(progress=0, total=2)
