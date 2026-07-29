@@ -28,6 +28,8 @@ from mcp.server.mcpserver import MCPServer
 from mcp.server.mcpserver.exceptions import ToolError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from . import __version__
+
 # ---------------------------------------------------------------------------
 # Constants
 # ---------------------------------------------------------------------------
@@ -41,7 +43,7 @@ IDD_BASE = "https://api.idd.bag.admin.ch"
 OBSAN_BASE = "https://ind.obsan.admin.ch"
 VERSORGUNGSATLAS_BASE = "https://www.versorgungsatlas.ch"
 TIMEOUT = 30.0
-USER_AGENT = "bag-health-mcp/0.2.0 (https://github.com/malkreide/bag-health-mcp)"
+USER_AGENT = f"bag-health-mcp/{__version__} (https://github.com/malkreide/bag-health-mcp)"
 
 
 # ---------------------------------------------------------------------------
