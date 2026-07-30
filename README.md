@@ -220,6 +220,20 @@ user identity, front it with a gateway.
 allow-list to enable cross-origin browser access; the `Mcp-Session-Id` header is
 exposed so stateful sessions work. Empty = no cross-origin (never a wildcard).
 
+**Host allow-list (DNS rebinding):** set `MCP_ALLOWED_HOSTS` to a comma-separated
+list of the names this server is reachable under, including the port, e.g.
+`bag.example.ch:8000`. Requests arriving under any other `Host` are rejected
+with **421**; loopback stays allowed so container health checks keep working.
+
+Unset on a non-localhost bind, the check is left off and a warning is logged —
+that is the gateway-fronted deployment, where the gateway validates `Host`. It
+is not guessed: on `0.0.0.0` the reachable name is unknowable here, and a wrong
+guess would reject the very deployment it is meant to protect.
+
+This is independent of `MCP_AUTH_TOKEN`. The token says *who* is asking; this
+says *under which name* the server is addressed. A rebinding attack runs in a
+browser that already holds the token.
+
 For running at scale (session affinity, resource limits, MCP gateway), see the
 [deployment & scaling guide](docs/deployment-scaling.md) and the reference
 manifests in [`deploy/`](deploy/).
