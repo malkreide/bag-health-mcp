@@ -321,7 +321,12 @@ def test_main_http_passes_host_and_port_to_run(monkeypatch):
         "transport": "streamable-http",
         "host": "127.0.0.1",  # safe default, no MCP_HOST
         "port": 9001,
+        # SEC-005: the allow-list travels the same way, so this path is
+        # protected identically to the auth/CORS one. A loopback bind gets the
+        # loopback list; see build_transport_security.
+        "transport_security": called["kwargs"]["transport_security"],
     }
+    assert "127.0.0.1:9001" in called["kwargs"]["transport_security"].allowed_hosts
 
 
 def test_main_http_respects_mcp_host_env(monkeypatch):
@@ -1735,3 +1740,260 @@ def test_settings_auth_and_cors_from_env(monkeypatch):
     s = Settings()
     assert s.auth_token == "abc"
     assert s.cors_origin_list == ["https://a.example", "https://b.example"]
+
+
+# ---------------------------------------------------------------------------
+# Inbound Host/Origin allow-list (SEC-005)
+# ---------------------------------------------------------------------------
+#
+# The outbound side was already covered: the egress guard pins where this
+# server may talk to. These cover the other direction — under which name it may
+# be addressed. A DNS-rebinding attack runs in a browser on the operator's
+# network, so MCP_AUTH_TOKEN does not cover it: the attacking page carries a
+# valid token by construction.
+#
+# The load-bearing case is right hostname / wrong port. "evil.example.com"
+# alone proves little, because a fallback loopback policy rejects it too; only
+# the wrong-port case tells a port-exact allow-list apart from one that lets
+# everything through.
+
+_INIT_BODY = {
+    "jsonrpc": "2.0",
+    "id": 1,
+    "method": "initialize",
+    "params": {
+        "protocolVersion": "2025-06-18",
+        "capabilities": {},
+        "clientInfo": {"name": "test", "version": "1"},
+    },
+}
+_INIT_HEADERS = {
+    "Content-Type": "application/json",
+    "Accept": "application/json, text/event-stream",
+}
+
+
+def _init_status(app, host_header: str) -> int:
+    """POST an initialize request under ``host_header`` and return the status.
+
+    Through the real ASGI stack, and via ``TestClient`` rather than a bare
+    ``ASGITransport``: streamable-HTTP starts its session manager in the app
+    lifespan, and without that every request answers 500 instead of exercising
+    the Host check. ``raise_server_exceptions=False`` because the transport
+    surfaces a rejection as an exception, while a real client sees the status —
+    which is what is being asserted.
+    """
+    from starlette.testclient import TestClient
+
+    with TestClient(app, raise_server_exceptions=False) as client:
+        return client.post(
+            "/mcp", headers={**_INIT_HEADERS, "Host": host_header}, json=_INIT_BODY
+        ).status_code
+
+
+def test_local_bind_gets_an_explicit_loopback_allowlist():
+    """The SDK infers this from a loopback ``host``; stating it explicitly means
+    the protection no longer depends on that inference."""
+    from bag_health_mcp.server import Settings, build_transport_security
+
+    sec = build_transport_security(Settings(host="127.0.0.1", port=8000))
+    assert sec is not None
+    assert sec.enable_dns_rebinding_protection is True
+    assert "127.0.0.1:8000" in sec.allowed_hosts
+
+
+def test_non_local_bind_without_allowlist_stays_off():
+    """The documented gateway-fronted deployment (SEC-016).
+
+    Guessing a list here would reject the very deployment it is meant to
+    protect: on 0.0.0.0 the reachable name is unknowable at this layer.
+    """
+    from bag_health_mcp.server import Settings, build_transport_security
+
+    assert build_transport_security(Settings(host="0.0.0.0", port=8000)) is None
+
+
+def test_non_local_bind_with_allowlist_is_enforced():
+    from bag_health_mcp.server import Settings, build_transport_security
+
+    sec = build_transport_security(
+        Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000")
+    )
+    assert "bag.example.ch:8000" in sec.allowed_hosts
+    # Loopback stays reachable so container health checks keep working.
+    assert "127.0.0.1:8000" in sec.allowed_hosts
+
+
+def test_configured_cors_origins_pass_the_transport_check():
+    """Otherwise the transport rejects exactly the browser clients CORS opened
+    the door for."""
+    from bag_health_mcp.server import Settings, build_transport_security
+
+    sec = build_transport_security(
+        Settings(host="127.0.0.1", port=8000, cors_origins="https://a.example")
+    )
+    assert "https://a.example" in sec.allowed_origins
+
+
+def test_wildcard_origin_is_not_copied():
+    """``*`` is not expressible as a transport origin — compared literally it
+    permits nothing while making the list unreadable."""
+    from bag_health_mcp.server import Settings, build_transport_security
+
+    sec = build_transport_security(Settings(host="127.0.0.1", port=8000, cors_origins="*"))
+    assert "*" not in sec.allowed_origins
+
+
+def test_settings_allowed_hosts_from_env(monkeypatch):
+    from bag_health_mcp.server import Settings
+
+    monkeypatch.setenv("MCP_ALLOWED_HOSTS", "bag.example.ch:8000, alt.example.ch")
+    assert Settings().allowed_host_list == ["bag.example.ch:8000", "alt.example.ch"]
+
+
+def test_an_allowlisted_host_is_admitted():
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(
+        Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000")
+    )
+    assert _init_status(app, "bag.example.ch:8000") == 200
+
+
+def test_foreign_host_is_rejected():
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(
+        Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000")
+    )
+    assert _init_status(app, "evil.example.com") == 421
+
+
+def test_right_host_wrong_port_is_rejected():
+    """The load-bearing case: this is what distinguishes a port-exact allow-list
+    from one that lets anything through."""
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(
+        Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000")
+    )
+    assert _init_status(app, "bag.example.ch:9999") == 421
+
+
+def test_the_host_check_is_not_the_auth_check():
+    """A valid bearer token does not rescue a foreign Host.
+
+    The two controls answer different questions — *who* is asking versus *under
+    which name* the server is addressed — and a rebinding attack arrives
+    holding a valid token.
+    """
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(
+        Settings(
+            host="0.0.0.0",
+            port=8000,
+            auth_token="s3cr3t",
+            allowed_hosts="bag.example.ch:8000",
+        )
+    )
+    from starlette.testclient import TestClient
+
+    with TestClient(app, raise_server_exceptions=False) as client:
+        r = client.post(
+            "/mcp",
+            headers={
+                **_INIT_HEADERS,
+                "Host": "evil.example.com",
+                "Authorization": "Bearer s3cr3t",
+            },
+            json=_INIT_BODY,
+        )
+    assert r.status_code == 421
+
+
+def test_gateway_fronted_deployment_keeps_working():
+    """No allow-list configured means no behaviour change: a real hostname on a
+    0.0.0.0 bind is still served, as it was before this setting existed."""
+    from bag_health_mcp.server import Settings, build_http_app
+
+    app = build_http_app(Settings(host="0.0.0.0", port=8000))
+    assert _init_status(app, "bag.example.ch:8000") == 200
+
+
+def test_the_sdk_served_path_gets_the_allowlist_too(monkeypatch):
+    """build_http_app is only taken when auth or CORS is configured; without
+    them the SDK runs the server via mcp.run(). Both must carry the allow-list,
+    otherwise enabling it would silently depend on unrelated settings.
+
+    Both servers are patched, not just the one under test. ``main()`` picks its
+    branch from the environment, so an inherited ``MCP_AUTH_TOKEN`` would send
+    it down the uvicorn branch and start a **real** server — the suite would
+    hang instead of failing. Measured, then guarded: the assertion below states
+    which branch ran.
+    """
+    import uvicorn
+
+    import bag_health_mcp.server as srv
+
+    for var in ("MCP_AUTH_TOKEN", "MCP_CORS_ORIGINS"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("MCP_TRANSPORT", "http")
+    monkeypatch.setenv("MCP_HOST", "0.0.0.0")
+    monkeypatch.setenv("MCP_ALLOWED_HOSTS", "bag.example.ch:8000")
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp"])
+
+    captured: dict = {}
+    served_by_uvicorn: list = []
+    # Patched on the instance, matching the tests above. Patching the class
+    # would be shadowed: monkeypatch restores a class attribute it took from an
+    # instance *onto that instance*, so an earlier test leaves mcp.run bound
+    # permanently — and the real server would start.
+    monkeypatch.setattr(srv.mcp, "run", lambda **kw: captured.update(kw))
+    monkeypatch.setattr(uvicorn, "run", lambda app, **kw: served_by_uvicorn.append(kw))
+    srv.main()
+
+    assert not served_by_uvicorn, "took the uvicorn branch — this test asserts the other one"
+    assert captured["host"] == "0.0.0.0"
+    assert "bag.example.ch:8000" in captured["transport_security"].allowed_hosts
+
+
+def test_the_uvicorn_served_path_gets_the_allowlist_too(monkeypatch):
+    """The other branch: auth configured, so the app is built here and served
+    by uvicorn directly."""
+    import uvicorn
+
+    import bag_health_mcp.server as srv
+
+    monkeypatch.delenv("MCP_CORS_ORIGINS", raising=False)
+    monkeypatch.setenv("MCP_TRANSPORT", "http")
+    monkeypatch.setenv("MCP_HOST", "0.0.0.0")
+    monkeypatch.setenv("MCP_AUTH_TOKEN", "s3cr3t")
+    monkeypatch.setenv("MCP_ALLOWED_HOSTS", "bag.example.ch:8000")
+    monkeypatch.setattr(sys, "argv", ["bag-health-mcp"])
+
+    captured: dict = {}
+    ran_via_sdk: list = []
+    monkeypatch.setattr(uvicorn, "run", lambda app, **kw: captured.update(app=app, **kw))
+    monkeypatch.setattr(srv.mcp, "run", lambda **kw: ran_via_sdk.append(kw))
+    srv.main()
+
+    assert not ran_via_sdk, "took the SDK branch — this test asserts the other one"
+    assert captured["host"] == "0.0.0.0"
+
+    # With a *valid* token, so the request gets past the bearer middleware and
+    # actually reaches the transport check. Without the token this would be a
+    # 401 and would prove nothing about the Host allow-list.
+    from starlette.testclient import TestClient
+
+    with TestClient(captured["app"], raise_server_exceptions=False) as client:
+        r = client.post(
+            "/mcp",
+            headers={
+                **_INIT_HEADERS,
+                "Host": "evil.example.com",
+                "Authorization": "Bearer s3cr3t",
+            },
+            json=_INIT_BODY,
+        )
+    assert r.status_code == 421

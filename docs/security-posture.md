@@ -72,6 +72,26 @@ default), and this document updated.
     exposed so stateful sessions work.
   - For real per-user identity/authorisation, front the server with an edge
     gateway (see the [deployment & scaling guide](deployment-scaling.md)).
+- **Host/Origin allow-list against DNS rebinding (SEC-005):**
+  `MCP_ALLOWED_HOSTS` is a comma-separated, **port-exact** list of the names the
+  server is reachable under; anything else is answered with 421. Loopback stays
+  allowed so container health checks keep working, and configured
+  `MCP_CORS_ORIGINS` are folded into the transport's origin list — otherwise the
+  transport would reject precisely the browser clients CORS opened the door for.
+
+  This is the inbound counterpart to the outbound egress allow-list of §2: that
+  one decides where this server may talk *to*, this one under which name it may
+  be *addressed*.
+
+  It is **independent of `MCP_AUTH_TOKEN`**. The token answers *who* is asking,
+  the Host check *under which name* the server is addressed; a rebinding attack
+  runs in a browser on the operator's network that already holds a valid token.
+
+  Left unset on a non-localhost bind, the check stays off and the startup
+  warning says so — that is the gateway-fronted deployment above, where the
+  gateway terminates and validates `Host`. It is deliberately not guessed: on
+  `0.0.0.0` the reachable name is unknowable in-process, and a guessed list
+  rejects the very deployment it is meant to protect.
 
 ---
 

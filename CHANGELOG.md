@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Host/Origin allow-list for the HTTP transport (`MCP_ALLOWED_HOSTS`,
+  SEC-005).** Comma-separated and **port-exact** — the names this server is
+  reachable under, e.g. `bag.example.ch:8000`. Anything else is answered with
+  421. Loopback stays allowed so container health checks keep working, and
+  configured `MCP_CORS_ORIGINS` are folded into the transport's origin list;
+  otherwise the transport would reject precisely the browser clients CORS
+  opened the door for. A `*` origin is not copied across, since origins are
+  compared literally.
+
+  This is the inbound counterpart to the existing outbound egress allow-list:
+  that one decides where this server may talk *to*, this one under which name it
+  may be *addressed*. It is independent of `MCP_AUTH_TOKEN` — the token answers
+  *who* is asking, the Host check *under which name* the server is addressed,
+  and a DNS-rebinding attack runs in a browser that already holds a valid token.
+  A test pins that: a valid `Bearer` still gets 421 for a foreign Host.
+
+  **No behaviour change without the variable.** On a localhost bind the list is
+  now stated explicitly instead of being inferred by the SDK from the bind
+  address — same protection, no longer dependent on that inference. On a
+  non-localhost bind it stays off, as before, and the startup warning now says
+  so rather than leaving it to be inferred. It is deliberately not guessed: on
+  `0.0.0.0` the reachable name is unknowable in-process, and a guessed list
+  would reject the very deployment it is meant to protect.
+
+  Both HTTP paths carry it: the auth/CORS-wrapped app served by uvicorn, and the
+  SDK-served path via `mcp.run()` — `run()` forwards `transport_security` to the
+  same app builder. Otherwise enabling the allow-list would have silently
+  depended on whether auth or CORS happened to be configured.
+
+  13 new tests, the load-bearing one being right hostname / wrong port —
+  `evil.example.com` alone proves little, because a fallback loopback policy
+  rejects it too.
+
 ## [0.3.0] - 2026-07-30
 
 ### Fixed

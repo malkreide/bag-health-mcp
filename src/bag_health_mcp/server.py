@@ -73,6 +73,13 @@ class Settings(BaseSettings):
     # SDK-004: comma-separated CORS allow-list for browser MCP clients. Empty =
     # no cross-origin access. Never a wildcard.
     cors_origins: str = ""
+    # SEC-005: comma-separated Host allow-list for the HTTP transport — the
+    # names this server is reachable under, e.g. "bag.example.ch:8000". This is
+    # the *inbound* counterpart to the module-level ``ALLOWED_HOSTS`` below,
+    # which is the egress allow-list and is not configurable. Empty on a
+    # non-local bind leaves the check off (the gateway-fronted default, see
+    # ``build_transport_security``).
+    allowed_hosts: str = ""
 
     def wants_http(self, *, http_flag: bool) -> bool:
         """Whether to serve over Streamable HTTP (vs. stdio), SCALE-001.
@@ -91,6 +98,10 @@ class Settings(BaseSettings):
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]
+
+    @property
+    def allowed_host_list(self) -> list[str]:
+        return [h.strip() for h in self.allowed_hosts.split(",") if h.strip()]
 
 # Code-layer egress allow-list (SEC-021): the only hosts this server may ever
 # talk to are the BAG IDD API plus the two additional public health-data hosts
@@ -910,6 +921,54 @@ class _BearerAuthMiddleware:
         await self.app(scope, receive, send)
 
 
+def build_transport_security(settings: Settings) -> Any:
+    """Host/Origin allow-list for the HTTP transport (SEC-005).
+
+    The inbound counterpart to the outbound DNS pinning in ``_new_client``:
+    that one decides where this server may *talk to*, this one under which name
+    it may be *addressed*. A DNS-rebinding attack turns a browser on the
+    operator's network into a client, so a bearer token does not cover it — the
+    attacking page carries a valid one by construction.
+
+    Three cases, in the order they are decided:
+
+    - ``MCP_ALLOWED_HOSTS`` set — that list, port-exact, plus loopback so
+      container health checks keep working.
+    - local bind, no list — loopback only. This is what the SDK auto-enables
+      for a loopback ``host``; making it explicit means the same protection no
+      longer depends on the SDK's inference from the bind address.
+    - non-local bind, no list — ``None``, i.e. the check stays off, and
+      ``main()`` says so in its warning. That is the documented gateway-fronted
+      deployment (SEC-016), where the gateway terminates and validates Host.
+
+    The last case is deliberately not "guess a list": on ``0.0.0.0`` the
+    reachable name is unknowable here, and a guessed allow-list rejects the
+    very deployment it is meant to protect — HTTP 421 on every request.
+    """
+    from mcp.server.transport_security import TransportSecuritySettings
+
+    port = settings.port
+    loopback = {f"127.0.0.1:{port}", f"localhost:{port}", f"[::1]:{port}"}
+    configured = settings.allowed_host_list
+    if configured:
+        hosts = set(configured) | loopback
+    elif settings.is_local_bind:
+        hosts = loopback | {f"{settings.host}:{port}"}
+    else:
+        return None
+
+    # Configured CORS origins must pass the transport check too, otherwise the
+    # server rejects precisely the browser clients CORS was opened for. A
+    # wildcard is not expressible here — origins are compared literally.
+    origins = {o for o in settings.cors_origin_list if o != "*"}
+    origins |= {f"http://{h}" for h in hosts}
+    return TransportSecuritySettings(
+        enable_dns_rebinding_protection=True,
+        allowed_hosts=sorted(hosts),
+        allowed_origins=sorted(origins),
+    )
+
+
 def build_http_app(settings: Settings) -> Any:
     """Build the Streamable-HTTP ASGI app with optional auth + CORS.
 
@@ -918,14 +977,16 @@ def build_http_app(settings: Settings) -> Any:
       ``Mcp-Session-Id`` header browser clients need for stateful sessions
       (SDK-004). Origins are an explicit allow-list — never a wildcard.
 
-    ``host`` is handed to the SDK rather than left at its default: on a
-    localhost bind the SDK auto-enables DNS-rebinding protection (Host/Origin
-    allow-list of ``127.0.0.1`` / ``localhost`` / ``[::1]``), which is the
-    inbound counterpart to the outbound DNS pinning in ``_new_client``
-    (SEC-005). On a non-localhost bind it stays off — such a deployment sits
-    behind a gateway that terminates and validates Host itself (SEC-016).
+    ``host`` is handed to the SDK rather than left at its default because the
+    SDK derives its DNS-rebinding protection from it; leaving it out would mean
+    a loopback allow-list on a ``0.0.0.0`` bind, and HTTP 421 for every real
+    request. The allow-list itself is passed explicitly (SEC-005) rather than
+    inferred — see :func:`build_transport_security`.
     """
-    app = mcp.streamable_http_app(host=settings.host)
+    app = mcp.streamable_http_app(
+        host=settings.host,
+        transport_security=build_transport_security(settings),
+    )
     if settings.auth_token:
         app = _BearerAuthMiddleware(app, settings.auth_token)
         logger.info("HTTP bearer-token authentication enabled")
@@ -968,14 +1029,26 @@ def main() -> None:
         # --port is a CLI-only override (not an env var) for local convenience.
         if "--port" in sys.argv:
             settings.port = int(sys.argv[sys.argv.index("--port") + 1])
-        if not settings.is_local_bind:
+        if not settings.is_local_bind and not settings.allowed_host_list:
             # NeighborJack awareness (SEC-016): binding beyond localhost exposes
             # the server on the network; that should only happen in an isolated,
-            # gateway-fronted deployment.
+            # gateway-fronted deployment. Without MCP_ALLOWED_HOSTS the Host
+            # check is off as well (SEC-005), so the gateway is the only thing
+            # validating Host — say that rather than let it be inferred.
             logger.warning(
-                "binding HTTP server to non-localhost host %s — ensure this is "
-                "an intended, network-isolated deployment behind a gateway",
+                "binding HTTP server to non-localhost host %s with no "
+                "MCP_ALLOWED_HOSTS — Host/Origin validation is left to the "
+                "gateway in front of it; set MCP_ALLOWED_HOSTS to the names "
+                "this server is reachable under to enforce it here too",
                 settings.host,
+                extra={"bind_host": settings.host},
+            )
+        elif not settings.is_local_bind:
+            logger.info(
+                "binding HTTP server to non-localhost host %s with a Host "
+                "allow-list of %s",
+                settings.host,
+                ", ".join(settings.allowed_host_list),
                 extra={"bind_host": settings.host},
             )
         if settings.auth_token or settings.cors_origin_list:
@@ -993,10 +1066,14 @@ def main() -> None:
             # 2.x the bind address is a run() kwarg — MCPServer.settings no
             # longer carries host/port, so passing them here is the only way
             # to bind anywhere other than the SDK default of 127.0.0.1:8000.
+            # transport_security travels the same way; run() forwards it to the
+            # same app builder, so both HTTP paths get the identical allow-list
+            # rather than only the auth/CORS one.
             mcp.run(
                 transport="streamable-http",
                 host=settings.host,
                 port=settings.port,
+                transport_security=build_transport_security(settings),
             )
     else:
         mcp.run()
