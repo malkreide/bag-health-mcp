@@ -39,8 +39,10 @@ from bag_health_mcp.server import (
 # Unit: helpers
 # ---------------------------------------------------------------------------
 
+
 def test_fmt_isoweek_6digit():
     assert _fmt_isoweek(202413) == "2024-W13"
+
 
 def test_fmt_isoweek_passthrough():
     assert _fmt_isoweek(2024) == "2024"
@@ -97,9 +99,7 @@ MOCK_DATA = {
 @pytest.mark.asyncio
 @respx.mock
 async def test_bag_list_diseases():
-    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
-        return_value=httpx.Response(200, json=MOCK_SETS)
-    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(return_value=httpx.Response(200, json=MOCK_SETS))
     result = await bag_list_diseases(ListDiseasesInput())
     assert result.total_topics > 0
     cats = result.categories
@@ -110,9 +110,7 @@ async def test_bag_list_diseases():
 @pytest.mark.asyncio
 @respx.mock
 async def test_bag_list_series_found():
-    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
-        return_value=httpx.Response(200, json=MOCK_SETS)
-    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(return_value=httpx.Response(200, json=MOCK_SETS))
     result = await bag_list_series(DataSetsInput(topic="influenza"))
     assert result.topic == "influenza"
     assert result.total_series == 3
@@ -122,9 +120,7 @@ async def test_bag_list_series_found():
 @pytest.mark.asyncio
 @respx.mock
 async def test_bag_list_series_not_found():
-    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
-        return_value=httpx.Response(200, json=MOCK_SETS)
-    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(return_value=httpx.Response(200, json=MOCK_SETS))
     # Unknown topic is an execution error: raised as ToolError -> isError:true.
     with pytest.raises(ToolError) as exc:
         await bag_list_series(DataSetsInput(topic="unknown_disease"))
@@ -134,9 +130,9 @@ async def test_bag_list_series_not_found():
 @pytest.mark.asyncio
 @respx.mock
 async def test_bag_get_series_details_ok():
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
 
     result = await bag_get_series_details(
         SeriesDetailsInput(series_id="influenza/cases/incValue/iso_week")
@@ -159,12 +155,12 @@ async def test_bag_get_series_details_invalid_format():
 @pytest.mark.asyncio
 @respx.mock
 async def test_bag_get_disease_data_zh():
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
 
     result = await bag_get_disease_data(
         DiseaseDataInput(
@@ -175,8 +171,7 @@ async def test_bag_get_disease_data_zh():
     assert result.topic == "influenza"
     assert result.provenance.source_date == "2026-03-24"
     # ZH has 3 data points
-    zh_results = [r for r in result.results
-                  if isinstance(r, CantonSeries) and r.canton == "ZH"]
+    zh_results = [r for r in result.results if isinstance(r, CantonSeries) and r.canton == "ZH"]
     assert len(zh_results) > 0
     assert zh_results[0].data_points == 3
 
@@ -188,12 +183,12 @@ async def test_disease_data_api_error_does_not_leak_body():
     OBS-001) whose message carries only the status code and a generic hint —
     never the raw upstream body (OBS-002)."""
     secret_body = "INTERNAL-STACKTRACE secret upstream detail 0xDEADBEEF"
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(500, text=secret_body))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(500, text=secret_body)
+    )
 
     with pytest.raises(ToolError) as exc:
         await bag_get_disease_data(
@@ -229,6 +224,7 @@ async def test_bag_list_export_files():
 # ---------------------------------------------------------------------------
 # Live tests (require network, skip in CI)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.live
 @pytest.mark.asyncio
@@ -272,6 +268,7 @@ async def test_live_canton_situation():
 # ---------------------------------------------------------------------------
 # Unit: entry point / transport selection
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_all_tools_declare_readonly_annotations():
@@ -438,6 +435,7 @@ def test_main_http_no_warning_on_localhost(monkeypatch):
 # OBS-001: protocol vs. execution error contract (in-memory client roundtrip)
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 @respx.mock
 async def test_execution_error_surfaces_as_tool_result_iserror():
@@ -449,12 +447,12 @@ async def test_execution_error_surfaces_as_tool_result_iserror():
     from bag_health_mcp.server import mcp
 
     secret_body = "INTERNAL upstream stacktrace 0xDEADBEEF"
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(500, text=secret_body))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(500, text=secret_body)
+    )
 
     async with Client(mcp) as client:
         result = await client.call_tool(
@@ -477,9 +475,7 @@ async def test_not_found_surfaces_as_tool_result_iserror():
 
     from bag_health_mcp.server import mcp
 
-    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
-        return_value=httpx.Response(200, json=MOCK_SETS)
-    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(return_value=httpx.Response(200, json=MOCK_SETS))
 
     async with Client(mcp) as client:
         result = await client.call_tool(
@@ -503,8 +499,12 @@ async def test_schema_invalid_params_are_protocol_errors():
     async with Client(mcp) as client:
         result = await client.call_tool(
             "bag_health_mcp__get_disease_data",
-            {"params": {"series_id": "influenza/cases/incValue/iso_week",
-                        "canton": "NOT_A_CANTON"}},
+            {
+                "params": {
+                    "series_id": "influenza/cases/incValue/iso_week",
+                    "canton": "NOT_A_CANTON",
+                }
+            },
         )
 
     assert result.is_error is True
@@ -519,12 +519,12 @@ async def test_successful_call_is_not_iserror():
 
     from bag_health_mcp.server import mcp
 
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
 
     async with Client(mcp) as client:
         result = await client.call_tool(
@@ -538,6 +538,7 @@ async def test_successful_call_is_not_iserror():
 # ---------------------------------------------------------------------------
 # SDK-001: lifespan-managed shared httpx client (connection pooling)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_lifespan_shares_single_pooled_client():
@@ -566,9 +567,7 @@ async def test_tools_reuse_pooled_client_under_lifespan():
     (no client-per-call), and still work end to end."""
     from bag_health_mcp import server
 
-    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
-        return_value=httpx.Response(200, json=MOCK_SETS)
-    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(return_value=httpx.Response(200, json=MOCK_SETS))
 
     async with server.lifespan(server.mcp) as ctx:
         pooled = ctx["http_client"]
@@ -583,6 +582,7 @@ async def test_tools_reuse_pooled_client_under_lifespan():
 # ---------------------------------------------------------------------------
 # SEC-021 / SEC-004: egress allow-list + HTTPS enforcement
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_assert_egress_allows_idd_host():
@@ -674,9 +674,7 @@ async def test_redirect_to_internal_host_is_blocked_no_leak():
     )
     # Even if the attacker stands up a listener, the guard fires before this
     # response can be consumed:
-    respx.get("http://169.254.169.254/x").mock(
-        return_value=httpx.Response(200, text=secret)
-    )
+    respx.get("http://169.254.169.254/x").mock(return_value=httpx.Response(200, text=secret))
 
     with pytest.raises(ToolError) as exc:
         await bag_get_data_version(DataVersionInput())
@@ -702,6 +700,7 @@ async def test_new_client_registers_egress_guard():
 #
 # These exercise the _PinningBackend directly with a fake inner backend, because
 # respx intercepts ABOVE the network backend (verified) and so never reaches it.
+
 
 class _FakeStream:
     pass
@@ -845,8 +844,10 @@ async def test_canton_situation_degrades_on_egress_block_no_leak():
 
     assert result.canton == "ZH"
     # Every series failed closed as a status (not data), all 'unavailable'.
-    assert all(isinstance(v, CantonDiseaseStatus) and v.status == "unavailable"
-               for v in result.diseases.values())
+    assert all(
+        isinstance(v, CantonDiseaseStatus) and v.status == "unavailable"
+        for v in result.diseases.values()
+    )
     assert "LEAK-MUST-NOT-APPEAR" not in repr(result)
 
 
@@ -866,11 +867,15 @@ def test_input_models_accept_real_world_values():
         SeriesDetailsInput,
     )
 
-    for topic in ["influenza", "covid19", "tick-borne_encephalitis",
-                  "acute_respiratory_infection", "wastewater_viral_load"]:
+    for topic in [
+        "influenza",
+        "covid19",
+        "tick-borne_encephalitis",
+        "acute_respiratory_infection",
+        "wastewater_viral_load",
+    ]:
         DataSetsInput(topic=topic)
-    for sid in ["influenza/cases/incValue/iso_week",
-                "wastewater_viral_load/NA/value/date"]:
+    for sid in ["influenza/cases/incValue/iso_week", "wastewater_viral_load/NA/value/date"]:
         SeriesDetailsInput(series_id=sid)
     for age in ["0 - 4", "5 - 14", "65+"]:
         DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", age_group=age)
@@ -899,10 +904,10 @@ def test_input_models_are_strict_no_coercion():
 @pytest.mark.parametrize(
     "kwargs",
     [
-        {"topic": "../../etc/passwd"},   # path traversal
-        {"topic": "a/b"},                # slash not allowed in a topic slug
-        {"topic": "a" * 65},             # over max_length
-        {"topic": ""},                   # under min_length
+        {"topic": "../../etc/passwd"},  # path traversal
+        {"topic": "a/b"},  # slash not allowed in a topic slug
+        {"topic": "a" * 65},  # over max_length
+        {"topic": ""},  # under min_length
     ],
 )
 def test_topic_rejects_malicious_or_oversized(kwargs):
@@ -956,8 +961,13 @@ def test_json_log_formatter_emits_valid_json_with_rfc5424_severity():
 
     fmt = JsonLogFormatter()
     rec = _logging.LogRecord(
-        name="bag_health_mcp", level=_logging.WARNING, pathname=__file__,
-        lineno=1, msg="careful %s", args=("now",), exc_info=None,
+        name="bag_health_mcp",
+        level=_logging.WARNING,
+        pathname=__file__,
+        lineno=1,
+        msg="careful %s",
+        args=("now",),
+        exc_info=None,
     )
     obj = _json.loads(fmt.format(rec))
     assert obj["message"] == "careful now"
@@ -977,8 +987,13 @@ def test_json_log_formatter_merges_extra_and_exception():
         raise ValueError("boom")
     except ValueError:
         rec = _logging.LogRecord(
-            name="bag_health_mcp", level=_logging.ERROR, pathname=__file__,
-            lineno=1, msg="failed", args=(), exc_info=sys.exc_info(),
+            name="bag_health_mcp",
+            level=_logging.ERROR,
+            pathname=__file__,
+            lineno=1,
+            msg="failed",
+            args=(),
+            exc_info=sys.exc_info(),
         )
         rec.request_id = "abc123"  # as logger.error(..., extra={"request_id": ...})
     obj = _json.loads(fmt.format(rec))
@@ -1017,8 +1032,7 @@ def test_configure_logging_is_idempotent_and_no_propagate():
         server._configure_logging("INFO")
         server._configure_logging("INFO")
         server._configure_logging("INFO")
-        handlers = [h for h in server.logger.handlers
-                    if h.get_name() == "bag_health_mcp_json"]
+        handlers = [h for h in server.logger.handlers if h.get_name() == "bag_health_mcp_json"]
         assert len(handlers) == 1
         assert server.logger.propagate is False
         assert server.logger.level == _logging.INFO
@@ -1051,8 +1065,7 @@ def test_main_configures_logging(monkeypatch):
     monkeypatch.setattr(server.mcp, "run", lambda *a, **k: None)
     try:
         server.main()
-        handlers = [h for h in server.logger.handlers
-                    if h.get_name() == "bag_health_mcp_json"]
+        handlers = [h for h in server.logger.handlers if h.get_name() == "bag_health_mcp_json"]
         assert len(handlers) == 1
     finally:
         for h in list(server.logger.handlers):
@@ -1064,6 +1077,7 @@ def test_main_configures_logging(monkeypatch):
 # ---------------------------------------------------------------------------
 # SDK-002: typed output models + provenance
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 @respx.mock
@@ -1083,9 +1097,7 @@ async def test_every_output_carries_attribution_provenance():
     respx.get(f"{IDD_BASE}/api/v1/data/version").mock(
         return_value=httpx.Response(200, json={"name": "20260325"})
     )
-    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
-        return_value=httpx.Response(200, json=MOCK_SETS)
-    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(return_value=httpx.Response(200, json=MOCK_SETS))
     v = await bag_get_data_version(DataVersionInput())
     d = await bag_list_diseases(ListDiseasesInput())
     assert v.provenance.attribution == DATA_ATTRIBUTION
@@ -1134,18 +1146,17 @@ async def test_call_through_client_yields_structured_content():
 async def test_disease_data_results_are_typed_union():
     """Canton-grouped results are CantonSeries of typed DiseaseDataPoints, and
     the summary is a typed model populated from them (SDK-002)."""
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
 
     result = await bag_get_disease_data(
         DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
     )
-    zh = next(r for r in result.results
-              if isinstance(r, CantonSeries) and r.canton == "ZH")
+    zh = next(r for r in result.results if isinstance(r, CantonSeries) and r.canton == "ZH")
     assert zh.series[0].period  # typed DiseaseDataPoint
     assert result.summary.canton == "ZH"
     assert result.summary.data_points_returned == 3
@@ -1156,9 +1167,7 @@ async def test_disease_data_results_are_typed_union():
 @respx.mock
 async def test_canton_situation_returns_typed_disease_data():
     """A successful canton overview yields typed CantonDiseaseData entries."""
-    respx.get(url__regex=r".*/details$").mock(
-        return_value=httpx.Response(200, json=MOCK_DETAILS)
-    )
+    respx.get(url__regex=r".*/details$").mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
     respx.post(url__regex=r"/api/v1/data/[^/]+/[^/]+/[^/]+/[^/]+$").mock(
         return_value=httpx.Response(200, json=MOCK_DATA)
     )
@@ -1187,6 +1196,7 @@ async def test_license_advertised_in_output_schema():
 # ---------------------------------------------------------------------------
 # ARCH-008: all three MCP primitives (tools, resources, prompts)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_server_exposes_resources_and_prompts():
@@ -1225,8 +1235,7 @@ async def test_reference_resources_are_readable_json():
             (await client.read_resource("bag://reference/cantons")).contents[0].text
         )
         cats = json.loads(
-            (await client.read_resource("bag://reference/disease-categories"))
-            .contents[0].text
+            (await client.read_resource("bag://reference/disease-categories")).contents[0].text
         )
         lic = json.loads(
             (await client.read_resource("bag://reference/data-licence")).contents[0].text
@@ -1246,9 +1255,7 @@ async def test_prompts_render_with_arguments():
 
     async with Client(mcp) as client:
         brief = await client.get_prompt("canton_situation_brief", {"canton": "BE"})
-        outbreak = await client.get_prompt(
-            "outbreak_check", {"disease": "measles", "canton": "ZH"}
-        )
+        outbreak = await client.get_prompt("outbreak_check", {"disease": "measles", "canton": "ZH"})
 
     brief_text = brief.messages[0].content.text
     assert "BE" in brief_text
@@ -1271,6 +1278,7 @@ def test_disease_categories_taxonomy_is_source_of_truth():
 # ---------------------------------------------------------------------------
 # SDK-003: Context injection (progress + structured logging)
 # ---------------------------------------------------------------------------
+
 
 class _RecordingCtx:
     """Minimal stand-in for MCPServer Context capturing log/progress calls."""
@@ -1313,12 +1321,12 @@ def test_context_param_not_in_input_schema():
 @respx.mock
 async def test_disease_data_reports_progress_and_logs():
     """bag_get_disease_data emits info logs and 0→1→2 progress via Context."""
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
 
     ctx = _RecordingCtx()
     result = await bag_get_disease_data(
@@ -1335,9 +1343,7 @@ async def test_disease_data_reports_progress_and_logs():
 @respx.mock
 async def test_canton_situation_reports_progress_per_series():
     """The fan-out reports progress as each series completes (SDK-003)."""
-    respx.get(url__regex=r".*/details$").mock(
-        return_value=httpx.Response(200, json=MOCK_DETAILS)
-    )
+    respx.get(url__regex=r".*/details$").mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
     respx.post(url__regex=r"/api/v1/data/[^/]+/[^/]+/[^/]+/[^/]+$").mock(
         return_value=httpx.Response(200, json=MOCK_DATA)
     )
@@ -1366,8 +1372,10 @@ async def test_canton_situation_warns_client_on_degraded_series():
     ctx = _RecordingCtx()
     result = await bag_get_canton_situation(canton="ZH", ctx=ctx)
     assert len(ctx.warnings) == len(result.diseases)
-    assert all(isinstance(v, CantonDiseaseStatus) and v.status == "unavailable"
-               for v in result.diseases.values())
+    assert all(
+        isinstance(v, CantonDiseaseStatus) and v.status == "unavailable"
+        for v in result.diseases.values()
+    )
     assert "LEAK-MUST-NOT-APPEAR" not in repr(result)
     assert all("LEAK-MUST-NOT-APPEAR" not in w for w in ctx.warnings)
 
@@ -1376,12 +1384,12 @@ async def test_canton_situation_warns_client_on_degraded_series():
 @respx.mock
 async def test_tools_still_work_without_context():
     """ctx is optional: a direct call with no Context behaves as before."""
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
 
     result = await bag_get_disease_data(
         DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
@@ -1425,12 +1433,12 @@ def otel_exporter(monkeypatch):
 async def test_tool_emits_span_with_no_pii(otel_exporter):
     """A successful tool call emits a tool/<name> span carrying only the tool
     name — no arguments, canton or upstream data (OBS-006 / OBS-002)."""
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DATA))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(200, json=MOCK_DATA)
+    )
 
     await bag_get_disease_data(
         DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
@@ -1438,8 +1446,7 @@ async def test_tool_emits_span_with_no_pii(otel_exporter):
 
     # The span name derives from the Python function name (fn.__name__), which
     # is unchanged by the advertised-name rename (SEC-022 #1).
-    spans = [s for s in otel_exporter.get_finished_spans()
-             if s.name == "tool/bag_get_disease_data"]
+    spans = [s for s in otel_exporter.get_finished_spans() if s.name == "tool/bag_get_disease_data"]
     assert len(spans) == 1
     attrs = dict(spans[0].attributes or {})
     assert attrs["mcp.tool.name"] == "bag_get_disease_data"
@@ -1453,20 +1460,21 @@ async def test_tool_span_records_error(otel_exporter):
     """A failing tool marks its span ERROR with the exception class (OBS-006)."""
     from opentelemetry.trace import StatusCode
 
-    respx.get(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details"
-    ).mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
-    respx.post(
-        f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week"
-    ).mock(return_value=httpx.Response(500, text="boom"))
+    respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
+        return_value=httpx.Response(200, json=MOCK_DETAILS)
+    )
+    respx.post(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week").mock(
+        return_value=httpx.Response(500, text="boom")
+    )
 
     with pytest.raises(ToolError):
         await bag_get_disease_data(
             DiseaseDataInput(series_id="influenza/cases/incValue/iso_week", canton="ZH")
         )
 
-    span = next(s for s in otel_exporter.get_finished_spans()
-                if s.name == "tool/bag_get_disease_data")
+    span = next(
+        s for s in otel_exporter.get_finished_spans() if s.name == "tool/bag_get_disease_data"
+    )
     assert span.status.status_code == StatusCode.ERROR
     assert span.attributes["mcp.tool.is_error"] is True
     assert span.attributes["mcp.tool.error_type"] == "ToolError"
@@ -1503,6 +1511,7 @@ def test_configure_tracing_noop_without_endpoint(monkeypatch):
 # CH-006: data classification + aggregation floor on the aggregating tool
 # ---------------------------------------------------------------------------
 
+
 def test_data_classification_constants_declared():
     """The server declares its (public/BUI) classification and aggregation floor
     as documented constants (CH-006)."""
@@ -1519,9 +1528,7 @@ async def test_canton_situation_note_states_classification_and_aggregation():
     aggregated at canton level with no finer/personal data (CH-006)."""
     from bag_health_mcp.server import DATA_CLASSIFICATION, MIN_AGGREGATION_LEVEL
 
-    respx.get(url__regex=r".*/details$").mock(
-        return_value=httpx.Response(200, json=MOCK_DETAILS)
-    )
+    respx.get(url__regex=r".*/details$").mock(return_value=httpx.Response(200, json=MOCK_DETAILS))
     respx.post(url__regex=r"/api/v1/data/[^/]+/[^/]+/[^/]+/[^/]+$").mock(
         return_value=httpx.Response(200, json=MOCK_DATA)
     )
@@ -1535,6 +1542,7 @@ async def test_canton_situation_note_states_classification_and_aggregation():
 # ---------------------------------------------------------------------------
 # ARCH-004: Settings config object (IoC, transport-agnostic)
 # ---------------------------------------------------------------------------
+
 
 def test_settings_defaults():
     """Settings has safe defaults when no MCP_* env vars are set."""
@@ -1578,6 +1586,7 @@ def test_settings_transport_stdio_overrides_flag(monkeypatch):
 # ARCH-002: structured use-case tags in tool descriptions
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_tool_descriptions_have_usecase_tags():
     """>=80% of tools carry <use_case>/<important_notes>/<example> tags (ARCH-002)."""
@@ -1585,9 +1594,11 @@ async def test_tool_descriptions_have_usecase_tags():
 
     tools = await mcp.list_tools()
     tagged = [
-        t for t in tools
-        if all(tag in (t.description or "")
-               for tag in ("<use_case>", "<important_notes>", "<example>"))
+        t
+        for t in tools
+        if all(
+            tag in (t.description or "") for tag in ("<use_case>", "<important_notes>", "<example>")
+        )
     ]
     assert len(tagged) / len(tools) >= 0.8
     # In practice all 10 are tagged.
@@ -1598,17 +1609,27 @@ async def test_tool_descriptions_have_usecase_tags():
 # ARCH-003: fuzzy "did you mean" suggestions on not-found
 # ---------------------------------------------------------------------------
 
+
 def test_suggest_close_matches_and_substrings():
     """_suggest returns typo-close and substring/prefix candidates, capped."""
     from bag_health_mcp.server import _suggest
 
-    cands = ["influenza", "influenza-like_illness", "covid19",
-             "hepatitis_a", "hepatitis_b", "hepatitis_c"]
-    assert _suggest("influenzaa", cands)[0] == "influenza"        # typo
-    assert set(_suggest("hepatitis", cands)) == {                 # prefix → all three
-        "hepatitis_a", "hepatitis_b", "hepatitis_c"}
-    assert _suggest("zzz-nothing", cands) == []                   # no match
-    assert len(_suggest("hepatitis", cands, n=2)) == 2            # capped
+    cands = [
+        "influenza",
+        "influenza-like_illness",
+        "covid19",
+        "hepatitis_a",
+        "hepatitis_b",
+        "hepatitis_c",
+    ]
+    assert _suggest("influenzaa", cands)[0] == "influenza"  # typo
+    assert set(_suggest("hepatitis", cands)) == {  # prefix → all three
+        "hepatitis_a",
+        "hepatitis_b",
+        "hepatitis_c",
+    }
+    assert _suggest("zzz-nothing", cands) == []  # no match
+    assert len(_suggest("hepatitis", cands, n=2)) == 2  # capped
 
 
 @pytest.mark.asyncio
@@ -1616,9 +1637,7 @@ def test_suggest_close_matches_and_substrings():
 async def test_unknown_topic_error_suggests_alternatives():
     """An unknown topic raises ToolError whose message includes a 'Did you
     mean' suggestion from the real topic list (ARCH-003)."""
-    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(
-        return_value=httpx.Response(200, json=MOCK_SETS)
-    )
+    respx.get(f"{IDD_BASE}/api/v1/data/sets").mock(return_value=httpx.Response(200, json=MOCK_SETS))
     with pytest.raises(ToolError) as exc:
         # 'influenz' is a near-miss for the real 'influenza' topic
         await bag_list_series(DataSetsInput(topic="influenz"))
@@ -1633,6 +1652,7 @@ async def test_unknown_topic_error_suggests_alternatives():
 # ---------------------------------------------------------------------------
 # SEC-022: tool-definition hash snapshot (rug-pull guard)
 # ---------------------------------------------------------------------------
+
 
 @pytest.mark.asyncio
 async def test_tool_hashes_match_snapshot():
@@ -1661,6 +1681,7 @@ async def test_tool_hashes_match_snapshot():
 # SEC-009 / SDK-004: HTTP bearer auth + CORS
 # ---------------------------------------------------------------------------
 
+
 @pytest.mark.asyncio
 async def test_bearer_auth_middleware_rejects_and_allows():
     """_BearerAuthMiddleware returns 401 without/with a wrong token and passes
@@ -1670,8 +1691,13 @@ async def test_bearer_auth_middleware_rejects_and_allows():
     from bag_health_mcp.server import _BearerAuthMiddleware
 
     async def inner(scope, receive, send):
-        await send({"type": "http.response.start", "status": 200,
-                    "headers": [(b"content-type", b"text/plain")]})
+        await send(
+            {
+                "type": "http.response.start",
+                "status": 200,
+                "headers": [(b"content-type", b"text/plain")],
+            }
+        )
         await send({"type": "http.response.body", "body": b"ok"})
 
     app = _BearerAuthMiddleware(inner, token="s3cr3t")
@@ -1701,6 +1727,7 @@ def test_build_http_app_wraps_auth_when_token_set():
 
     app = build_http_app(Settings(auth_token="tok", cors_origins=""))
     from starlette.applications import Starlette
+
     assert not isinstance(app, Starlette)  # wrapped
 
 
@@ -1718,15 +1745,16 @@ async def test_cors_exposes_session_id_header():
     async with httpx.AsyncClient(transport=tr, base_url="http://t") as c:
         pre = await c.options(
             "/mcp",
-            headers={"Origin": "https://a.example",
-                     "Access-Control-Request-Method": "POST",
-                     "Access-Control-Request-Headers": "mcp-session-id"},
+            headers={
+                "Origin": "https://a.example",
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "mcp-session-id",
+            },
         )
         assert pre.headers.get("access-control-allow-origin") == "https://a.example"
         evil = await c.options(
             "/mcp",
-            headers={"Origin": "https://evil.example",
-                     "Access-Control-Request-Method": "POST"},
+            headers={"Origin": "https://evil.example", "Access-Control-Request-Method": "POST"},
         )
         assert evil.headers.get("access-control-allow-origin") is None
 
@@ -1854,18 +1882,14 @@ def test_settings_allowed_hosts_from_env(monkeypatch):
 def test_an_allowlisted_host_is_admitted():
     from bag_health_mcp.server import Settings, build_http_app
 
-    app = build_http_app(
-        Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000")
-    )
+    app = build_http_app(Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000"))
     assert _init_status(app, "bag.example.ch:8000") == 200
 
 
 def test_foreign_host_is_rejected():
     from bag_health_mcp.server import Settings, build_http_app
 
-    app = build_http_app(
-        Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000")
-    )
+    app = build_http_app(Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000"))
     assert _init_status(app, "evil.example.com") == 421
 
 
@@ -1874,9 +1898,7 @@ def test_right_host_wrong_port_is_rejected():
     from one that lets anything through."""
     from bag_health_mcp.server import Settings, build_http_app
 
-    app = build_http_app(
-        Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000")
-    )
+    app = build_http_app(Settings(host="0.0.0.0", port=8000, allowed_hosts="bag.example.ch:8000"))
     assert _init_status(app, "bag.example.ch:9999") == 421
 
 

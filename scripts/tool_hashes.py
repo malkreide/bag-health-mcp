@@ -14,6 +14,7 @@ Usage:
                                              # intentional tool change
     python scripts/tool_hashes.py --print     # print current hashes
 """
+
 from __future__ import annotations
 
 import argparse
@@ -62,9 +63,7 @@ def load_snapshot() -> dict[str, str]:
 
 
 def write_snapshot(hashes: dict[str, str]) -> None:
-    SNAPSHOT.write_text(
-        json.dumps({"algorithm": "sha256", "tools": hashes}, indent=2) + "\n"
-    )
+    SNAPSHOT.write_text(json.dumps({"algorithm": "sha256", "tools": hashes}, indent=2) + "\n")
 
 
 def main() -> int:

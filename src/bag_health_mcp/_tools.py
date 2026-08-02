@@ -7,6 +7,7 @@ tools, 3 resources and 2 prompts on the shared ``mcp`` instance from
 definitions (after ``mcp`` and the helpers exist) to perform that registration;
 the tool functions are re-exported from server for backward-compatible imports.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -74,16 +75,20 @@ READ_ONLY = ToolAnnotations(
 )
 
 
-@mcp.tool(name="bag_health_mcp__list_diseases", annotations=READ_ONLY, description=(
-    "List all 51 disease topics available in the BAG Infectious Disease Dashboard (IDD). "
-    "Returns the topic slug needed for other tools, grouped by category "
-    "(respiratory, enteric, STI, vector-borne, wastewater). "
-    "<use_case>Discover what diseases are available before querying data.</use_case>"
-    "<important_notes>Start here; the topic slugs returned are required inputs "
-    "for the other tools.</important_notes>"
-    "<example>bag_health_mcp__list_diseases() -> categories incl. 'influenza', 'measles', "
-    "'covid19'.</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__list_diseases",
+    annotations=READ_ONLY,
+    description=(
+        "List all 51 disease topics available in the BAG Infectious Disease Dashboard (IDD). "
+        "Returns the topic slug needed for other tools, grouped by category "
+        "(respiratory, enteric, STI, vector-borne, wastewater). "
+        "<use_case>Discover what diseases are available before querying data.</use_case>"
+        "<important_notes>Start here; the topic slugs returned are required inputs "
+        "for the other tools.</important_notes>"
+        "<example>bag_health_mcp__list_diseases() -> categories incl. 'influenza', 'measles', "
+        "'covid19'.</example>"
+    ),
+)
 @_traced
 async def bag_list_diseases(params: ListDiseasesInput) -> ListDiseasesOutput:
     async with _client() as c:
@@ -115,16 +120,20 @@ async def bag_list_diseases(params: ListDiseasesInput) -> ListDiseasesOutput:
     )
 
 
-@mcp.tool(name="bag_health_mcp__list_series", annotations=READ_ONLY, description=(
-    "List all available data series for a specific disease topic. "
-    "Each series is identified by 'topic/chapter/aggregation/temporality'. "
-    "Returns series IDs to use with bag_health_mcp__get_series_details and bag_health_mcp__get_disease_data."
-    "<use_case>Find which exact series exist for a disease (e.g. weekly cases vs "
-    "yearly incidence) before fetching data.</use_case>"
-    "<important_notes>Needs a valid topic slug from bag_health_mcp__list_diseases.</important_notes>"
-    "<example>bag_health_mcp__list_series(topic='influenza') -> "
-    "'influenza/cases/incValue/iso_week', ...</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__list_series",
+    annotations=READ_ONLY,
+    description=(
+        "List all available data series for a specific disease topic. "
+        "Each series is identified by 'topic/chapter/aggregation/temporality'. "
+        "Returns series IDs to use with bag_health_mcp__get_series_details and bag_health_mcp__get_disease_data."
+        "<use_case>Find which exact series exist for a disease (e.g. weekly cases vs "
+        "yearly incidence) before fetching data.</use_case>"
+        "<important_notes>Needs a valid topic slug from bag_health_mcp__list_diseases.</important_notes>"
+        "<example>bag_health_mcp__list_series(topic='influenza') -> "
+        "'influenza/cases/incValue/iso_week', ...</example>"
+    ),
+)
 @_traced
 async def bag_list_series(params: DataSetsInput) -> ListSeriesOutput:
     async with _client() as c:
@@ -135,7 +144,9 @@ async def bag_list_series(params: DataSetsInput) -> ListSeriesOutput:
     if not topic_sets:
         all_topics = sorted({s.split("/")[0] for s in all_sets})
         _fail_not_found(
-            "Topic", params.topic, all_topics,
+            "Topic",
+            params.topic,
+            all_topics,
             "Use bag_health_mcp__list_diseases to see valid topic slugs.",
         )
 
@@ -161,17 +172,21 @@ async def bag_list_series(params: DataSetsInput) -> ListSeriesOutput:
     )
 
 
-@mcp.tool(name="bag_health_mcp__get_series_details", annotations=READ_ONLY, description=(
-    "Get metadata and available filter values for a specific data series. "
-    "Shows which canton, age group, sex, and other dimensions are available. "
-    "Always call this before bag_health_mcp__get_disease_data to know valid filter options."
-    "<use_case>Learn the valid filter values (cantons, age groups, sex) for a "
-    "series so a subsequent data query uses accepted parameters.</use_case>"
-    "<important_notes>Available dimensions vary by series — always check here "
-    "rather than assuming.</important_notes>"
-    "<example>bag_health_mcp__get_series_details(series_id='influenza/cases/incValue/iso_week') "
-    "-> cantons=['ZH','BE',...], age_groups=[...].</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__get_series_details",
+    annotations=READ_ONLY,
+    description=(
+        "Get metadata and available filter values for a specific data series. "
+        "Shows which canton, age group, sex, and other dimensions are available. "
+        "Always call this before bag_health_mcp__get_disease_data to know valid filter options."
+        "<use_case>Learn the valid filter values (cantons, age groups, sex) for a "
+        "series so a subsequent data query uses accepted parameters.</use_case>"
+        "<important_notes>Available dimensions vary by series — always check here "
+        "rather than assuming.</important_notes>"
+        "<example>bag_health_mcp__get_series_details(series_id='influenza/cases/incValue/iso_week') "
+        "-> cantons=['ZH','BE',...], age_groups=[...].</example>"
+    ),
+)
 @_traced
 async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOutput:
     parts = params.series_id.split("/")
@@ -194,7 +209,9 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOut
             sets_r = await _get(c, "/api/v1/data/sets", context="listing series for suggestions")
             topic_series = [s for s in sets_r.json() if s.startswith(f"{topic}/")]
             _fail_not_found(
-                "Series", params.series_id, topic_series,
+                "Series",
+                params.series_id,
+                topic_series,
                 "Use bag_health_mcp__list_series(topic=...) to discover valid series.",
             )
         data = r.json()
@@ -229,17 +246,21 @@ async def bag_get_series_details(params: SeriesDetailsInput) -> SeriesDetailsOut
     )
 
 
-@mcp.tool(name="bag_health_mcp__get_disease_data", annotations=READ_ONLY, description=(
-    "Fetch time-series surveillance data for a disease from the BAG IDD. "
-    "Returns weekly or yearly case counts, incidence rates, or other metrics. "
-    "Data updated every Wednesday. "
-    "<use_case>Get the actual numbers/trend for a disease in a canton over "
-    "time — the core data-retrieval tool.</use_case>"
-    "<important_notes>Call bag_health_mcp__get_series_details first for valid filters. "
-    "'incValue' = incidence per 100'000; 'value' = absolute count.</important_notes>"
-    "<example>bag_health_mcp__get_disease_data(series_id='influenza/cases/incValue/iso_week', "
-    "canton='ZH') -> weekly influenza incidence for Zurich.</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__get_disease_data",
+    annotations=READ_ONLY,
+    description=(
+        "Fetch time-series surveillance data for a disease from the BAG IDD. "
+        "Returns weekly or yearly case counts, incidence rates, or other metrics. "
+        "Data updated every Wednesday. "
+        "<use_case>Get the actual numbers/trend for a disease in a canton over "
+        "time — the core data-retrieval tool.</use_case>"
+        "<important_notes>Call bag_health_mcp__get_series_details first for valid filters. "
+        "'incValue' = incidence per 100'000; 'value' = absolute count.</important_notes>"
+        "<example>bag_health_mcp__get_disease_data(series_id='influenza/cases/incValue/iso_week', "
+        "canton='ZH') -> weekly influenza incidence for Zurich.</example>"
+    ),
+)
 @_traced
 async def bag_get_disease_data(
     params: DiseaseDataInput, ctx: Context | None = None
@@ -275,7 +296,9 @@ async def bag_get_disease_data(
             sets_r = await _get(c, "/api/v1/data/sets", context="listing series for suggestions")
             topic_series = [s for s in sets_r.json() if s.startswith(f"{topic}/")]
             _fail_not_found(
-                "Series", params.series_id, topic_series,
+                "Series",
+                params.series_id,
+                topic_series,
                 "Use bag_health_mcp__list_series to find valid series_ids.",
             )
         details = dr.json()
@@ -368,7 +391,7 @@ async def bag_get_disease_data(
             if not isinstance(points, list):
                 continue
             # Take last N points
-            recent = points[-params.limit_weeks:]
+            recent = points[-params.limit_weeks :]
             series_points = [
                 DiseaseDataPoint(
                     period=fmt_period(p["x"]),
@@ -380,13 +403,15 @@ async def bag_get_disease_data(
                 if p.get("y") is not None
             ]
             if series_points:
-                result_series.append(CantonSeries(
-                    canton=canton_key,
-                    data_points=len(series_points),
-                    series=series_points,
-                ))
+                result_series.append(
+                    CantonSeries(
+                        canton=canton_key,
+                        data_points=len(series_points),
+                        series=series_points,
+                    )
+                )
     elif isinstance(values, list):
-        recent = values[-params.limit_weeks:]
+        recent = values[-params.limit_weeks :]
         result_series = [
             DiseaseDataPoint(
                 period=fmt_period(p["x"]),
@@ -401,8 +426,7 @@ async def bag_get_disease_data(
     summary = DiseaseDataSummary()
     if params.canton == "ZH" or params.canton != "all":
         matching = next(
-            (s for s in result_series
-             if isinstance(s, CantonSeries) and s.canton == params.canton),
+            (s for s in result_series if isinstance(s, CantonSeries) and s.canton == params.canton),
             None,
         )
         if matching and matching.series:
@@ -440,18 +464,22 @@ async def bag_get_disease_data(
     )
 
 
-@mcp.tool(name="bag_health_mcp__list_export_files", annotations=READ_ONLY, description=(
-    "List all available export file names from the BAG IDD. "
-    "These are complete datasets (CSV/JSON) per disease, "
-    "e.g. INFLUENZA_oblig, COVID19_wastewater_sequencing, MEASLES_oblig. "
-    "Use with bag_health_mcp__download_export to get raw data files."
-    "<use_case>Discover which complete bulk datasets can be downloaded for "
-    "offline/bulk analysis.</use_case>"
-    "<important_notes>Returns file names, not the data — pass one to "
-    "bag_health_mcp__download_export.</important_notes>"
-    "<example>bag_health_mcp__list_export_files() -> ['INFLUENZA_oblig', "
-    "'COVID19_wastewater_sequencing', ...].</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__list_export_files",
+    annotations=READ_ONLY,
+    description=(
+        "List all available export file names from the BAG IDD. "
+        "These are complete datasets (CSV/JSON) per disease, "
+        "e.g. INFLUENZA_oblig, COVID19_wastewater_sequencing, MEASLES_oblig. "
+        "Use with bag_health_mcp__download_export to get raw data files."
+        "<use_case>Discover which complete bulk datasets can be downloaded for "
+        "offline/bulk analysis.</use_case>"
+        "<important_notes>Returns file names, not the data — pass one to "
+        "bag_health_mcp__download_export.</important_notes>"
+        "<example>bag_health_mcp__list_export_files() -> ['INFLUENZA_oblig', "
+        "'COVID19_wastewater_sequencing', ...].</example>"
+    ),
+)
 @_traced
 async def bag_list_export_files(params: ExportFilesInput) -> ListExportFilesOutput:
     async with _client() as c:
@@ -473,18 +501,22 @@ async def bag_list_export_files(params: ExportFilesInput) -> ListExportFilesOutp
     )
 
 
-@mcp.tool(name="bag_health_mcp__download_export", annotations=READ_ONLY, description=(
-    "Download a complete export dataset from the BAG IDD as CSV or JSON. "
-    "Returns the raw data content for a specific disease file. "
-    "Useful for bulk analysis. Files are updated weekly."
-    "<use_case>Retrieve a full raw dataset (all rows) for one disease for "
-    "downstream/offline analysis.</use_case>"
-    "<important_notes>The preview is truncated at 3000 chars; for very large "
-    "datasets use the IDD web interface. Get file names from "
-    "bag_health_mcp__list_export_files.</important_notes>"
-    "<example>bag_health_mcp__download_export(file='INFLUENZA_oblig', format='csv') -> raw "
-    "CSV content.</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__download_export",
+    annotations=READ_ONLY,
+    description=(
+        "Download a complete export dataset from the BAG IDD as CSV or JSON. "
+        "Returns the raw data content for a specific disease file. "
+        "Useful for bulk analysis. Files are updated weekly."
+        "<use_case>Retrieve a full raw dataset (all rows) for one disease for "
+        "downstream/offline analysis.</use_case>"
+        "<important_notes>The preview is truncated at 3000 chars; for very large "
+        "datasets use the IDD web interface. Get file names from "
+        "bag_health_mcp__list_export_files.</important_notes>"
+        "<example>bag_health_mcp__download_export(file='INFLUENZA_oblig', format='csv') -> raw "
+        "CSV content.</example>"
+    ),
+)
 @_traced
 async def bag_download_export(params: ExportDownloadInput) -> DownloadExportOutput:
     async with _client() as c:
@@ -516,17 +548,21 @@ async def bag_download_export(params: ExportDownloadInput) -> DownloadExportOutp
     )
 
 
-@mcp.tool(name="bag_health_mcp__get_data_version", annotations=READ_ONLY, description=(
-    "Get the current data version of the BAG IDD. "
-    "Returns the date of the last data update (format YYYYMMDD). "
-    "IDD is updated every Wednesday."
-    "<use_case>Check how fresh the data is / which weekly snapshot you are "
-    "looking at.</use_case>"
-    "<important_notes>Data is updated only weekly (Wednesdays); not "
-    "real-time.</important_notes>"
-    "<example>bag_health_mcp__get_data_version() -> version='20260325', "
-    "date='2026-03-25'.</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__get_data_version",
+    annotations=READ_ONLY,
+    description=(
+        "Get the current data version of the BAG IDD. "
+        "Returns the date of the last data update (format YYYYMMDD). "
+        "IDD is updated every Wednesday."
+        "<use_case>Check how fresh the data is / which weekly snapshot you are "
+        "looking at.</use_case>"
+        "<important_notes>Data is updated only weekly (Wednesdays); not "
+        "real-time.</important_notes>"
+        "<example>bag_health_mcp__get_data_version() -> version='20260325', "
+        "date='2026-03-25'.</example>"
+    ),
+)
 @_traced
 async def bag_get_data_version(params: DataVersionInput) -> DataVersionOutput:
     async with _client() as c:
@@ -548,20 +584,24 @@ async def bag_get_data_version(params: DataVersionInput) -> DataVersionOutput:
     )
 
 
-@mcp.tool(name="bag_health_mcp__get_canton_situation", annotations=READ_ONLY, description=(
-    "Get a public health situation overview for a specific canton or Switzerland. "
-    "Combines current incidence data for key school-relevant diseases "
-    "(influenza, measles, norovirus proxy via acute_respiratory_infection) "
-    "with trend information. Designed for school authorities and "
-    "city administration Public Health Reporting. "
-    "<use_case>One-call situational overview for a canton (Schulamt / city "
-    "administration) without orchestrating multiple series queries.</use_case>"
-    "<important_notes>Aggregates several series; a single unavailable series is "
-    "reported as a per-disease status, not a failure of the whole call.</important_notes>"
-    "<example>bag_health_mcp__get_canton_situation(canton='ZH') -> per-disease latest value, "
-    "trend and change for Zurich. Anchor query: 'Wie ist die aktuelle "
-    "Grippesituation im Kanton Zürich?'</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__get_canton_situation",
+    annotations=READ_ONLY,
+    description=(
+        "Get a public health situation overview for a specific canton or Switzerland. "
+        "Combines current incidence data for key school-relevant diseases "
+        "(influenza, measles, norovirus proxy via acute_respiratory_infection) "
+        "with trend information. Designed for school authorities and "
+        "city administration Public Health Reporting. "
+        "<use_case>One-call situational overview for a canton (Schulamt / city "
+        "administration) without orchestrating multiple series queries.</use_case>"
+        "<important_notes>Aggregates several series; a single unavailable series is "
+        "reported as a per-disease status, not a failure of the whole call.</important_notes>"
+        "<example>bag_health_mcp__get_canton_situation(canton='ZH') -> per-disease latest value, "
+        "trend and change for Zurich. Anchor query: 'Wie ist die aktuelle "
+        "Grippesituation im Kanton Zürich?'</example>"
+    ),
+)
 @_traced
 async def bag_get_canton_situation(
     canton: str = "ZH",
@@ -619,7 +659,9 @@ async def bag_get_canton_situation(
             georegion_options = props.get("georegion", {}).get("possibleValues", [])
 
             if "georegion" in props:
-                body["georegion"] = "canton" if "canton" in georegion_options else georegion_options[0]
+                body["georegion"] = (
+                    "canton" if "canton" in georegion_options else georegion_options[0]
+                )
             if "canton" in props:
                 body["canton"] = canton_up
             if "sex" in props:
@@ -661,9 +703,7 @@ async def bag_get_canton_situation(
             prev = recent[-2] if len(recent) >= 2 else None
 
             trend = latest.get("properties", {}).get("trend")
-            period_fmt = (
-                _fmt_isoweek(latest["x"]) if not is_yearly else _fmt_year(latest["x"])
-            )
+            period_fmt = _fmt_isoweek(latest["x"]) if not is_yearly else _fmt_year(latest["x"])
 
             change_pct: float | None = None
             if prev and prev.get("y") and latest.get("y") is not None:
@@ -682,7 +722,8 @@ async def bag_get_canton_situation(
                         period=_fmt_isoweek(p["x"]) if not is_yearly else _fmt_year(p["x"]),
                         value=p.get("y"),
                     )
-                    for p in recent if p.get("y") is not None
+                    for p in recent
+                    if p.get("y") is not None
                 ],
             )
         except (EgressNotAllowed, httpx.HTTPError, KeyError, ValueError, TypeError) as exc:
@@ -700,11 +741,9 @@ async def bag_get_canton_situation(
     # long-running client gets incremental progress (SDK-003).
     total = len(school_relevant)
     if ctx:
-        await ctx.info(f"Building situation overview for canton {canton_up} "
-                       f"({total} series)")
+        await ctx.info(f"Building situation overview for canton {canton_up} ({total} series)")
     tasks = [
-        asyncio.ensure_future(_fetch_series(name, sid))
-        for name, sid in school_relevant.items()
+        asyncio.ensure_future(_fetch_series(name, sid)) for name, sid in school_relevant.items()
     ]
     diseases: dict[str, CantonDiseaseStatus | CantonDiseaseData] = {}
     done = 0
@@ -745,6 +784,7 @@ async def bag_get_canton_situation(
 # can fetch and cache) is the right primitive. Live, parameterised surveillance
 # data stays behind Tools.
 
+
 @mcp.resource(
     "bag://reference/cantons",
     name="swiss_cantons",
@@ -767,9 +807,7 @@ def cantons_resource() -> str:
     mime_type="application/json",
 )
 def disease_categories_resource() -> str:
-    return json.dumps(
-        {name: sorted(members) for name, members in DISEASE_CATEGORIES.items()}
-    )
+    return json.dumps({name: sorted(members) for name, members in DISEASE_CATEGORIES.items()})
 
 
 @mcp.resource(
@@ -791,6 +829,7 @@ def data_licence_resource() -> str:
 # Prompts package the recommended multi-tool workflows as reusable, parameterised
 # templates a host can surface to the user (e.g. as slash-commands).
 
+
 @mcp.prompt(
     name="canton_situation_brief",
     title="Canton public-health situation brief",
@@ -803,7 +842,7 @@ def canton_situation_brief(canton: str = "ZH") -> str:
     return (
         f"Erstelle einen kurzen Public-Health-Lagebericht für den Kanton {canton}.\n\n"
         "Vorgehen:\n"
-        f"1. Rufe bag_health_mcp__get_canton_situation(canton=\"{canton}\") auf.\n"
+        f'1. Rufe bag_health_mcp__get_canton_situation(canton="{canton}") auf.\n'
         "2. Fasse je Krankheit den aktuellen Stand, den Trend und die "
         "Veränderung zur Vorperiode zusammen.\n"
         "3. Hebe schulrelevante Risiken hervor (Influenza/ARI-Spitzen, "
@@ -823,14 +862,12 @@ def outbreak_check(disease: str = "measles", canton: str = "all") -> str:
         f"Prüfe, ob bei '{disease}' aktuell ein Ausbruch bzw. eine erhöhte "
         f"Aktivität im Gebiet '{canton}' vorliegt.\n\n"
         "Vorgehen:\n"
-        f"1. bag_health_mcp__list_series(topic=\"{disease}\") um eine geeignete Serie zu finden.\n"
+        f'1. bag_health_mcp__list_series(topic="{disease}") um eine geeignete Serie zu finden.\n'
         "2. bag_health_mcp__get_series_details(series_id=...) für gültige Filter.\n"
-        f"3. bag_health_mcp__get_disease_data(series_id=..., canton=\"{canton}\") für die "
+        f'3. bag_health_mcp__get_disease_data(series_id=..., canton="{canton}") für die '
         "Zeitreihe.\n"
         "4. Bewerte den Trend; vergleiche – wenn verfügbar – mit dem 5-Jahres-"
         "Mittel (Serien mit 'valueMean5y').\n"
         "Gib eine klare Einschätzung (erhöht / normal / unklar) mit Datenstand "
         "und Quelle."
     )
-
-
