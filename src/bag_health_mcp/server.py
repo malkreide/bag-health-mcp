@@ -55,6 +55,7 @@ USER_AGENT = f"bag-health-mcp/{__version__} (https://github.com/malkreide/bag-he
 # (or their defaults). main() builds one instance and uses it to wire up
 # logging, transport and binding.
 
+
 class Settings(BaseSettings):
     """Runtime configuration, sourced from ``MCP_*`` environment variables."""
 
@@ -103,6 +104,7 @@ class Settings(BaseSettings):
     def allowed_host_list(self) -> list[str]:
         return [h.strip() for h in self.allowed_hosts.split(",") if h.strip()]
 
+
 # Code-layer egress allow-list (SEC-021): the only hosts this server may ever
 # talk to are the BAG IDD API plus the two additional public health-data hosts
 # used by the indicator tools, derived from their base URLs so there is a single
@@ -150,14 +152,14 @@ class JsonLogFormatter(logging.Formatter):
     merged in.
     """
 
-    _RESERVED = frozenset(
-        logging.makeLogRecord({}).__dict__.keys()
-    ) | {"message", "asctime", "taskName"}
+    _RESERVED = frozenset(logging.makeLogRecord({}).__dict__.keys()) | {
+        "message",
+        "asctime",
+        "taskName",
+    }
 
     def format(self, record: logging.LogRecord) -> str:
-        severity, severity_code = _RFC5424_SEVERITY.get(
-            record.levelno, ("info", 6)
-        )
+        severity, severity_code = _RFC5424_SEVERITY.get(record.levelno, ("info", 6))
         payload: dict[str, Any] = {
             "timestamp": datetime.fromtimestamp(record.created, tz=UTC).isoformat(),
             "level": record.levelname,
@@ -313,9 +315,34 @@ def _instrument_client(client: httpx.AsyncClient) -> None:
 
 # Swiss cantons (incl. FL = Liechtenstein as BAG tracks it)
 CANTONS = [
-    "AG","AI","AR","BE","BL","BS","FR","GE","GL","GR",
-    "JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG",
-    "TI","UR","VD","VS","ZG","ZH","FL","all",
+    "AG",
+    "AI",
+    "AR",
+    "BE",
+    "BL",
+    "BS",
+    "FR",
+    "GE",
+    "GL",
+    "GR",
+    "JU",
+    "LU",
+    "NE",
+    "NW",
+    "OW",
+    "SG",
+    "SH",
+    "SO",
+    "SZ",
+    "TG",
+    "TI",
+    "UR",
+    "VD",
+    "VS",
+    "ZG",
+    "ZH",
+    "FL",
+    "all",
 ]
 
 # Data classification (CH-006, Stadt Zürich Schulamt scheme).
@@ -336,27 +363,58 @@ MIN_AGGREGATION_LEVEL = "canton"
 # reference resource, so the two never drift (single source of truth).
 DISEASE_CATEGORIES: dict[str, set[str]] = {
     "respiratory": {
-        "acute_respiratory_infection", "influenza", "influenza-like_illness",
-        "respiratory_pathogens", "covid19",
+        "acute_respiratory_infection",
+        "influenza",
+        "influenza-like_illness",
+        "respiratory_pathogens",
+        "covid19",
     },
     "enteric": {
-        "campylobacteriosis", "salmonellosis", "ehec", "listeriosis",
-        "hepatitis_a", "hepatitis_e", "shigellosis", "cholera",
-        "typhoidParatyphoidFever", "trichinellosis", "botulism", "qFever",
+        "campylobacteriosis",
+        "salmonellosis",
+        "ehec",
+        "listeriosis",
+        "hepatitis_a",
+        "hepatitis_e",
+        "shigellosis",
+        "cholera",
+        "typhoidParatyphoidFever",
+        "trichinellosis",
+        "botulism",
+        "qFever",
     },
     "sti_and_bloodborne": {
-        "hiv", "aids", "syphilis", "gonorrhea", "chlamydiosis",
-        "hepatitis_b", "hepatitis_c",
+        "hiv",
+        "aids",
+        "syphilis",
+        "gonorrhea",
+        "chlamydiosis",
+        "hepatitis_b",
+        "hepatitis_c",
     },
     "vaccine_preventable": {
-        "measles", "rubella", "pertussis", "diphtheria", "tetanus",
-        "haemophilusInfluenzae", "ipd", "meningo", "herpesZoster",
+        "measles",
+        "rubella",
+        "pertussis",
+        "diphtheria",
+        "tetanus",
+        "haemophilusInfluenzae",
+        "ipd",
+        "meningo",
+        "herpesZoster",
         "postZosterNeuralgia",
     },
     "vector_borne": {
-        "lyme_borreliosis", "tick-borne_encephalitis", "dengueFever",
-        "malaria", "westnileFever", "chikungunya", "zika", "yellowFever",
-        "hanta", "tularemia",
+        "lyme_borreliosis",
+        "tick-borne_encephalitis",
+        "dengueFever",
+        "malaria",
+        "westnileFever",
+        "chikungunya",
+        "zika",
+        "yellowFever",
+        "hanta",
+        "tularemia",
     },
 }
 
@@ -450,9 +508,7 @@ async def _assert_egress_allowed(url: httpx.URL) -> None:
             logger.warning("egress: unparseable resolved address %r for %s", addr, host)
             raise EgressNotAllowed("host resolved to an unparseable address; refused")
         if _is_disallowed_ip(ip):
-            logger.warning(
-                "blocked egress: host %s resolved to disallowed IP %s", host, ip
-            )
+            logger.warning("blocked egress: host %s resolved to disallowed IP %s", host, ip)
             raise EgressNotAllowed(
                 "the target host resolved to a non-public address; refused as a "
                 "possible SSRF attempt"
@@ -526,9 +582,7 @@ class _PinningBackend(httpcore.AsyncNetworkBackend):
                 logger.warning("egress: unparseable resolved address %r for %s", addr, host)
                 raise EgressNotAllowed("host resolved to an unparseable address; refused")
             if _is_disallowed_ip(ip):
-                logger.warning(
-                    "blocked egress: host %s resolved to disallowed IP %s", host, ip
-                )
+                logger.warning("blocked egress: host %s resolved to disallowed IP %s", host, ip)
                 raise EgressNotAllowed(
                     "the target host resolved to a non-public address; refused as a "
                     "possible SSRF attempt"
@@ -636,6 +690,7 @@ mcp = MCPServer(
 # Raw upstream detail (status bodies, exception text, URLs) is logged
 # server-side only and never placed in the returned message (OBS-002).
 
+
 def _fail(message: str, *, detail: str | None = None) -> NoReturn:
     """Raise an execution-class error as an MCP tool result (``isError: true``).
 
@@ -672,9 +727,7 @@ def _suggest(query: str, candidates: list[str], *, n: int = 3) -> list[str]:
     return out[:n]
 
 
-def _fail_not_found(
-    label: str, query: str, candidates: list[str], hint: str
-) -> NoReturn:
+def _fail_not_found(label: str, query: str, candidates: list[str], hint: str) -> NoReturn:
     """Raise a not-found ToolError enriched with fuzzy suggestions (ARCH-003).
 
     Keeps the OBS-001 contract (not-found is an execution error → isError:true)
@@ -703,6 +756,7 @@ def _ensure_ok(r: httpx.Response, *, context: str) -> None:
 # ---------------------------------------------------------------------------
 # HTTP client accessor
 # ---------------------------------------------------------------------------
+
 
 @asynccontextmanager
 async def _client() -> AsyncIterator[httpx.AsyncClient]:
@@ -794,7 +848,9 @@ async def _get_with_retry(
             last_detail = r.text[:500]
             logger.warning(
                 "transient upstream %s while %s (attempt %d)",
-                r.status_code, context, attempt,
+                r.status_code,
+                context,
+                attempt,
             )
             continue
         # Permanent client error — do not retry.
@@ -806,9 +862,7 @@ async def _get_with_retry(
     )
 
 
-async def _post(
-    client: httpx.AsyncClient, url: str, *, json: Any, context: str
-) -> httpx.Response:
+async def _post(client: httpx.AsyncClient, url: str, *, json: Any, context: str) -> httpx.Response:
     """POST ``json`` to ``url``, converting transport errors into safe ToolErrors.
 
     The response is returned without status validation so callers can branch on
@@ -888,6 +942,7 @@ from bag_health_mcp._models import (  # noqa: E402,F401
 # HTTP auth + CORS (SEC-009 / SDK-004)
 # ---------------------------------------------------------------------------
 
+
 class _BearerAuthMiddleware:
     """ASGI middleware enforcing a shared-secret bearer token (SEC-009).
 
@@ -910,12 +965,13 @@ class _BearerAuthMiddleware:
 
         expected = f"Bearer {self._token}"
         if not hmac.compare_digest(provided, expected):
-            await send({
-                "type": "http.response.start",
-                "status": 401,
-                "headers": [(b"content-type", b"text/plain"),
-                            (b"www-authenticate", b"Bearer")],
-            })
+            await send(
+                {
+                    "type": "http.response.start",
+                    "status": 401,
+                    "headers": [(b"content-type", b"text/plain"), (b"www-authenticate", b"Bearer")],
+                }
+            )
             await send({"type": "http.response.body", "body": b"unauthorized"})
             return
         await self.app(scope, receive, send)
@@ -1009,6 +1065,7 @@ def build_http_app(settings: Settings) -> Any:
 # Entry point
 # ---------------------------------------------------------------------------
 
+
 def main() -> None:
     """Console-script / module entry point.
 
@@ -1045,8 +1102,7 @@ def main() -> None:
             )
         elif not settings.is_local_bind:
             logger.info(
-                "binding HTTP server to non-localhost host %s with a Host "
-                "allow-list of %s",
+                "binding HTTP server to non-localhost host %s with a Host allow-list of %s",
                 settings.host,
                 ", ".join(settings.allowed_host_list),
                 extra={"bind_host": settings.host},

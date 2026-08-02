@@ -20,6 +20,7 @@ def stub_dns(monkeypatch):
 
     Prevents the egress guard from performing real DNS during unit tests.
     """
+
     async def _fake_resolve(host: str) -> list[str]:
         return [PUBLIC_IP]
 

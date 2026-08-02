@@ -23,6 +23,7 @@ Access model (verified live, see ``docs/probe-*.md``):
 Every response carries the mandated aggregate-statistics safeguard label: these
 tools serve aggregated population statistics, never individual advice.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -142,9 +143,7 @@ def _apply_year_filter(
 _SITEMAP_LOC_RE = re.compile(r"<loc>\s*([^<]+?)\s*</loc>")
 # Indicator locations look like ".../<lang>/indicator/<topic>/<slug>" or, for the
 # canonical entry, ".../indicator/<topic>/<slug>" with no language segment.
-_OBSAN_IND_RE = re.compile(
-    r"/(?:(de|fr|it|en)/)?indicator/([a-z0-9_]+)/([a-z0-9-]+)$", re.I
-)
+_OBSAN_IND_RE = re.compile(r"/(?:(de|fr|it|en)/)?indicator/([a-z0-9_]+)/([a-z0-9-]+)$", re.I)
 
 
 async def _obsan_catalogue() -> list[dict[str, str]]:
@@ -163,8 +162,9 @@ async def _obsan_catalogue() -> list[dict[str, str]]:
         for loc in _SITEMAP_LOC_RE.findall(r.text):
             m = _OBSAN_IND_RE.search(loc)
             if m:
-                out.append({"lang": (m.group(1) or "").lower(), "topic": m.group(2),
-                            "slug": m.group(3)})
+                out.append(
+                    {"lang": (m.group(1) or "").lower(), "topic": m.group(2), "slug": m.group(3)}
+                )
         return out
 
     return await _cached("obsan:sitemap", factory)
@@ -210,8 +210,12 @@ async def _obsan_search(
 
     return IndicatorSearchOutput(
         source=params.source,
-        query={"topic": params.topic, "region": params.region,
-               "year_from": params.year_from, "year_to": params.year_to},
+        query={
+            "topic": params.topic,
+            "region": params.region,
+            "year_from": params.year_from,
+            "year_to": params.year_to,
+        },
         total_matches=len(matches),
         indicators=matches,
         usage=(
@@ -249,7 +253,9 @@ async def _obsan_resolve_id(indicator_id: str, lang: Language) -> str:
             catalogue = await _obsan_catalogue()
             ids = [f"{e['topic']}/{e['slug']}" for e in catalogue]
             _fail_not_found(
-                "Obsan indicator", indicator_id, ids,
+                "Obsan indicator",
+                indicator_id,
+                ids,
                 "Use bag_health_mcp__search_health_indicators(source='obsan', ...).",
             )
     data = _extract_next_data(r.text)
@@ -270,13 +276,16 @@ async def _obsan_series(
 
     async with _client() as c:
         r = await _get_with_retry(
-            c, f"{OBSAN_BASE}/api/{internal}/g/json",
-            context=f"fetching Obsan series '{internal}'", allow_404=True,
+            c,
+            f"{OBSAN_BASE}/api/{internal}/g/json",
+            context=f"fetching Obsan series '{internal}'",
+            allow_404=True,
         )
         if r.status_code == 404:
             # Not every indicator exposes the '/g' variant; fall back to '/gum'.
             r = await _get_with_retry(
-                c, f"{OBSAN_BASE}/api/{internal}/gum/json",
+                c,
+                f"{OBSAN_BASE}/api/{internal}/gum/json",
                 context=f"fetching Obsan series '{internal}' (gum variant)",
             )
     payload = r.json()
@@ -354,13 +363,15 @@ async def _obsan_series(
 # Versorgungsatlas adapter
 # ---------------------------------------------------------------------------
 
+
 async def _va_catalogue(lang: Language) -> list[dict[str, Any]]:
     """The Versorgungsatlas catalogue (~285 aspects / 124 indicators), cached."""
 
     async def factory() -> list[dict[str, Any]]:
         async with _client() as c:
             r = await _get_with_retry(
-                c, f"{VERSORGUNGSATLAS_BASE}/search/search_{lang}.json",
+                c,
+                f"{VERSORGUNGSATLAS_BASE}/search/search_{lang}.json",
                 context="loading the Versorgungsatlas catalogue",
             )
         data = r.json()
@@ -377,8 +388,14 @@ async def _va_search(params: SearchHealthIndicatorsInput) -> IndicatorSearchOutp
     for entry in catalogue:
         hay = " ".join(
             str(entry.get(k, ""))
-            for k in ("title", "aspect_title", "topic", "description",
-                      "search_terms", "group_terms")
+            for k in (
+                "title",
+                "aspect_title",
+                "topic",
+                "description",
+                "search_terms",
+                "group_terms",
+            )
         ).lower()
         if term and term not in hay:
             continue
@@ -400,8 +417,12 @@ async def _va_search(params: SearchHealthIndicatorsInput) -> IndicatorSearchOutp
 
     return IndicatorSearchOutput(
         source=params.source,
-        query={"topic": params.topic, "region": params.region,
-               "year_from": params.year_from, "year_to": params.year_to},
+        query={
+            "topic": params.topic,
+            "region": params.region,
+            "year_from": params.year_from,
+            "year_to": params.year_to,
+        },
         total_matches=len(matches),
         indicators=matches,
         usage=(
@@ -411,7 +432,8 @@ async def _va_search(params: SearchHealthIndicatorsInput) -> IndicatorSearchOutp
         ),
         provenance=Provenance(
             source=VERSORGUNGSATLAS_ATTRIBUTION,
-            attribution=VERSORGUNGSATLAS_ATTRIBUTION, license=INDICATOR_LICENSE,
+            attribution=VERSORGUNGSATLAS_ATTRIBUTION,
+            license=INDICATOR_LICENSE,
         ),
     )
 
@@ -436,7 +458,8 @@ async def _va_fetch_data(base: str, suffix: str) -> Any | None:
     """Fetch one Versorgungsatlas data file, or ``None`` if it does not exist."""
     async with _client() as c:
         r = await _get_with_retry(
-            c, f"{VERSORGUNGSATLAS_BASE}/data/{base}_{suffix}.json",
+            c,
+            f"{VERSORGUNGSATLAS_BASE}/data/{base}_{suffix}.json",
             context=f"fetching Versorgungsatlas data '{base}_{suffix}'",
             allow_404=True,
         )
@@ -464,13 +487,17 @@ async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
     meta = await _va_fetch_data(base, "ad")
     if meta is None:
         _fail_not_found(
-            "Versorgungsatlas indicator", params.indicator_id, [],
+            "Versorgungsatlas indicator",
+            params.indicator_id,
+            [],
             "Use bag_health_mcp__search_health_indicators(source='versorgungsatlas', ...).",
         )
 
     var_label = meta.get("var1_label", "")
     unit = _VA_VAR_LABELS.get(var_label, var_label or None)
-    population = (meta.get("population") or {}).get(lang) or (meta.get("population") or {}).get("de")
+    population = (meta.get("population") or {}).get(lang) or (meta.get("population") or {}).get(
+        "de"
+    )
     dims: dict[str, str] = {}
     if subtitle:
         dims["subtitle"] = subtitle
@@ -509,7 +536,8 @@ async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
                 for r in rows
                 if r.get("var1") is not None
             ],
-            params.year_from, params.year_to,
+            params.year_from,
+            params.year_to,
         )
         dims["regions_available"] = ", ".join(available)
 
@@ -517,8 +545,9 @@ async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
         # to the national value, provided by the source).
         region_note = None
         if region != "CH":
-            ch_by_year = {r["year"]: r.get("var1") for r in regional
-                          if r.get("region_name") == "CH"}
+            ch_by_year = {
+                r["year"]: r.get("var1") for r in regional if r.get("region_name") == "CH"
+            }
             latest = max((r["year"] for r in rows), default=None)
             rr = next((r.get("rr") for r in rows if r.get("year") == latest), None)
             ch_val = ch_by_year.get(latest)
@@ -568,7 +597,8 @@ async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
                 for r in age
                 if r.get("var1") is not None
             ],
-            params.year_from, params.year_to,
+            params.year_from,
+            params.year_to,
         )
         dims["category_id"] = "age class (see 'age' labels in the atlas)"
         return IndicatorSeriesOutput(
@@ -580,7 +610,8 @@ async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
             region_note=(
                 "This indicator has no regional file; the national age-group series "
                 "is returned (category_id = age class)."
-                if params.region and params.region.upper() != "CH" else None
+                if params.region and params.region.upper() != "CH"
+                else None
             ),
             values_available=bool(points),
             dimensions=dims,
@@ -618,23 +649,28 @@ async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
 # Tools
 # ---------------------------------------------------------------------------
 
-@mcp.tool(name="bag_health_mcp__search_health_indicators", annotations=READ_ONLY_INDICATORS, description=(
-    "Search health indicators across three Swiss sources: 'obsan' (Swiss Health "
-    "Observatory — hundreds of indicators incl. the HBSC youth-survey series), "
-    "'versorgungsatlas' (Swiss health-care supply atlas, ~124 indicators), and "
-    "'suchtschweiz' (addiction / HBSC series, served via Obsan's official mirror). "
-    "Returns matching indicator_ids to pass to bag_health_mcp__get_indicator_series. "
-    "IMPORTANT: this serves AGGREGATED population statistics (prevalences/metrics by "
-    "age/sex/region) — NOT individual advice, diagnosis or case assessment, and no "
-    "personal data. Especially for 'suchtschweiz' (prevention topics in a school "
-    "context): the figures are population-level survey aggregates only. "
-    "<use_case>Find which indicators exist for a topic (e.g. youth alcohol) before "
-    "fetching a series.</use_case>"
-    "<important_notes>Most indicators are national; cantonal breakdowns are rare "
-    "(HBSC youth surveys are not cantonally representative).</important_notes>"
-    "<example>bag_health_mcp__search_health_indicators(source='suchtschweiz', "
-    "topic='alkohol') -> Obsan HBSC alcohol-prevalence indicators.</example>"
-))
+
+@mcp.tool(
+    name="bag_health_mcp__search_health_indicators",
+    annotations=READ_ONLY_INDICATORS,
+    description=(
+        "Search health indicators across three Swiss sources: 'obsan' (Swiss Health "
+        "Observatory — hundreds of indicators incl. the HBSC youth-survey series), "
+        "'versorgungsatlas' (Swiss health-care supply atlas, ~124 indicators), and "
+        "'suchtschweiz' (addiction / HBSC series, served via Obsan's official mirror). "
+        "Returns matching indicator_ids to pass to bag_health_mcp__get_indicator_series. "
+        "IMPORTANT: this serves AGGREGATED population statistics (prevalences/metrics by "
+        "age/sex/region) — NOT individual advice, diagnosis or case assessment, and no "
+        "personal data. Especially for 'suchtschweiz' (prevention topics in a school "
+        "context): the figures are population-level survey aggregates only. "
+        "<use_case>Find which indicators exist for a topic (e.g. youth alcohol) before "
+        "fetching a series.</use_case>"
+        "<important_notes>Most indicators are national; cantonal breakdowns are rare "
+        "(HBSC youth surveys are not cantonally representative).</important_notes>"
+        "<example>bag_health_mcp__search_health_indicators(source='suchtschweiz', "
+        "topic='alkohol') -> Obsan HBSC alcohol-prevalence indicators.</example>"
+    ),
+)
 @_traced
 async def bag_search_health_indicators(
     params: SearchHealthIndicatorsInput,
@@ -649,34 +685,36 @@ async def bag_search_health_indicators(
     return await _va_search(params)
 
 
-@mcp.tool(name="bag_health_mcp__get_indicator_series", annotations=READ_ONLY_INDICATORS, description=(
-    "Fetch one health indicator's time series from Obsan, the Versorgungsatlas or "
-    "Sucht Schweiz (HBSC). Use an indicator_id from bag_health_mcp__search_health_indicators. "
-    "Obsan/suchtschweiz return national year/value points (with 95% confidence "
-    "intervals and sex/category dimensions where available); versorgungsatlas returns "
-    "a cantonal year/value series (26 cantons + a 'CH' national total, with 95% CIs "
-    "and a canton-vs-Switzerland ratio) — pass region='ZH' for a canton. "
-    "IMPORTANT: AGGREGATED population statistics only — NOT individual advice, "
-    "diagnosis or case assessment, no personal data. For 'suchtschweiz' (school-context "
-    "prevention topics) the values are national HBSC survey aggregates by age/sex. "
-    "<use_case>Get a national trend (obsan/suchtschweiz) or a cantonal series with a "
-    "Switzerland comparison (versorgungsatlas).</use_case>"
-    "<important_notes>obsan/suchtschweiz indicators are national — passing a canton "
-    "returns the national series with an explanatory note (HBSC is not cantonally "
-    "representative). versorgungsatlas supports cantons: region='ZH' returns ZH plus a "
-    "canton-vs-CH comparison.</important_notes>"
-    "<example>bag_health_mcp__get_indicator_series(source='versorgungsatlas', "
-    "indicator_id='_003/b', region='ZH') -> ZH cantonal series with 95% CIs and its "
-    "ratio to the Swiss average.</example>"
-))
+@mcp.tool(
+    name="bag_health_mcp__get_indicator_series",
+    annotations=READ_ONLY_INDICATORS,
+    description=(
+        "Fetch one health indicator's time series from Obsan, the Versorgungsatlas or "
+        "Sucht Schweiz (HBSC). Use an indicator_id from bag_health_mcp__search_health_indicators. "
+        "Obsan/suchtschweiz return national year/value points (with 95% confidence "
+        "intervals and sex/category dimensions where available); versorgungsatlas returns "
+        "a cantonal year/value series (26 cantons + a 'CH' national total, with 95% CIs "
+        "and a canton-vs-Switzerland ratio) — pass region='ZH' for a canton. "
+        "IMPORTANT: AGGREGATED population statistics only — NOT individual advice, "
+        "diagnosis or case assessment, no personal data. For 'suchtschweiz' (school-context "
+        "prevention topics) the values are national HBSC survey aggregates by age/sex. "
+        "<use_case>Get a national trend (obsan/suchtschweiz) or a cantonal series with a "
+        "Switzerland comparison (versorgungsatlas).</use_case>"
+        "<important_notes>obsan/suchtschweiz indicators are national — passing a canton "
+        "returns the national series with an explanatory note (HBSC is not cantonally "
+        "representative). versorgungsatlas supports cantons: region='ZH' returns ZH plus a "
+        "canton-vs-CH comparison.</important_notes>"
+        "<example>bag_health_mcp__get_indicator_series(source='versorgungsatlas', "
+        "indicator_id='_003/b', region='ZH') -> ZH cantonal series with 95% CIs and its "
+        "ratio to the Swiss average.</example>"
+    ),
+)
 @_traced
 async def bag_get_indicator_series(
     params: GetIndicatorSeriesInput, ctx: Context | None = None
 ) -> IndicatorSeriesOutput:
     if ctx:
-        await ctx.info(
-            f"Fetching {params.source} indicator '{params.indicator_id}'"
-        )
+        await ctx.info(f"Fetching {params.source} indicator '{params.indicator_id}'")
     if params.source == "obsan":
         return await _obsan_series(params, attribution=OBSAN_ATTRIBUTION)
     if params.source == "suchtschweiz":

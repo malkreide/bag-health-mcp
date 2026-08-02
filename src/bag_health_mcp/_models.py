@@ -5,6 +5,7 @@ Split out of server.py (ARCH-011). Input models enforce strict validation
 Provenance block (SDK-002 / CH-004). Re-exported from
 ``bag_health_mcp.server`` for backward compatibility.
 """
+
 from __future__ import annotations
 
 from typing import Literal
@@ -17,9 +18,34 @@ from pydantic import BaseModel, ConfigDict, Field
 
 Language = Literal["de", "fr", "it", "en"]
 CantonCode = Literal[
-    "AG","AI","AR","BE","BL","BS","FR","GE","GL","GR",
-    "JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG",
-    "TI","UR","VD","VS","ZG","ZH","FL","all",
+    "AG",
+    "AI",
+    "AR",
+    "BE",
+    "BL",
+    "BS",
+    "FR",
+    "GE",
+    "GL",
+    "GR",
+    "JU",
+    "LU",
+    "NE",
+    "NW",
+    "OW",
+    "SG",
+    "SH",
+    "SO",
+    "SZ",
+    "TG",
+    "TI",
+    "UR",
+    "VD",
+    "VS",
+    "ZG",
+    "ZH",
+    "FL",
+    "all",
 ]
 
 
@@ -186,16 +212,22 @@ class SearchHealthIndicatorsInput(_StrictInput):
         ),
     )
     year_from: int | None = Field(
-        default=None, ge=1900, le=2100,
+        default=None,
+        ge=1900,
+        le=2100,
         description="Optional lower bound (year) — a hint for downstream series retrieval.",
     )
     year_to: int | None = Field(
-        default=None, ge=1900, le=2100,
+        default=None,
+        ge=1900,
+        le=2100,
         description="Optional upper bound (year) — a hint for downstream series retrieval.",
     )
     language: Language = Field(default="de", description="Result language for labels.")
     limit: int = Field(
-        default=25, ge=1, le=100,
+        default=25,
+        ge=1,
+        le=100,
         description="Maximum number of matching indicators to return.",
     )
 
@@ -226,11 +258,15 @@ class GetIndicatorSeriesInput(_StrictInput):
         ),
     )
     year_from: int | None = Field(
-        default=None, ge=1900, le=2100,
+        default=None,
+        ge=1900,
+        le=2100,
         description="Optional lower year bound; points before it are dropped.",
     )
     year_to: int | None = Field(
-        default=None, ge=1900, le=2100,
+        default=None,
+        ge=1900,
+        le=2100,
         description="Optional upper year bound; points after it are dropped.",
     )
     language: Language = Field(default="de", description="Language for labels/units.")
@@ -472,4 +508,3 @@ class IndicatorSeriesOutput(BaseModel):
     aggregate_statistics_notice: str = AGGREGATE_STATISTICS_NOTICE
     note: str | None = None
     provenance: Provenance = Field(default_factory=Provenance)
-

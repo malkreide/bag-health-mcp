@@ -29,8 +29,16 @@ jobs:
         run: |
           PYTHONPATH=src pytest tests/ -m "not live"
 
+      # Pin ruff so an upstream release cannot change the default rule set or
+      # formatter and break CI on unrelated, untouched code.
+      - name: Install pinned ruff
+        run: pip install ruff==0.16.1
+
       - name: Lint
-        run: python -m ruff check src/ tests/
+        run: python -m ruff check src/ tests/ scripts/
+
+      - name: Format check
+        run: python -m ruff format --check src/ tests/ scripts/
 
       - name: Verify tool-definition hashes (SEC-022 rug-pull guard)
         run: python scripts/tool_hashes.py --check

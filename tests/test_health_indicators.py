@@ -64,34 +64,75 @@ OBSAN_API_330 = {
 }
 
 VA_SEARCH = [
-    {"id": "_003", "aspect": "b", "title": "MMR-Impfungen",
-     "aspect_title": "bei Kindern bis 15 Jahre", "topic": "Impfungen",
-     "description": "Die MMR-Impfung …", "search_terms": "", "group_terms": "Pädiatrie"},
-    {"id": "_010", "aspect": "a", "title": "Diabetes",
-     "aspect_title": "Behandlung", "topic": "Chronische Krankheiten",
-     "description": "…", "search_terms": "", "group_terms": ""},
+    {
+        "id": "_003",
+        "aspect": "b",
+        "title": "MMR-Impfungen",
+        "aspect_title": "bei Kindern bis 15 Jahre",
+        "topic": "Impfungen",
+        "description": "Die MMR-Impfung …",
+        "search_terms": "",
+        "group_terms": "Pädiatrie",
+    },
+    {
+        "id": "_010",
+        "aspect": "a",
+        "title": "Diabetes",
+        "aspect_title": "Behandlung",
+        "topic": "Chronische Krankheiten",
+        "description": "…",
+        "search_terms": "",
+        "group_terms": "",
+    },
 ]
 
 # Versorgungsatlas data files: _ad (definition), _rz (regional incl. CH), _ag (age).
 VA_AD = {
-    "var1_label": "std_costs", "datasource": "Tarifpool",
+    "var1_label": "std_costs",
+    "datasource": "Tarifpool",
     "denominator": "Wohnbevölkerung",
     "population": {"de": "Wohnbevölkerung bis 15 Jahre"},
-    "version": 20220829, "date_export": "05.11.2025",
+    "version": 20220829,
+    "date_export": "05.11.2025",
 }
 VA_RZ = [
-    {"year": 2020, "region_name": "ZH", "var1": 5.0, "lci1": 4.9, "uci1": 5.1, "sex": 0, "rr": 1.05},
+    {
+        "year": 2020,
+        "region_name": "ZH",
+        "var1": 5.0,
+        "lci1": 4.9,
+        "uci1": 5.1,
+        "sex": 0,
+        "rr": 1.05,
+    },
     {"year": 2020, "region_name": "CH", "var1": 4.8, "lci1": 4.7, "uci1": 4.9, "sex": 0, "rr": 1.0},
-    {"year": 2021, "region_name": "ZH", "var1": 5.2, "lci1": 5.1, "uci1": 5.3, "sex": 0, "rr": 1.06},
+    {
+        "year": 2021,
+        "region_name": "ZH",
+        "var1": 5.2,
+        "lci1": 5.1,
+        "uci1": 5.3,
+        "sex": 0,
+        "rr": 1.06,
+    },
     {"year": 2021, "region_name": "CH", "var1": 4.9, "lci1": 4.8, "uci1": 5.0, "sex": 0, "rr": 1.0},
 ]
 VA_AG = [
     {"year": 2021, "ageclass": 1, "sex": 0, "var1": 3.1, "lci1": 3.0, "uci1": 3.2, "age": "0 - 5"},
-    {"year": 2021, "ageclass": 3, "sex": 0, "var1": 0.5, "lci1": 0.4, "uci1": 0.6, "age": "11 - 15"},
+    {
+        "year": 2021,
+        "ageclass": 3,
+        "sex": 0,
+        "var1": 0.5,
+        "lci1": 0.4,
+        "uci1": 0.6,
+        "age": "11 - 15",
+    },
 ]
 
 
 # --- Obsan / suchtschweiz --------------------------------------------------
+
 
 @pytest.mark.asyncio
 @respx.mock
@@ -124,14 +165,14 @@ async def test_obsan_series_resolves_path_and_filters_years():
     respx.get(f"{OBSAN}/de/indicator/monam/alkoholkonsum-alter-11-15").mock(
         return_value=httpx.Response(200, text=_page("_330"))
     )
-    respx.get(f"{OBSAN}/api/_330/g/json").mock(
-        return_value=httpx.Response(200, json=OBSAN_API_330)
-    )
+    respx.get(f"{OBSAN}/api/_330/g/json").mock(return_value=httpx.Response(200, json=OBSAN_API_330))
     out = await srv.bag_get_indicator_series(
         GetIndicatorSeriesInput(
             source="suchtschweiz",
             indicator_id="monam/alkoholkonsum-alter-11-15",
-            region="ZH", year_from=2010, language="de",
+            region="ZH",
+            year_from=2010,
+            language="de",
         )
     )
     assert out.title.startswith("Prävalenz")
@@ -187,12 +228,11 @@ async def test_obsan_series_network_error_is_clean_toolerror():
 
 # --- Versorgungsatlas ------------------------------------------------------
 
+
 @pytest.mark.asyncio
 @respx.mock
 async def test_va_search_happy():
-    respx.get(f"{VA}/search/search_de.json").mock(
-        return_value=httpx.Response(200, json=VA_SEARCH)
-    )
+    respx.get(f"{VA}/search/search_de.json").mock(return_value=httpx.Response(200, json=VA_SEARCH))
     out = await srv.bag_search_health_indicators(
         SearchHealthIndicatorsInput(source="versorgungsatlas", topic="impfung", language="de")
     )
@@ -204,15 +244,16 @@ async def test_va_search_happy():
 @pytest.mark.asyncio
 @respx.mock
 async def test_va_series_cantonal_with_comparison():
-    respx.get(f"{VA}/search/search_de.json").mock(
-        return_value=httpx.Response(200, json=VA_SEARCH)
-    )
+    respx.get(f"{VA}/search/search_de.json").mock(return_value=httpx.Response(200, json=VA_SEARCH))
     respx.get(f"{VA}/data/_003b_ad.json").mock(return_value=httpx.Response(200, json=VA_AD))
     respx.get(f"{VA}/data/_003b_rz.json").mock(return_value=httpx.Response(200, json=VA_RZ))
     out = await srv.bag_get_indicator_series(
         GetIndicatorSeriesInput(
-            source="versorgungsatlas", indicator_id="_003/b", region="ZH",
-            year_from=2020, language="de",
+            source="versorgungsatlas",
+            indicator_id="_003/b",
+            region="ZH",
+            year_from=2020,
+            language="de",
         )
     )
     assert out.values_available is True
@@ -230,9 +271,7 @@ async def test_va_series_cantonal_with_comparison():
 @pytest.mark.asyncio
 @respx.mock
 async def test_va_series_national_ch():
-    respx.get(f"{VA}/search/search_de.json").mock(
-        return_value=httpx.Response(200, json=VA_SEARCH)
-    )
+    respx.get(f"{VA}/search/search_de.json").mock(return_value=httpx.Response(200, json=VA_SEARCH))
     respx.get(f"{VA}/data/_003b_ad.json").mock(return_value=httpx.Response(200, json=VA_AD))
     respx.get(f"{VA}/data/_003b_rz.json").mock(return_value=httpx.Response(200, json=VA_RZ))
     out = await srv.bag_get_indicator_series(
@@ -246,9 +285,7 @@ async def test_va_series_national_ch():
 @pytest.mark.asyncio
 @respx.mock
 async def test_va_series_falls_back_to_age_when_no_regional():
-    respx.get(f"{VA}/search/search_de.json").mock(
-        return_value=httpx.Response(200, json=VA_SEARCH)
-    )
+    respx.get(f"{VA}/search/search_de.json").mock(return_value=httpx.Response(200, json=VA_SEARCH))
     respx.get(f"{VA}/data/_003b_ad.json").mock(return_value=httpx.Response(200, json=VA_AD))
     respx.get(f"{VA}/data/_003b_rz.json").mock(return_value=httpx.Response(404))
     respx.get(f"{VA}/data/_003b_ag.json").mock(return_value=httpx.Response(200, json=VA_AG))
@@ -264,9 +301,7 @@ async def test_va_series_falls_back_to_age_when_no_regional():
 @pytest.mark.asyncio
 @respx.mock
 async def test_va_series_unknown_region_fails_cleanly():
-    respx.get(f"{VA}/search/search_de.json").mock(
-        return_value=httpx.Response(200, json=VA_SEARCH)
-    )
+    respx.get(f"{VA}/search/search_de.json").mock(return_value=httpx.Response(200, json=VA_SEARCH))
     respx.get(f"{VA}/data/_003b_ad.json").mock(return_value=httpx.Response(200, json=VA_AD))
     respx.get(f"{VA}/data/_003b_rz.json").mock(return_value=httpx.Response(200, json=VA_RZ))
     with pytest.raises(ToolError) as exc:
