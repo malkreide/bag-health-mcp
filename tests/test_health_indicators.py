@@ -5,9 +5,12 @@ degradation, the retry-with-backoff path (503 then 200) and a clean network-erro
 failure. Run unit tests: pytest -m "not live".
 """
 
+import re
+
 import httpx
 import pytest
 import respx
+from fixture_data import fixture_json, fixture_text, internal_id
 from mcp.server.mcpserver.exceptions import ToolError
 
 import bag_health_mcp.server as srv
@@ -30,105 +33,34 @@ def _fast_and_fresh(monkeypatch):
     hi._clear_cache()
 
 
-# --- fixtures --------------------------------------------------------------
+# --- fixtures ---------------------------------------------------------------
+#
+# Aufgezeichnet statt ausgedacht. Herkunft, Datum, Auswahlregel und SHA-256 je
+# Datei stehen in tests/fixtures/PROVENANCE.md; neu aufzeichnen mit
+# `python scripts/record_fixtures.py`.
+#
+# Was der Wechsel zutage gefoerdert hat, steht im CHANGELOG. Kurz: Die alte
+# SITEMAP-Fixture bestand aus `/de/indicator/...`-URLs — die Quelle liefert
+# davon **keine einzige**. Deutsch kommt sprachneutral, ohne Sprachsegment.
+# Der Zweig, ueber den damit jedes deutsche Ergebnis laeuft, war ungetestet.
 
-SITEMAP = f"""<?xml version="1.0"?>
-<urlset>
-  <url><loc>{OBSAN}</loc></url>
-  <url><loc>{OBSAN}/de/indicator/monam/alkoholkonsum-alter-11-15</loc></url>
-  <url><loc>{OBSAN}/de/indicator/monam/kosten-des-gesundheitswesens</loc></url>
-  <url><loc>{OBSAN}/de/indicator/avos/urologie</loc></url>
-  <url><loc>{OBSAN}/fr/indicator/monam/consommation-d-alcool-age-11-15</loc></url>
-</urlset>"""
+SITEMAP = fixture_text("obsan_sitemap.xml")
+OBSAN_PAGE = fixture_text("obsan_page.html")
+OBSAN_PAGE_NO_SERIES = fixture_text("obsan_page_no_series.html")
+OBSAN_API = fixture_json("obsan_api_g.json")
+OBSAN_API_GUM = fixture_json("obsan_api_gum.json")
 
+# Aus der Fixture gelesen, nicht danebengeschrieben: eine Kopie waere eine
+# zweite Stelle, an der die Angabe falsch sein kann.
+INTERNAL = internal_id("obsan_page.html")
+INTERNAL_NO_SERIES = internal_id("obsan_page_no_series.html")
+INDICATOR_ID = "obsan/suizid-und-suizidhilfe"
+NO_SERIES_ID = "obsan/lebenserwartung"
 
-def _page(internal_id: str) -> str:
-    return (
-        '<html><body><script id="__NEXT_DATA__" type="application/json">'
-        f'{{"props":{{"pageProps":{{"id":"{internal_id}"}}}}}}'
-        "</script></body></html>"
-    )
-
-
-OBSAN_API_330 = {
-    "title": {"de": "Prävalenz des Alkoholkonsums", "en": "Alcohol prevalence"},
-    "source": {"de": "Sucht Schweiz – HBSC"},
-    "value": {"de": "Anteil in %"},
-    "version": "20260615",
-    "last_updated_at": "2023-03-27",
-    "data": [
-        {"year": 2006, "value": 31.0, "value_lci": 29.1, "value_uci": 33.0, "n": 9700, "sex_id": 0},
-        {"year": 2010, "value": 29.8, "value_lci": 27.6, "value_uci": 31.5, "n": 9700, "sex_id": 0},
-        {"year": 2022, "value": 23.4, "value_lci": 21.0, "value_uci": 25.0, "n": 9500, "sex_id": 0},
-    ],
-}
-
-VA_SEARCH = [
-    {
-        "id": "_003",
-        "aspect": "b",
-        "title": "MMR-Impfungen",
-        "aspect_title": "bei Kindern bis 15 Jahre",
-        "topic": "Impfungen",
-        "description": "Die MMR-Impfung …",
-        "search_terms": "",
-        "group_terms": "Pädiatrie",
-    },
-    {
-        "id": "_010",
-        "aspect": "a",
-        "title": "Diabetes",
-        "aspect_title": "Behandlung",
-        "topic": "Chronische Krankheiten",
-        "description": "…",
-        "search_terms": "",
-        "group_terms": "",
-    },
-]
-
-# Versorgungsatlas data files: _ad (definition), _rz (regional incl. CH), _ag (age).
-VA_AD = {
-    "var1_label": "std_costs",
-    "datasource": "Tarifpool",
-    "denominator": "Wohnbevölkerung",
-    "population": {"de": "Wohnbevölkerung bis 15 Jahre"},
-    "version": 20220829,
-    "date_export": "05.11.2025",
-}
-VA_RZ = [
-    {
-        "year": 2020,
-        "region_name": "ZH",
-        "var1": 5.0,
-        "lci1": 4.9,
-        "uci1": 5.1,
-        "sex": 0,
-        "rr": 1.05,
-    },
-    {"year": 2020, "region_name": "CH", "var1": 4.8, "lci1": 4.7, "uci1": 4.9, "sex": 0, "rr": 1.0},
-    {
-        "year": 2021,
-        "region_name": "ZH",
-        "var1": 5.2,
-        "lci1": 5.1,
-        "uci1": 5.3,
-        "sex": 0,
-        "rr": 1.06,
-    },
-    {"year": 2021, "region_name": "CH", "var1": 4.9, "lci1": 4.8, "uci1": 5.0, "sex": 0, "rr": 1.0},
-]
-VA_AG = [
-    {"year": 2021, "ageclass": 1, "sex": 0, "var1": 3.1, "lci1": 3.0, "uci1": 3.2, "age": "0 - 5"},
-    {
-        "year": 2021,
-        "ageclass": 3,
-        "sex": 0,
-        "var1": 0.5,
-        "lci1": 0.4,
-        "uci1": 0.6,
-        "age": "11 - 15",
-    },
-]
+VA_SEARCH = fixture_json("va_search_de.json")
+VA_AD = fixture_json("va_ad.json")
+VA_RZ = fixture_json("va_rz.json")
+VA_AG = fixture_json("va_ag.json")
 
 
 # --- Obsan / suchtschweiz --------------------------------------------------
@@ -139,10 +71,12 @@ VA_AG = [
 async def test_obsan_search_happy():
     respx.get(f"{OBSAN}/sitemap.xml").mock(return_value=httpx.Response(200, text=SITEMAP))
     out = await srv.bag_search_health_indicators(
-        SearchHealthIndicatorsInput(source="obsan", topic="alkohol", language="de")
+        SearchHealthIndicatorsInput(source="obsan", topic="suizid", language="de")
     )
+    # Der Treffer kommt aus einem sprachneutralen Sitemap-Eintrag — der Form,
+    # in der die Quelle Deutsch tatsaechlich ausliefert.
     assert out.total_matches == 1
-    assert out.indicators[0].indicator_id == "monam/alkoholkonsum-alter-11-15"
+    assert out.indicators[0].indicator_id == INDICATOR_ID
     # safeguard label present in every response
     assert "Aggregierte Bevölkerungsstatistik" in out.aggregate_statistics_notice
 
@@ -154,7 +88,10 @@ async def test_suchtschweiz_scoped_to_monam_with_attribution():
     out = await srv.bag_search_health_indicators(
         SearchHealthIndicatorsInput(source="suchtschweiz", topic="", language="de")
     )
-    # avos/urologie is filtered out (not monam); only monam indicators remain
+    # Die obsan/*-Eintraege fallen raus, die monam/*-Eintraege bleiben.
+    # Die Nicht-Leerheit ist Teil der Zusicherung: `all(...)` ueber einer leeren
+    # Liste ist wahr, und ein Test, der so besteht, prueft nichts.
+    assert out.indicators, "keine monam-Indikatoren — die Zusicherung waere leer wahr"
     assert all(i.indicator_id.startswith("monam/") for i in out.indicators)
     assert "HBSC" in out.provenance.attribution
 
@@ -162,28 +99,34 @@ async def test_suchtschweiz_scoped_to_monam_with_attribution():
 @pytest.mark.asyncio
 @respx.mock
 async def test_obsan_series_resolves_path_and_filters_years():
-    respx.get(f"{OBSAN}/de/indicator/monam/alkoholkonsum-alter-11-15").mock(
-        return_value=httpx.Response(200, text=_page("_330"))
+    respx.get(f"{OBSAN}/de/indicator/{INDICATOR_ID}").mock(
+        return_value=httpx.Response(200, text=OBSAN_PAGE)
     )
-    respx.get(f"{OBSAN}/api/_330/g/json").mock(return_value=httpx.Response(200, json=OBSAN_API_330))
+    respx.get(f"{OBSAN}/api/{INTERNAL}/g/json").mock(
+        return_value=httpx.Response(200, json=OBSAN_API)
+    )
+    year_from = 2020
     out = await srv.bag_get_indicator_series(
         GetIndicatorSeriesInput(
-            source="suchtschweiz",
-            indicator_id="monam/alkoholkonsum-alter-11-15",
+            source="obsan",
+            indicator_id=INDICATOR_ID,
             region="ZH",
-            year_from=2010,
+            year_from=year_from,
             language="de",
         )
     )
-    assert out.title.startswith("Prävalenz")
-    assert out.total_points == 2  # 2006 dropped by year_from=2010
-    assert out.points[0].year == 2010
-    assert out.points[0].value_lower_ci == 27.6
+    assert out.title.startswith("Suizid")
+    # Erwartung aus der Fixture abgeleitet, nicht hingeschrieben: eine feste
+    # Zahl waere beim naechsten Aufzeichnen falsch, ohne dass sich etwas
+    # Gepruefte geaendert haette.
+    expected = [p for p in OBSAN_API["data"] if p["year"] >= year_from]
+    assert out.total_points == len(expected)
+    assert min(p.year for p in out.points) >= year_from
+    assert out.points[0].value_lower_ci == expected[0]["value_lci"]
     # canton requested but indicator is national -> explanatory note
     assert out.region == "CH"
     assert "ZH" in out.region_note and "cantonally representative" in out.region_note
-    assert "HBSC" in out.provenance.attribution
-    assert out.provenance.data_version == "20260615"
+    assert out.provenance.data_version == OBSAN_API["version"]
 
 
 @pytest.mark.asyncio
@@ -191,12 +134,12 @@ async def test_obsan_series_resolves_path_and_filters_years():
 async def test_obsan_series_falls_back_to_gum_variant():
     respx.get(f"{OBSAN}/api/_500/g/json").mock(return_value=httpx.Response(404))
     respx.get(f"{OBSAN}/api/_500/gum/json").mock(
-        return_value=httpx.Response(200, json=OBSAN_API_330)
+        return_value=httpx.Response(200, json=OBSAN_API_GUM)
     )
     out = await srv.bag_get_indicator_series(
         GetIndicatorSeriesInput(source="obsan", indicator_id="_500", language="de")
     )
-    assert out.total_points == 3
+    assert out.total_points == len(OBSAN_API_GUM["data"])
 
 
 @pytest.mark.asyncio
@@ -204,12 +147,12 @@ async def test_obsan_series_falls_back_to_gum_variant():
 async def test_obsan_series_retries_then_succeeds():
     # first call 503 (transient), retry returns 200
     respx.get(f"{OBSAN}/api/_777/g/json").mock(
-        side_effect=[httpx.Response(503), httpx.Response(200, json=OBSAN_API_330)]
+        side_effect=[httpx.Response(503), httpx.Response(200, json=OBSAN_API)]
     )
     out = await srv.bag_get_indicator_series(
         GetIndicatorSeriesInput(source="obsan", indicator_id="_777", language="de")
     )
-    assert out.total_points == 3
+    assert out.total_points == len(OBSAN_API["data"])
 
 
 @pytest.mark.asyncio
@@ -236,8 +179,17 @@ async def test_va_search_happy():
     out = await srv.bag_search_health_indicators(
         SearchHealthIndicatorsInput(source="versorgungsatlas", topic="impfung", language="de")
     )
-    assert out.total_matches == 1
-    assert out.indicators[0].indicator_id == "_003/b"
+    # Erwartung aus der Fixture abgeleitet. Die Quelle fuehrt drei Aspekte von
+    # `_003` und zwei von `_006` — die handgeschriebene Fixture kannte je einen,
+    # also hat nie ein Test mehrere Aspekte desselben Indikators gesehen.
+    expected = {
+        f"{e['id']}/{e['aspect']}"
+        for e in VA_SEARCH
+        if "impfung" in (e["topic"] + e["title"]).lower()
+    }
+    assert expected, "Fixture enthaelt kein Impfungs-Thema — Auswahlregel pruefen"
+    assert out.total_matches == len(expected)
+    assert {i.indicator_id for i in out.indicators} == expected
     assert out.indicators[0].regional_dimension.startswith("canton")
 
 
@@ -256,15 +208,21 @@ async def test_va_series_cantonal_with_comparison():
             language="de",
         )
     )
+    zh = sorted((r for r in VA_RZ if r.get("region_name") == "ZH"), key=lambda r: r["year"])
+    ch = {r["year"]: r["var1"] for r in VA_RZ if r.get("region_name") == "CH"}
+    assert zh and ch, "Fixture ohne ZH- oder CH-Zeilen — Auswahlregel pruefen"
+
     assert out.values_available is True
     assert out.region == "ZH"
-    assert out.total_points == 2  # ZH only (CH filtered out)
-    assert out.points[0].year == 2020 and out.points[0].value == 5.0
-    assert out.points[0].value_lower_ci == 4.9
+    assert out.total_points == len(zh)  # ZH only (CH filtered out)
+    assert out.points[0].year == zh[0]["year"] and out.points[0].value == zh[0]["var1"]
+    assert out.points[0].value_lower_ci == zh[0]["lci1"]
     assert out.title == "MMR-Impfungen"
     assert out.unit and "costs" in out.unit
-    # canton-vs-Switzerland comparison from the latest shared year (2021)
-    assert "ZH=5.2" in out.region_note and "CH=4.9" in out.region_note
+    # canton-vs-Switzerland comparison from the latest shared year
+    latest = zh[-1]
+    assert f"ZH={latest['var1']}" in out.region_note
+    assert f"CH={ch[latest['year']]}" in out.region_note
     assert "CH" in out.dimensions["regions_available"]
 
 
@@ -277,9 +235,10 @@ async def test_va_series_national_ch():
     out = await srv.bag_get_indicator_series(
         GetIndicatorSeriesInput(source="versorgungsatlas", indicator_id="_003/b", language="de")
     )
+    ch = sorted((r for r in VA_RZ if r.get("region_name") == "CH"), key=lambda r: r["year"])
     assert out.region == "CH"
     assert out.region_note is None
-    assert [p.value for p in out.points] == [4.8, 4.9]
+    assert [p.value for p in out.points] == [r["var1"] for r in ch]
 
 
 @pytest.mark.asyncio
@@ -294,8 +253,10 @@ async def test_va_series_falls_back_to_age_when_no_regional():
     )
     assert out.values_available is True
     assert out.region == "CH"
-    assert out.total_points == 2
-    assert out.points[0].category_id == 1  # age class
+    # Aus der Fixture abgeleitet: die Altersreihe traegt eine Zeile je
+    # Altersklasse und Jahr, nicht die zwei der erfundenen Vorgaengerin.
+    assert out.total_points == len(VA_AG)
+    assert out.points[0].category_id == VA_AG[0]["ageclass"]  # age class
 
 
 @pytest.mark.asyncio
@@ -309,3 +270,39 @@ async def test_va_series_unknown_region_fails_cleanly():
             GetIndicatorSeriesInput(source="versorgungsatlas", indicator_id="_003/b", region="XX")
         )
     assert "not available" in str(exc.value).lower()
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_german_results_ride_on_the_language_neutral_catalogue_entries():
+    """Deutsch kommt ohne Sprachsegment — und genau das war ungetestet.
+
+    Gemessen am 2026-08-07 fuehrt die Obsan-Sitemap 285 `fr`, 223 `it`, 41 `en`
+    und 285 sprachneutrale Eintraege — und **keine einzige** `/de/`-URL. Die
+    neutralen tragen die deutschen Slugs. Jedes deutsche Suchergebnis laeuft
+    damit ueber den `lang == ""`-Zweig von `_obsan_catalogue`.
+
+    Die alte, handgeschriebene Fixture bestand ausschliesslich aus
+    `/de/indicator/...`-URLs: eine Form, die die Quelle nicht produziert. Sie
+    hat den einzigen Zweig, der in der Wirklichkeit traegt, nie beruehrt.
+
+    Diese Zusicherung haelt beides fest — dass die aufgezeichnete Fixture die
+    Form der Quelle behaelt, und dass die Suche darauf antwortet. Ohne den
+    ersten Teil bestuende sie auch wieder mit `/de/`-URLs, und dann waere sie
+    genau der Test, den sie ersetzt.
+    """
+    assert "/de/indicator/" not in SITEMAP, (
+        "Die Fixture traegt wieder /de/-URLs — die Quelle liefert davon keine. "
+        "Neu aufzeichnen mit `python scripts/record_fixtures.py`."
+    )
+    assert re.search(r"admin\.ch/indicator/", SITEMAP), (
+        "Kein sprachneutraler Eintrag in der Fixture — dann prueft dieser Test "
+        "den Zweig nicht, um den es geht"
+    )
+
+    respx.get(f"{OBSAN}/sitemap.xml").mock(return_value=httpx.Response(200, text=SITEMAP))
+    out = await srv.bag_search_health_indicators(
+        SearchHealthIndicatorsInput(source="obsan", topic="suizid", language="de")
+    )
+    assert out.total_matches == 1
+    assert out.indicators[0].indicator_id == INDICATOR_ID
