@@ -7,6 +7,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Retry policy against the upstream: spread, obedient and time-bounded
+  (`ARCH-014`).** A portfolio run of the audit catalogue on 2026-08-07 read
+  `_get_with_retry` by hand. What it retries was already right — network errors
+  and 5xx/429, fail fast on any other 4xx. The other two questions the check
+  asks were unanswered.
+
+  | Property | Before | Now |
+  |---|---|---|
+  | Jitter | none — a fixed exponential ladder | spread into `[0.5x, 1.5x]` |
+  | `Retry-After` | not read | read (both RFC 9110 forms), and it beats our curve |
+  | Cap on a single wait | none | `RETRY_MAX_DELAY`, applied **after** the jitter |
+  | Wall-clock budget | none | `RETRY_TOTAL_BUDGET = 25.0` on `asyncio.timeout` |
+  | Ladder | 4s / 8s / 16s | 2s / 4s / 8s, as the comment always claimed |
+
+  **A deterministic ladder is a retry storm.** Every client that hits the same
+  outage comes back at the same moment, and the load returns as a wave exactly
+  when the source recovers — the retry extends the outage it was meant to
+  bridge. Obsan and the Versorgungsatlas are shared, unfunded infrastructure;
+  this is the difference between a guest and a load.
+
+  **`TIMEOUT` was never a budget.** httpx bounds each *operation* and its read
+  timeout restarts with every chunk, so a slowly trickling response outlives
+  any ceiling without a single read expiring. Four attempts against an upstream
+  that takes the full 30s to give up is two minutes inside one tool call, and
+  `RETRY_ATTEMPTS = 4` never said so. The 25s budget hangs off `asyncio.timeout`
+  and sits below the MCP SDK's 30s default, so the server stops working before
+  the caller stops listening.
+
+  **The ladder was off by one.** `RETRY_BACKOFF_BASE * 2**attempt` with
+  `attempt` starting at 1 gives 4s/8s/16s, while the docstring and the comment
+  above the constant both said 2s/4s/8s. The exponent is now `attempt - 1` and
+  a test pins the first wait, so the code and the prose agree.
+
+### Added
+
+- **Tests for the retry path (`tests/test_retry_policy.py`).** It had none. The
+  properties that were already correct — 5xx/429 and network errors retried,
+  other 4xx not — are pinned alongside the new ones, so a later edit cannot
+  lose them quietly. Counter-checks were run against all six properties; see
+  the pull request.
+
 ### Added
 
 - **Host/Origin allow-list for the HTTP transport (`MCP_ALLOWED_HOSTS`,

@@ -14,11 +14,14 @@ import ipaddress
 import json
 import logging
 import os
+import random
 import socket
 import sys
+import time
 from collections.abc import AsyncIterator
 from contextlib import AsyncExitStack, asynccontextmanager
 from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from typing import Any, NoReturn
 from urllib.parse import urlsplit
 
@@ -801,10 +804,97 @@ async def _get(
     return r
 
 
-# Exponential-backoff base (seconds); overridden to 0 in tests so retry paths run
-# instantly. Attempt N waits RETRY_BACKOFF_BASE * 2**N (2s, 4s, 8s) before retry.
+# --- Retry policy (ARCH-014) -------------------------------------------------
+# Three questions: *what* is retried, *how fast*, and *how long*. The first is
+# settled in `_get_with_retry` (4xx except 429 fails fast); these settle the
+# other two.
+
+# Exponential-backoff base (seconds); overridden to 0 in tests so retry paths
+# run instantly. Attempt N waits RETRY_BACKOFF_BASE * 2**(N-1) before jitter —
+# 2s, 4s, 8s. (The exponent used to be N, which made the real ladder 4/8/16s
+# while this comment said 2/4/8. The comment was right about the intent.)
 RETRY_BACKOFF_BASE = 2.0
 RETRY_ATTEMPTS = 4  # 1 initial + 3 retries
+
+# Ceiling on the WHOLE call — every attempt and every wait together. An attempt
+# count is not a bound: four attempts against an upstream that takes the full
+# TIMEOUT (30s) to give up is two minutes inside one tool call, and
+# RETRY_ATTEMPTS never says so. The anchor is measured: the Python MCP SDK
+# ships MCP_DEFAULT_TIMEOUT = 30.0, so 25s leaves headroom for framing and
+# parsing. Past the caller's timeout nobody is listening — the work continues,
+# the load lands on the source, and the result goes nowhere.
+RETRY_TOTAL_BUDGET = 25.0
+
+# Ceiling for a single wait. Bounds the exponential ladder, and bounds a
+# `Retry-After` the source is entitled to send but we are not obliged to sit
+# through.
+RETRY_MAX_DELAY = 20.0
+
+# Jitter spread. Without it every client that hit the same outage retries in
+# lockstep, and the load returns as a wave exactly when the source recovers —
+# the retry storm extends the outage it was meant to bridge.
+RETRY_JITTER_SPREAD = 0.5  # exponential delays land in [0.5x, 1.5x]
+
+# Applied on top of a `Retry-After`, deliberately one-sided: the source told us
+# when to come back, so later is polite and earlier ignores the value read.
+RETRY_AFTER_JITTER = 0.25  # lands in [1.0x, 1.25x]
+
+# Statuses that carry a meaningful `Retry-After` (RFC 9110 section 10.2.3). A
+# 429 or 503 is the source answering the very question the curve is guessing
+# at; reading the header elsewhere means honouring a number never about waiting.
+RETRY_AFTER_STATUSES = frozenset({429, 503})
+
+# Indirection so tests can zero the wait without patching `asyncio.sleep`
+# itself. A `monkeypatch.setattr(server.asyncio, "sleep", ...)` looks local and
+# is not — `server.asyncio` *is* the stdlib module, so it would disable sleeping
+# for the whole process, including foreign tests that use it to yield to the
+# event loop and would then measure nothing while staying green.
+_sleep = asyncio.sleep
+
+
+def _parse_retry_after(resp: httpx.Response | None) -> float | None:
+    """Seconds to wait per the response's ``Retry-After``, or ``None``.
+
+    RFC 9110 section 10.2.3 allows two forms — delta-seconds (``120``) and an
+    HTTP-date. Both appear in the wild, so both are read. Anything unparseable
+    yields ``None`` and the caller falls back to its own curve: a malformed
+    header must not become a crash on the error path, which is the one path
+    already going badly.
+    """
+    if resp is None or resp.status_code not in RETRY_AFTER_STATUSES:
+        return None
+    raw = (resp.headers.get("retry-after") or "").strip()
+    if not raw:
+        return None
+    if raw.isdigit():
+        return float(raw)
+    try:
+        when = parsedate_to_datetime(raw)
+    except (TypeError, ValueError):
+        return None
+    if when.tzinfo is None:  # RFC 9110 dates are GMT; a naive one means UTC
+        when = when.replace(tzinfo=UTC)
+    return max(0.0, (when - datetime.now(UTC)).total_seconds())  # past date -> now
+
+
+def _retry_delay(attempt: int, resp: httpx.Response | None) -> float:
+    """Seconds to wait before ``attempt`` (1-based for the first retry).
+
+    The cap wraps the jitter and not the other way round. ``min(cap, base) *
+    jitter`` and ``min(cap, base * jitter)`` both contain a cap and a jitter;
+    only the second is bounded — a value capped at 20s and then multiplied by
+    up to 1.5 lands at 30s, and the constant would claim a ceiling it does not
+    hold. That ordering shipped in six portfolio servers.
+    """
+    hinted = _parse_retry_after(resp)
+    if hinted is not None:
+        return min(hinted * (1.0 + random.random() * RETRY_AFTER_JITTER), RETRY_MAX_DELAY)
+    return min(
+        RETRY_BACKOFF_BASE
+        * 2 ** (attempt - 1)
+        * (1.0 - RETRY_JITTER_SPREAD + random.random() * 2 * RETRY_JITTER_SPREAD),
+        RETRY_MAX_DELAY,
+    )
 
 
 async def _get_with_retry(
@@ -817,8 +907,16 @@ async def _get_with_retry(
     """GET with exponential backoff for transient failures (resilience default).
 
     Retries up to :data:`RETRY_ATTEMPTS` times on network errors and 5xx/429
-    responses, waiting ``RETRY_BACKOFF_BASE * 2**attempt`` seconds between tries
-    (2s, 4s, 8s). A 4xx other than 429 is not retried — it will not fix itself.
+    responses. Each wait is jittered (2s/4s/8s into [0.5x, 1.5x]) and capped at
+    :data:`RETRY_MAX_DELAY`; a ``Retry-After`` on a 429 or 503 beats our curve.
+    A 4xx other than 429 is not retried — it will not fix itself.
+
+    The whole call is bounded by :data:`RETRY_TOTAL_BUDGET` seconds of wall
+    clock, enforced with ``asyncio.timeout``. The httpx ``TIMEOUT`` is *not* a
+    budget: it bounds each operation and its read timeout restarts with every
+    chunk, so a slowly trickling response outlives any ceiling without a single
+    read expiring.
+
     On ``allow_404`` a 404 is returned to the caller (for domain not-found
     messages). After the final attempt a safe ToolError is raised; raw upstream
     detail is logged server-side only (OBS-002).
@@ -828,15 +926,33 @@ async def _get_with_retry(
     skill's non-negotiable retry default.
     """
     last_detail: str | None = None
+    last_response: httpx.Response | None = None
+    deadline = time.monotonic() + RETRY_TOTAL_BUDGET
     for attempt in range(RETRY_ATTEMPTS):
         if attempt > 0:
-            await asyncio.sleep(RETRY_BACKOFF_BASE * (2**attempt))
+            delay = _retry_delay(attempt, last_response)
+            # A wait that outlasts the budget is a wait for nobody: the caller
+            # has given up by the time it ends. Stop instead of sleeping.
+            if delay >= deadline - time.monotonic():
+                break
+            await _sleep(delay)
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
         try:
-            r = await client.get(url)
+            # `asyncio.timeout` is the wall-clock deadline the budget promises;
+            # the httpx TIMEOUT stays alongside it as the per-operation bound.
+            async with asyncio.timeout(remaining):
+                r = await client.get(url)
         except EgressNotAllowed as exc:
             _fail(f"Request blocked: {exc}.")
+        except TimeoutError as exc:  # the budget is gone, not just this try
+            last_detail = repr(exc)
+            logger.warning("fetch budget spent (%s) attempt %d", context, attempt)
+            break
         except httpx.HTTPError as exc:
             last_detail = repr(exc)
+            last_response = None
             logger.warning("transient fetch error (%s) attempt %d: %r", context, attempt, exc)
             continue
         if allow_404 and r.status_code == 404:
@@ -846,6 +962,7 @@ async def _get_with_retry(
         # Non-2xx: retry only transient classes (5xx, 429).
         if r.status_code >= 500 or r.status_code == 429:
             last_detail = r.text[:500]
+            last_response = r  # carries a Retry-After the source may have sent
             logger.warning(
                 "transient upstream %s while %s (attempt %d)",
                 r.status_code,
