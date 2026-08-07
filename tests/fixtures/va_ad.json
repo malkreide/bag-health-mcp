@@ -1,0 +1,452 @@
+{
+  "version": 20220829,
+  "datasource": "Tarifpool",
+  "version_OP": 20220829,
+  "date_export": "05.11.2025",
+  "sector": "outpatient",
+  "order": 1,
+  "agecl_def": "sasis",
+  "var1_label": "std_costs",
+  "denominator": "Wohnbevölkerung",
+  "population": {
+    "de": "Wohnbevölkerung der Schweiz bis 15 Jahre",
+    "fr": "Population résidante permanente, jusqu’à 15 ans",
+    "en": "Switzerland's permanent resident population aged up to 15"
+  },
+  "numerator": "kosten",
+  "multiplier": 1,
+  "age_min": 0,
+  "age_max": 15,
+  "data_break": [],
+  "remark": {
+    "de": "Der Impfplan wurde 2019 für Säuglinge angepasst. Die Anzahl der empfohlenen Dosen für Diphtherie-Tetanus-Pertussis (DTP), Poliomyelitis (IPV) und Haemophilus influenzae Typ b (Hib) wurde dabei von vier auf drei Dosen gesenkt. Die Empfehlung für die Impfung gegen Hepatitis B (HPV), die in einem Sechsfachimpfstoff enthalten ist, wurde ab 2019 ebenfalls von vier auf drei Dosen gesenkt. Die epidemiologische Situation in der Schweiz und Daten zur Wirksamkeit ermöglichten diese Vereinfachung, die bereits in vielen europäischen Ländern umgesetzt ist. \r\n\r\nDie Indikatoren zu den Impfungen im Versorgungsatlas zeigen die Kosten pro Einwohner gemäss [Tarifpool](/p/glossar#tarifpool). Berücksichtigt werden die Präparate bzw. ATC-Codes gemäss \"Indikatorendefinition\" (siehe Downloadbereich). Grundsätzlich wäre es für Impfungen zweckmässiger, die Anzahl der verabreichten Dosen als Grundlage zu verwenden. Allerdings sind die im [Tarifpool](/p/glossar#tarifpool) erfassten Angaben zu den Dosierungen respektive zur Anzahl der Injektionen nicht in jedem Fall eindeutig. In Bezug auf die abgerechneten Kosten kann hingegen von einer hohen Datenqualität ausgegangen werden, weil diese Informationen für die Fakturierung massgebend und somit kostenrelevant sind.\r\n\r\nDer [Tarifpool](/p/glossar#tarifpool) umfasst Daten zu verschiedenen Leistungserbringertypen (Apotheken, Ärztinnen und Ärzte, Laboratorien, Spitäler etc.). Bei den Analysen zu diesem Indikator wurden die ambulanten Leistungen aller im Tarifpool enthaltenen Leistungserbringertypen berücksichtigt.\r\n\r\nIm [Tarifpool](/p/glossar#tarifpool) sind nur Leistungen berücksichtigt, für welche den Krankenversicherern eine Rechnung eingereicht oder die den Versicherern direkt vom Leistungserbringer in Rechnung gestellt werden. Rechnungen, welche von den Versicherten zurückbehalten werden (z.B. aufgrund einer hohen Franchise) sind im [Tarifpool](/p/glossar#tarifpool) nicht erfasst. Dies betrifft insbesondere die Arztpraxen (v.a. Tiers Garant) und nicht die Spitäler, weil letztere die Rechnungen direkt den Versicherern zustellen (Tiers Payant). Im [Tarifpool](/p/glossar#tarifpool) ebenfalls nicht enthalten sind Leistungen, welche nicht von den Versicherungen im Rahmen der [OKP](/p/glossar#okp) übernommen werden (z.B. Leistungen der Invalidenversicherung, Unfallversicherung oder Zusatzversicherung).\r\n\r\nDie standardisierten Raten werden anhand der direkten Methode und auf Basis der europäischen Standardbevölkerung 2010 berechnet. Eine detaillierte Beschreibung der Methodik findet sich [hier](/p/method#standardisierung).",
+    "fr": "Le plan de vaccination a été adapté en 2019 pour les nourrissons. Le nombre de doses recommandées pour diphtérie-tétanos-coqueluche (DTP), poliomyélite (IPV) et Haemophilus influenzae type b (Hib) est passé de quatre à trois. La recommandation pour la vaccination contre l’hépatite B (HPV), inclue dans un vaccin hexavalent, passe également de quatre à trois doses dès 2019. La situation épidémiologique suisse et les données d’efficacité ont permis cette simplification déjà appliquée dans de nombreux pays européens. \r\n\r\nLes indicateurs relatifs aux vaccinations dans l’Atlas suisse des services de santé montrent les coûts par habitant selon le [pool tarifaire](/p/glossar#tarifpool). Les médicaments ou codes ATC pris en compte sont ceux de la définition des indicateurs (voir espace de téléchargement). Pour les vaccinations, il serait en principe plus approprié de se baser sur le nombre de doses administrées. Reste que les données saisies dans le [pool tarifaire](/p/glossar#tarifpool) ne sont pas suffisamment précises en ce qui concerne les doses ainsi que le nombre d’injections. En revanche, on peut tabler sur la bonne qualité des données des coûts comptabilisés, ces informations étant déterminantes pour la facturation et ayant par conséquent une incidence sur les coûts.\r\n\r\nLe [pool tarifaire](/p/glossar#tarifpool) comprend des données provenant de différents types de fournisseurs de prestations (médecins, hôpitaux, pharmacies, laboratoires, etc.). Les analyses relatives à cet indicateur ont pris en compte les prestations ambulatoires de tous les types de fournisseurs de prestations figurant dans le pool tarifaire.\r\n\r\nSont uniquement prises en compte dans le [pool tarifaire](/p/glossar#tarifpool) les prestations pour lesquelles les assureurs-maladie ont reçu une facture ou qui leur ont été facturées directement par le fournisseur de prestations. Le [pool tarifaire](/p/glossar#tarifpool) ne comprend pas les factures que les assurés n’ont pas envoyées à leur assurance-maladie (franchise trop élevée, p. ex.). Cette remarque vaut en particulier pour les cabinets médicaux (tiers garant surtout) et non pour les hôpitaux, ces derniers envoyant les factures directement aux assureurs (tiers payant). En outre, le [pool tarifaire](/p/glossar#tarifpool) ne comprend pas non plus les prestations que les assurances ne prennent pas en charge dans le cadre de l’[AOS](/p/glossar#okp) (prestations de l’assurance-invalidité, de l’assurance-accidents ou de l’assurance complémentaire, p. ex.).\r\n\r\nLes taux standardisés sont calculés à l’aide de la méthode directe sur la base de la population européenne standard de 2010. Vous trouverez une description détaillée de la méthodologie sous le [lien suivant](/p/method#standardisierung).",
+    "en": "The vaccination schedule has been adjusted for infants in 2019. The number of recommended doses for diphtheria-tetanus-pertussis (DTP), poliomyelitis (IPV) and Haemophilus influenzae type b (Hib) was reduced from four to three doses. The recommendation for vaccination against hepatitis B (HPV), which is included in a six-dose vaccine, was also reduced from four to three doses as of 2019. The epidemiological situation in Switzerland and data on effectiveness made this simplification possible, which has already been implemented in many European countries. \r\n\r\nThe indicators on vaccinations in the atlas show the costs per inhabitant according to the [tariff pool](/p/glossar#tarifpool). The drugs or ATC codes according to the \"indicator definition\" (see download area) are taken into account. In principle, it would be more appropriate for vaccinations to be based on the number of doses administered. However, the information recorded in the [tariff pool](/p/glossar#tarifpool) on the dosages or the number of injections is not clear. With regard to the billed costs, on the other hand, a high data quality can be assumed, because this information is decisive for invoicing and thus relevant to costs.\r\n\r\nThe [tariff pool](/p/glossar#tarifpool) comprises data on various types of service providers (pharmacies, doctors, laboratories, hospitals, etc.). For this indicator, the outpatient services of all service provider types included in the tariff pool were taken into account.\r\n\r\nThe [tariff pool](/p/glossar#tarifpool) only includes services for which an invoice is submitted to the health insurers or which are invoiced directly to the insurers by the service provider. Bills that are retained by the insured person (e.g. due to a high deductible) are not included in the [tariff pool](/p/glossar#tarifpool). This concerns in particular the medical practices (especially third-party guarantor) and not the hospitals, because the latter send the bills directly to the insurers (third-party payment). The [tariff pool](/p/glossar#tarifpool) also does not include benefits that are not covered by the insurance companies within the framework of the [OKP](/p/glossar#okp) (e.g. benefits from disability insurance, accident insurance or supplementary insurance).\r\n\r\nStandardised rates are calculated using the direct method and based on the 2010 European standard population. A detailed description of the methodology can be found [here](/p/method#standardisierung)."
+  },
+  "GZ_data": [
+    {
+      "year": 2015,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.6663,
+      "lci1": 4.6434,
+      "uci1": 4.6894,
+      "costs_tot": 6592482.7109
+    },
+    {
+      "year": 2015,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.6786,
+      "lci1": 4.6466,
+      "uci1": 4.7109,
+      "costs_tot": 3395504.639
+    },
+    {
+      "year": 2015,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.654,
+      "lci1": 4.6212,
+      "uci1": 4.6871,
+      "costs_tot": 3196978.0719
+    },
+    {
+      "year": 2016,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.7455,
+      "lci1": 4.7219,
+      "uci1": 4.7691,
+      "costs_tot": 6788059.0832
+    },
+    {
+      "year": 2016,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.7748,
+      "lci1": 4.7419,
+      "uci1": 4.8079,
+      "costs_tot": 3511248.6067
+    },
+    {
+      "year": 2016,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.7161,
+      "lci1": 4.6825,
+      "uci1": 4.7499,
+      "costs_tot": 3276810.4765
+    },
+    {
+      "year": 2017,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.8311,
+      "lci1": 4.8073,
+      "uci1": 4.8549,
+      "costs_tot": 6979411.7215
+    },
+    {
+      "year": 2017,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.8415,
+      "lci1": 4.8084,
+      "uci1": 4.8748,
+      "costs_tot": 3595380.8116
+    },
+    {
+      "year": 2017,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.8206,
+      "lci1": 4.7864,
+      "uci1": 4.8549,
+      "costs_tot": 3384030.9099
+    },
+    {
+      "year": 2018,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.5585,
+      "lci1": 4.5353,
+      "uci1": 4.5817,
+      "costs_tot": 6646205.389
+    },
+    {
+      "year": 2018,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.5711,
+      "lci1": 4.5388,
+      "uci1": 4.6037,
+      "costs_tot": 3420992.7384
+    },
+    {
+      "year": 2018,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.5458,
+      "lci1": 4.5127,
+      "uci1": 4.579,
+      "costs_tot": 3225212.6505
+    },
+    {
+      "year": 2019,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.5154,
+      "lci1": 5.4903,
+      "uci1": 5.5407,
+      "costs_tot": 8069791.2373
+    },
+    {
+      "year": 2019,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.5099,
+      "lci1": 5.4748,
+      "uci1": 5.5451,
+      "costs_tot": 4137728.3213
+    },
+    {
+      "year": 2019,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.521,
+      "lci1": 5.4849,
+      "uci1": 5.5572,
+      "costs_tot": 3932062.9161
+    },
+    {
+      "year": 2020,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.7645,
+      "lci1": 4.7408,
+      "uci1": 4.7884,
+      "costs_tot": 6996202.3028
+    },
+    {
+      "year": 2020,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.7624,
+      "lci1": 4.7294,
+      "uci1": 4.7957,
+      "costs_tot": 3591254.1535
+    },
+    {
+      "year": 2020,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 4.7667,
+      "lci1": 4.7325,
+      "uci1": 4.801,
+      "costs_tot": 3404948.1493
+    },
+    {
+      "year": 2021,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.0974,
+      "lci1": 5.0723,
+      "uci1": 5.1225,
+      "costs_tot": 7531698.107
+    },
+    {
+      "year": 2021,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.162,
+      "lci1": 5.1268,
+      "uci1": 5.1975,
+      "costs_tot": 3910274.9155
+    },
+    {
+      "year": 2021,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.0327,
+      "lci1": 4.997,
+      "uci1": 5.0685,
+      "costs_tot": 3621423.1914
+    },
+    {
+      "year": 2022,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.5177,
+      "lci1": 5.4906,
+      "uci1": 5.5448,
+      "costs_tot": 8086818.0853
+    },
+    {
+      "year": 2022,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.5243,
+      "lci1": 5.4865,
+      "uci1": 5.5623,
+      "costs_tot": 4156258.2094
+    },
+    {
+      "year": 2022,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 5.511,
+      "lci1": 5.4723,
+      "uci1": 5.5499,
+      "costs_tot": 3930559.8759
+    },
+    {
+      "year": 2023,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 7.6686,
+      "lci1": 7.6309,
+      "uci1": 7.7064,
+      "costs_tot": 11197336.7246
+    },
+    {
+      "year": 2023,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 7.7295,
+      "lci1": 7.6768,
+      "uci1": 7.7825,
+      "costs_tot": 5794949.6712
+    },
+    {
+      "year": 2023,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 7.6077,
+      "lci1": 7.5538,
+      "uci1": 7.6619,
+      "costs_tot": 5402387.0534
+    },
+    {
+      "year": 2024,
+      "sex": 0,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 8.4868,
+      "lci1": 8.4448,
+      "uci1": 8.5291,
+      "costs_tot": 12170885.5821
+    },
+    {
+      "year": 2024,
+      "sex": 1,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 8.4829,
+      "lci1": 8.4242,
+      "uci1": 8.5418,
+      "costs_tot": 6246094.6206
+    },
+    {
+      "year": 2024,
+      "sex": 2,
+      "region_id": 0,
+      "region_name": "CH",
+      "var1": 8.4908,
+      "lci1": 8.4305,
+      "uci1": 8.5515,
+      "costs_tot": 5924790.9614
+    }
+  ],
+  "codes": [
+    {
+      "source": "Tarifpool",
+      "def1_type": "atc_4",
+      "def1_code": "J07BD",
+      "def1_code_label": "Masern-Impfstoffe",
+      "def1_multi": null,
+      "def2_type": null,
+      "def2_code": null,
+      "def2_code_label": null
+    },
+    {
+      "source": "Tarifpool",
+      "def1_type": "atc_4",
+      "def1_code": "J07BE",
+      "def1_code_label": "Mumps-Impstoffe (Kombinationen mit Masern mit/ohne Röteln J07BD, mit Röteln J07BJ)",
+      "def1_multi": null,
+      "def2_type": null,
+      "def2_code": null,
+      "def2_code_label": null
+    },
+    {
+      "source": "Tarifpool",
+      "def1_type": "atc_4",
+      "def1_code": "J07BJ",
+      "def1_code_label": "Röteln-Impfstoffe (Kombinationen mit Masern mit/ohne Mumps  J07BD, mit Di/Te J07CA)",
+      "def1_multi": null,
+      "def2_type": null,
+      "def2_code": null,
+      "def2_code_label": null
+    }
+  ],
+  "KF_data": [
+    {
+      "year": 2015,
+      "geo": "kt",
+      "costs_tot": 6592482.7109,
+      "SCV": 1.1686,
+      "EB": 1.1519,
+      "QR": 1.185,
+      "KCC": null
+    },
+    {
+      "year": 2016,
+      "geo": "kt",
+      "costs_tot": 6788059.0832,
+      "SCV": 1.149,
+      "EB": 1.2216,
+      "QR": 1.1511,
+      "KCC": null
+    },
+    {
+      "year": 2017,
+      "geo": "kt",
+      "costs_tot": 6979411.7215,
+      "SCV": 1.1487,
+      "EB": 1.2063,
+      "QR": 1.2135,
+      "KCC": null
+    },
+    {
+      "year": 2018,
+      "geo": "kt",
+      "costs_tot": 6646205.389,
+      "SCV": 1.3293,
+      "EB": 1.3334,
+      "QR": 1.1804,
+      "KCC": null
+    },
+    {
+      "year": 2019,
+      "geo": "kt",
+      "costs_tot": 8069791.2373,
+      "SCV": 0.8902,
+      "EB": 0.9398,
+      "QR": 1.0877,
+      "KCC": 0.8052
+    },
+    {
+      "year": 2020,
+      "geo": "kt",
+      "costs_tot": 6996202.3028,
+      "SCV": 0.7842,
+      "EB": 0.7379,
+      "QR": 1.1304,
+      "KCC": 0.7487
+    },
+    {
+      "year": 2021,
+      "geo": "kt",
+      "costs_tot": 7531698.107,
+      "SCV": 2.3174,
+      "EB": 2.3909,
+      "QR": 1.2645,
+      "KCC": 0.6983
+    },
+    {
+      "year": 2022,
+      "geo": "kt",
+      "costs_tot": 8086818.0853,
+      "SCV": 3.9838,
+      "EB": 4.027,
+      "QR": 1.4786,
+      "KCC": 0.6923
+    },
+    {
+      "year": 2023,
+      "geo": "kt",
+      "costs_tot": 11197336.7246,
+      "SCV": 2.8009,
+      "EB": 3.3326,
+      "QR": 1.1885,
+      "KCC": 0.6969
+    },
+    {
+      "year": 2024,
+      "geo": "kt",
+      "costs_tot": 12170885.5821,
+      "SCV": 2.09,
+      "EB": 2.2797,
+      "QR": 1.1846,
+      "KCC": 0.829
+    }
+  ]
+}

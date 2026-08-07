@@ -1,0 +1,1724 @@
+{
+  "name": "_010_g",
+  "title": {
+    "de": "Suizid- und Suizidhilferate, nach Geschlecht",
+    "fr": "Taux de suicide et suicide assisté, par sexe"
+  },
+  "description": {
+    "de": "Anzahl Fälle pro 100'000 Einwohner/innen, standardisierte Rate",
+    "fr": "Nombre de cas par 100'000 habitants, taux standardisé"
+  },
+  "source": {
+    "de": "BFS – Statistik der Todesursachen (CoD) und Statistik der Bevölkerung und der Haushalte (STATPOP)",
+    "fr": "OFS – Statistique des causes de décès (CoD) et Statistique de la population et des ménages (STATPOP)"
+  },
+  "n": {
+    "de": "Stichprobengrösse",
+    "fr": "Taille de l'échantillon"
+  },
+  "value": {
+    "de": "Standardisierte Rate",
+    "fr": "Taux standardisé"
+  },
+  "value_lci": {
+    "de": "Untere Grenze Vertrauensintervall",
+    "fr": "Limite inférieure de l'intervalle de confiance"
+  },
+  "value_uci": {
+    "de": "Obere Grenze Vertrauensintervall",
+    "fr": "Limite supérieure de l'intervalle de confiance"
+  },
+  "category_id": {
+    "de": "Kategorie",
+    "fr": "Catégorie",
+    "codes": {
+      "1": {
+        "de": "Suizidrate (exkl. Suizidhilfe)",
+        "fr": "Taux de suicide (sans les suicides assistés)"
+      },
+      "2": {
+        "de": "Suizidhilferate",
+        "fr": "Taux de suicide assisté"
+      }
+    }
+  },
+  "year": {
+    "de": "Jahr",
+    "fr": "Année"
+  },
+  "sex_id": {
+    "de": "Geschlecht",
+    "fr": "Sexe",
+    "codes": {
+      "0": {
+        "de": "Total",
+        "fr": "Total",
+        "it": "Totale",
+        "en": "Total"
+      },
+      "1": {
+        "de": "Männer",
+        "fr": "Hommes",
+        "it": "Uomini",
+        "en": "Men"
+      },
+      "2": {
+        "de": "Frauen",
+        "fr": "Femmes",
+        "it": "Donne",
+        "en": "Women"
+      }
+    }
+  },
+  "remarks": {
+    "de": "Quelle: BFS – Statistik der Todesursachen (CoD) und Statistik der Bevölkerung und der Haushalte (STATPOP)\nDie Daten sind mit dem 95% Vertrauensintervall dargestellt. Der Bereich innerhalb der Fehlerbalken enthält mit einer Wahrscheinlichkeit von 95% den tatsächlichen Wert in der Bevölkerung.\nDie standardisierten Raten basieren auf der europäischen Standardpopulation 2010.",
+    "fr": "Source: OFS – Statistique des causes de décès (CoD) et Statistique de la population et des ménages (STATPOP)\nLes valeurs sont représentées avec l’intervalle de confiance à 95%. L'intervalle représenté par la barre d'erreur contient, avec une probabilité de 95%, la valeur réelle pour la population.\nLes taux standardisés se basent sur la population européenne standard 2010."
+  },
+  "country": {
+    "de": "Schweiz",
+    "fr": "Suisse",
+    "it": "Svizzera",
+    "en": "Switzerland"
+  },
+  "indicator": {
+    "de": {
+      "title": "Suizid und Suizidhilfe",
+      "url": "https://ind.obsan.admin.ch/indicator/obsan/suizid-und-suizidhilfe"
+    },
+    "fr": {
+      "title": "Suicide et suicide assisté",
+      "url": "https://ind.obsan.admin.ch/fr/indicator/obsan/suicide-et-suicide-assiste"
+    }
+  },
+  "author": {
+    "de": "Schweizerisches Gesundheitsobsevratorium (Obsan)",
+    "fr": "Observatoire suisse de la santé (Obsan)"
+  },
+  "phone": "+41 58 463 60 45",
+  "email": "obsan@bfs.admin.ch",
+  "version": "20251209",
+  "created_at": "2026-08-07T18:27:14.347Z",
+  "last_updated_at": "2025-12-22",
+  "data": [
+    {
+      "n": 1328,
+      "crude_rate": 18.6779157978,
+      "value": 20.9480517352,
+      "value_lci": 19.7832104877,
+      "value_uci": 22.1632380375,
+      "category_id": 1,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "n": 989,
+      "crude_rate": 28.4853019874,
+      "value": 32.2184123718,
+      "value_lci": 30.1306627043,
+      "value_uci": 34.4165983646,
+      "category_id": 1,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "n": 339,
+      "crude_rate": 9.31821711446,
+      "value": 9.67769109867,
+      "value_lci": 8.66730915972,
+      "value_uci": 10.7724937691,
+      "category_id": 1,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "n": 43,
+      "crude_rate": 0.604781912126,
+      "value": 0.840754071654,
+      "value_lci": 0.588564264008,
+      "value_uci": 1.15669518947,
+      "category_id": 2,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "n": 20,
+      "crude_rate": 0.576042507329,
+      "value": 1.00774632174,
+      "value_lci": 0.59019589188,
+      "value_uci": 1.58351822465,
+      "category_id": 2,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "n": 23,
+      "crude_rate": 0.632209420745,
+      "value": 0.673761821566,
+      "value_lci": 0.425458526965,
+      "value_uci": 1.01172124357,
+      "category_id": 2,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "n": 1234,
+      "crude_rate": 17.273259252,
+      "value": 19.0600037648,
+      "value_lci": 17.9692332397,
+      "value_uci": 20.1997493957,
+      "category_id": 1,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "n": 895,
+      "crude_rate": 25.6469147693,
+      "value": 28.5422902795,
+      "value_lci": 26.6148282555,
+      "value_uci": 30.5770857203,
+      "category_id": 1,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "n": 339,
+      "crude_rate": 9.27676277648,
+      "value": 9.57771725011,
+      "value_lci": 8.57844434893,
+      "value_uci": 10.6605250737,
+      "category_id": 1,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "n": 63,
+      "crude_rate": 0.881860075262,
+      "value": 1.14929792007,
+      "value_lci": 0.860549134206,
+      "value_uci": 1.49807267095,
+      "category_id": 2,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "n": 35,
+      "crude_rate": 1.00295197422,
+      "value": 1.52041547128,
+      "value_lci": 1.02341368741,
+      "value_uci": 2.16049634384,
+      "category_id": 2,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "n": 28,
+      "crude_rate": 0.766222294223,
+      "value": 0.778180368862,
+      "value_lci": 0.514772034816,
+      "value_uci": 1.12810032271,
+      "category_id": 2,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "n": 1293,
+      "crude_rate": 17.9977045619,
+      "value": 19.8940381933,
+      "value_lci": 18.7701543575,
+      "value_uci": 21.067139915,
+      "category_id": 1,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "n": 935,
+      "crude_rate": 26.6366361148,
+      "value": 29.8140046499,
+      "value_lci": 27.8195434506,
+      "value_uci": 31.9165505227,
+      "category_id": 1,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "n": 358,
+      "crude_rate": 9.7440247422,
+      "value": 9.97407173669,
+      "value_lci": 8.96022126409,
+      "value_uci": 11.0704504682,
+      "category_id": 1,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "n": 85,
+      "crude_rate": 1.1831437647,
+      "value": 1.50774579744,
+      "value_lci": 1.19328688268,
+      "value_uci": 1.87684973657,
+      "category_id": 2,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "n": 45,
+      "crude_rate": 1.28197713921,
+      "value": 1.82622908177,
+      "value_lci": 1.31538802199,
+      "value_uci": 2.46474287767,
+      "category_id": 2,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "n": 40,
+      "crude_rate": 1.08871784829,
+      "value": 1.18926251311,
+      "value_lci": 0.847941183882,
+      "value_uci": 1.61889853424,
+      "category_id": 2,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "n": 1209,
+      "crude_rate": 16.7297537979,
+      "value": 18.4365046321,
+      "value_lci": 17.3740674582,
+      "value_uci": 19.5466882466,
+      "category_id": 1,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "n": 895,
+      "crude_rate": 25.3588381855,
+      "value": 28.2547155938,
+      "value_lci": 26.3568063628,
+      "value_uci": 30.2565642647,
+      "category_id": 1,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "n": 314,
+      "crude_rate": 8.4926746624,
+      "value": 8.61829367044,
+      "value_lci": 7.68496632448,
+      "value_uci": 9.63312188841,
+      "category_id": 1,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "n": 122,
+      "crude_rate": 1.68819682659,
+      "value": 1.99706654635,
+      "value_lci": 1.64173607242,
+      "value_uci": 2.40443687342,
+      "category_id": 2,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "n": 44,
+      "crude_rate": 1.24669148622,
+      "value": 1.83532081613,
+      "value_lci": 1.31162851471,
+      "value_uci": 2.48883718743,
+      "category_id": 2,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "n": 78,
+      "crude_rate": 2.1096452983,
+      "value": 2.15881227657,
+      "value_lci": 1.70329294177,
+      "value_uci": 2.69775780118,
+      "category_id": 2,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "n": 1331,
+      "crude_rate": 18.2710381532,
+      "value": 19.9739724698,
+      "value_lci": 18.8748680312,
+      "value_uci": 21.1200626686,
+      "category_id": 1,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "n": 934,
+      "crude_rate": 26.2382472177,
+      "value": 29.1250431199,
+      "value_lci": 27.2030619085,
+      "value_uci": 31.1495715199,
+      "category_id": 1,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "n": 397,
+      "crude_rate": 10.6575350115,
+      "value": 10.8229018198,
+      "value_lci": 9.77764800435,
+      "value_uci": 11.9487757741,
+      "category_id": 1,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "n": 120,
+      "crude_rate": 1.64727616708,
+      "value": 1.98418261967,
+      "value_lci": 1.62418709691,
+      "value_uci": 2.39700752027,
+      "category_id": 2,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "n": 47,
+      "crude_rate": 1.32034006342,
+      "value": 1.93395932233,
+      "value_lci": 1.38777010658,
+      "value_uci": 2.61099594789,
+      "category_id": 2,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "n": 73,
+      "crude_rate": 1.95969787365,
+      "value": 2.034405917,
+      "value_lci": 1.59146760134,
+      "value_uci": 2.56087454713,
+      "category_id": 2,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "n": 1093,
+      "crude_rate": 14.8930361839,
+      "value": 16.2563065188,
+      "value_lci": 15.2689404127,
+      "value_uci": 17.290291599,
+      "category_id": 1,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "n": 783,
+      "crude_rate": 21.821015282,
+      "value": 24.0845488011,
+      "value_lci": 22.3474966514,
+      "value_uci": 25.9229546444,
+      "category_id": 1,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "n": 310,
+      "crude_rate": 8.26508748395,
+      "value": 8.42806423647,
+      "value_lci": 7.51038367134,
+      "value_uci": 9.42608530947,
+      "category_id": 1,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "n": 187,
+      "crude_rate": 2.54803089331,
+      "value": 2.98607034835,
+      "value_lci": 2.55691105459,
+      "value_uci": 3.46484930835,
+      "category_id": 2,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "n": 70,
+      "crude_rate": 1.95079319251,
+      "value": 2.83585917874,
+      "value_lci": 2.19375477698,
+      "value_uci": 3.59912492634,
+      "category_id": 2,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "n": 117,
+      "crude_rate": 3.11940398588,
+      "value": 3.13628151795,
+      "value_lci": 2.59008458749,
+      "value_uci": 3.76312039826,
+      "category_id": 2,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "n": 1138,
+      "crude_rate": 15.3999695519,
+      "value": 16.7900123601,
+      "value_lci": 15.7951485229,
+      "value_uci": 17.830654914,
+      "category_id": 1,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "n": 792,
+      "crude_rate": 21.9080016071,
+      "value": 24.224224915,
+      "value_lci": 22.4963662891,
+      "value_uci": 26.0514429162,
+      "category_id": 1,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "n": 346,
+      "crude_rate": 9.16675884205,
+      "value": 9.35579980517,
+      "value_lci": 8.3901741807,
+      "value_uci": 10.401131669,
+      "category_id": 1,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "n": 154,
+      "crude_rate": 2.08400290948,
+      "value": 2.4629442799,
+      "value_lci": 2.07366415997,
+      "value_uci": 2.90181070485,
+      "category_id": 2,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "n": 68,
+      "crude_rate": 1.88099003698,
+      "value": 2.61751544193,
+      "value_lci": 2.01147727773,
+      "value_uci": 3.34123571824,
+      "category_id": 2,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "n": 86,
+      "crude_rate": 2.27844294918,
+      "value": 2.30837311787,
+      "value_lci": 1.84293479937,
+      "value_uci": 2.85468750917,
+      "category_id": 2,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "n": 1109,
+      "crude_rate": 14.9116962693,
+      "value": 16.0081698909,
+      "value_lci": 15.049069603,
+      "value_uci": 17.0120459437,
+      "category_id": 1,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "n": 809,
+      "crude_rate": 22.2216179261,
+      "value": 24.0973925322,
+      "value_lci": 22.4018097058,
+      "value_uci": 25.8894511631,
+      "category_id": 1,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "n": 300,
+      "crude_rate": 7.90198171165,
+      "value": 7.9189472496,
+      "value_lci": 7.04284349463,
+      "value_uci": 8.8734116781,
+      "category_id": 1,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "n": 195,
+      "crude_rate": 2.62198446575,
+      "value": 3.31768935254,
+      "value_lci": 2.84333728535,
+      "value_uci": 3.84415450456,
+      "category_id": 2,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "n": 92,
+      "crude_rate": 2.52705667392,
+      "value": 3.88816922159,
+      "value_lci": 3.10524169926,
+      "value_uci": 4.79489926722,
+      "category_id": 2,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "n": 103,
+      "crude_rate": 2.713013721,
+      "value": 2.74720948349,
+      "value_lci": 2.23803496807,
+      "value_uci": 3.33654511952,
+      "category_id": 2,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "n": 1098,
+      "crude_rate": 14.6714291355,
+      "value": 15.4972887555,
+      "value_lci": 14.5723318767,
+      "value_uci": 16.4656319478,
+      "category_id": 1,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "n": 770,
+      "crude_rate": 21.0042170739,
+      "value": 22.346466381,
+      "value_lci": 20.7507398997,
+      "value_uci": 24.0352584797,
+      "category_id": 1,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "n": 328,
+      "crude_rate": 8.59087852995,
+      "value": 8.64811113008,
+      "value_lci": 7.73206391173,
+      "value_uci": 9.64212319402,
+      "category_id": 1,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "n": 214,
+      "crude_rate": 2.85945886612,
+      "value": 3.3949094997,
+      "value_lci": 2.93264483779,
+      "value_uci": 3.90631850129,
+      "category_id": 2,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "n": 93,
+      "crude_rate": 2.53687297127,
+      "value": 3.64757261265,
+      "value_lci": 2.915439113,
+      "value_uci": 4.49692297472,
+      "category_id": 2,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "n": 121,
+      "crude_rate": 3.16919604306,
+      "value": 3.14224638674,
+      "value_lci": 2.60181275648,
+      "value_uci": 3.76126945731,
+      "category_id": 2,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "n": 1124,
+      "crude_rate": 14.885215981,
+      "value": 15.9658259259,
+      "value_lci": 15.0161841455,
+      "value_uci": 16.9591935226,
+      "category_id": 1,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "n": 814,
+      "crude_rate": 21.9810695465,
+      "value": 23.9528261462,
+      "value_lci": 22.2744746679,
+      "value_uci": 25.7251021689,
+      "category_id": 1,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "n": 310,
+      "crude_rate": 8.05627961008,
+      "value": 7.97882570553,
+      "value_lci": 7.11018720821,
+      "value_uci": 8.92398853774,
+      "category_id": 1,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "n": 244,
+      "crude_rate": 3.23131023075,
+      "value": 3.81055891373,
+      "value_lci": 3.32616565313,
+      "value_uci": 4.34285012543,
+      "category_id": 2,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "n": 111,
+      "crude_rate": 2.99741857452,
+      "value": 4.19065226995,
+      "value_lci": 3.41994397206,
+      "value_uci": 5.07381355681,
+      "category_id": 2,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "n": 133,
+      "crude_rate": 3.45640383271,
+      "value": 3.43046555752,
+      "value_lci": 2.86655990171,
+      "value_uci": 4.07218601884,
+      "category_id": 2,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "n": 1060,
+      "crude_rate": 13.8604216314,
+      "value": 14.7080717146,
+      "value_lci": 13.8128842394,
+      "value_uci": 15.6457082633,
+      "category_id": 1,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "n": 753,
+      "crude_rate": 20.0434167557,
+      "value": 21.4609828835,
+      "value_lci": 19.907212117,
+      "value_uci": 23.1053480582,
+      "category_id": 1,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "n": 307,
+      "crude_rate": 7.89034628982,
+      "value": 7.95516054579,
+      "value_lci": 7.08529395696,
+      "value_uci": 8.90148250521,
+      "category_id": 1,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "n": 253,
+      "crude_rate": 3.30819497429,
+      "value": 3.77502427154,
+      "value_lci": 3.30416575927,
+      "value_uci": 4.29193906401,
+      "category_id": 2,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "n": 108,
+      "crude_rate": 2.87475300082,
+      "value": 3.89573169497,
+      "value_lci": 3.16892011196,
+      "value_uci": 4.7309453264,
+      "category_id": 2,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "n": 145,
+      "crude_rate": 3.72671078835,
+      "value": 3.65431684811,
+      "value_lci": 3.07717301189,
+      "value_uci": 4.30783709999,
+      "category_id": 2,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "n": 1105,
+      "crude_rate": 14.2694229768,
+      "value": 15.0096854182,
+      "value_lci": 14.1157760798,
+      "value_uci": 15.9450964912,
+      "category_id": 1,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "n": 827,
+      "crude_rate": 21.7138987725,
+      "value": 23.0074648408,
+      "value_lci": 21.4207439285,
+      "value_uci": 24.6822362692,
+      "category_id": 1,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "n": 278,
+      "crude_rate": 7.0644251432,
+      "value": 7.01190599568,
+      "value_lci": 6.2076981448,
+      "value_uci": 7.89095727432,
+      "category_id": 1,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "n": 297,
+      "crude_rate": 3.83531097205,
+      "value": 4.38728584449,
+      "value_lci": 3.88072608662,
+      "value_uci": 4.93924597291,
+      "category_id": 2,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "n": 132,
+      "crude_rate": 3.46582181134,
+      "value": 4.69160698983,
+      "value_lci": 3.89725237677,
+      "value_uci": 5.59188138066,
+      "category_id": 2,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "n": 165,
+      "crude_rate": 4.1929142037,
+      "value": 4.08296469914,
+      "value_lci": 3.47562522503,
+      "value_uci": 4.76552174941,
+      "category_id": 2,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "n": 1004,
+      "crude_rate": 12.8308201412,
+      "value": 13.4605402238,
+      "value_lci": 12.6219778446,
+      "value_uci": 14.3398883478,
+      "category_id": 1,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "n": 723,
+      "crude_rate": 18.7742102595,
+      "value": 19.8860884686,
+      "value_lci": 18.4237283979,
+      "value_uci": 21.4349883562,
+      "category_id": 1,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "n": 281,
+      "crude_rate": 7.07117210214,
+      "value": 7.03499197894,
+      "value_lci": 6.23283969209,
+      "value_uci": 7.91121692625,
+      "category_id": 1,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "n": 352,
+      "crude_rate": 4.49845487021,
+      "value": 5.03402516586,
+      "value_lci": 4.5026171965,
+      "value_uci": 5.60910124538,
+      "category_id": 2,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "n": 155,
+      "crude_rate": 4.02489984816,
+      "value": 5.37154878034,
+      "value_lci": 4.54027045516,
+      "value_uci": 6.30407997244,
+      "category_id": 2,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "n": 197,
+      "crude_rate": 4.95736976556,
+      "value": 4.69650155138,
+      "value_lci": 4.05458487569,
+      "value_uci": 5.41147310562,
+      "category_id": 2,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "n": 1034,
+      "crude_rate": 13.0680989505,
+      "value": 13.7249302918,
+      "value_lci": 12.8773147978,
+      "value_uci": 14.6135127127,
+      "category_id": 1,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "n": 757,
+      "crude_rate": 19.4110552498,
+      "value": 20.6239686917,
+      "value_lci": 19.1314054111,
+      "value_uci": 22.2038785627,
+      "category_id": 1,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "n": 277,
+      "crude_rate": 6.90332614465,
+      "value": 6.8258918918,
+      "value_lci": 6.04119198823,
+      "value_uci": 7.68400779915,
+      "category_id": 1,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "n": 431,
+      "crude_rate": 5.44714762832,
+      "value": 6.14693862815,
+      "value_lci": 5.55169082725,
+      "value_uci": 6.78659117165,
+      "category_id": 2,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "n": 185,
+      "crude_rate": 4.74378496859,
+      "value": 6.48848874019,
+      "value_lci": 5.54989892807,
+      "value_uci": 7.53216308443,
+      "category_id": 2,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "n": 246,
+      "crude_rate": 6.13075173857,
+      "value": 5.80538851612,
+      "value_lci": 5.09441858563,
+      "value_uci": 6.58847204752,
+      "category_id": 2,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "n": 1037,
+      "crude_rate": 12.9675881574,
+      "value": 13.6000049137,
+      "value_lci": 12.7654546958,
+      "value_uci": 14.474720445,
+      "category_id": 1,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "n": 752,
+      "crude_rate": 19.0602268953,
+      "value": 20.2997013712,
+      "value_lci": 18.8348473711,
+      "value_uci": 21.8501283076,
+      "category_id": 1,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "n": 285,
+      "crude_rate": 7.03447943927,
+      "value": 6.90030845626,
+      "value_lci": 6.11886491692,
+      "value_uci": 7.7539177428,
+      "category_id": 1,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "n": 508,
+      "crude_rate": 6.35249255927,
+      "value": 7.17992315107,
+      "value_lci": 6.53489412328,
+      "value_uci": 7.8691210704,
+      "category_id": 2,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "n": 201,
+      "crude_rate": 5.09455532706,
+      "value": 7.11309749233,
+      "value_lci": 6.11605204373,
+      "value_uci": 8.21639536072,
+      "category_id": 2,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "n": 307,
+      "crude_rate": 7.57749188721,
+      "value": 7.24674880982,
+      "value_lci": 6.44977299788,
+      "value_uci": 8.11533944058,
+      "category_id": 2,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "n": 1070,
+      "crude_rate": 13.2272753092,
+      "value": 13.8637378963,
+      "value_lci": 13.0242383563,
+      "value_uci": 14.7429864145,
+      "category_id": 1,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "n": 786,
+      "crude_rate": 19.6730789808,
+      "value": 20.8604616593,
+      "value_lci": 19.3830166998,
+      "value_uci": 22.4223468994,
+      "category_id": 1,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "n": 284,
+      "crude_rate": 6.93691656013,
+      "value": 6.86701413331,
+      "value_lci": 6.08795757781,
+      "value_uci": 7.71785622281,
+      "category_id": 1,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "n": 587,
+      "crude_rate": 7.25645851077,
+      "value": 7.92345398746,
+      "value_lci": 7.27000823301,
+      "value_uci": 8.61864419827,
+      "category_id": 2,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "n": 249,
+      "crude_rate": 6.23231128017,
+      "value": 8.15261475289,
+      "value_lci": 7.14067836808,
+      "value_uci": 9.2621381447,
+      "category_id": 2,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "n": 338,
+      "crude_rate": 8.25590773706,
+      "value": 7.69429322202,
+      "value_lci": 6.88654612382,
+      "value_uci": 8.57170272371,
+      "category_id": 2,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "n": 1028,
+      "crude_rate": 12.5539641859,
+      "value": 13.0363471442,
+      "value_lci": 12.2381736428,
+      "value_uci": 13.8730503421,
+      "category_id": 1,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "n": 754,
+      "crude_rate": 18.626548934,
+      "value": 19.6069162379,
+      "value_lci": 18.2053196591,
+      "value_uci": 21.0901038752,
+      "category_id": 1,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "n": 274,
+      "crude_rate": 6.61729776125,
+      "value": 6.46577805048,
+      "value_lci": 5.71958837672,
+      "value_uci": 7.28230356587,
+      "category_id": 1,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "n": 742,
+      "crude_rate": 9.0613243443,
+      "value": 9.96305864459,
+      "value_lci": 9.22775671638,
+      "value_uci": 10.7398541414,
+      "category_id": 2,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "n": 320,
+      "crude_rate": 7.90516665635,
+      "value": 10.471619465,
+      "value_lci": 9.31630949644,
+      "value_uci": 11.7240830045,
+      "category_id": 2,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "n": 422,
+      "crude_rate": 10.1916045812,
+      "value": 9.45449782423,
+      "value_lci": 8.56414904887,
+      "value_uci": 10.4132692208,
+      "category_id": 2,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "n": 1071,
+      "crude_rate": 12.9310407278,
+      "value": 13.360117922,
+      "value_lci": 12.5581375069,
+      "value_uci": 14.1999708918,
+      "category_id": 1,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "n": 792,
+      "crude_rate": 19.3280312216,
+      "value": 20.2489815384,
+      "value_lci": 18.8354275662,
+      "value_uci": 21.742541048,
+      "category_id": 1,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "n": 279,
+      "crude_rate": 6.66711193734,
+      "value": 6.47125430567,
+      "value_lci": 5.73094492604,
+      "value_uci": 7.28079122382,
+      "category_id": 1,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "n": 965,
+      "crude_rate": 11.651217836,
+      "value": 12.8624772294,
+      "value_lci": 12.0246753686,
+      "value_uci": 13.7414730394,
+      "category_id": 2,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "n": 426,
+      "crude_rate": 10.3961380056,
+      "value": 13.9401879431,
+      "value_lci": 12.5994164685,
+      "value_uci": 15.3774076318,
+      "category_id": 2,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "n": 539,
+      "crude_rate": 12.8801911621,
+      "value": 11.7847665157,
+      "value_lci": 10.799644204,
+      "value_uci": 12.8368418126,
+      "category_id": 2,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "n": 1016,
+      "crude_rate": 12.1337511993,
+      "value": 12.4723365398,
+      "value_lci": 11.7069324763,
+      "value_uci": 13.2747686553,
+      "category_id": 1,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "n": 759,
+      "crude_rate": 18.3003838017,
+      "value": 18.9858556753,
+      "value_lci": 17.6384532328,
+      "value_uci": 20.410959669,
+      "category_id": 1,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "n": 257,
+      "crude_rate": 6.08156778558,
+      "value": 5.95881740429,
+      "value_lci": 5.24968786148,
+      "value_uci": 6.73684116661,
+      "category_id": 1,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "n": 928,
+      "crude_rate": 11.0827963711,
+      "value": 11.8752470165,
+      "value_lci": 11.095683963,
+      "value_uci": 12.6940252922,
+      "category_id": 2,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "n": 399,
+      "crude_rate": 9.62035986415,
+      "value": 12.3011621586,
+      "value_lci": 11.0914129101,
+      "value_uci": 13.6015561373,
+      "category_id": 2,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "n": 529,
+      "crude_rate": 12.5180908894,
+      "value": 11.4493318743,
+      "value_lci": 10.4837502221,
+      "value_uci": 12.4810956337,
+      "category_id": 2,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "n": 1043,
+      "crude_rate": 12.3405081024,
+      "value": 12.6762594365,
+      "value_lci": 11.9084015675,
+      "value_uci": 13.4806609869,
+      "category_id": 1,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "n": 773,
+      "crude_rate": 18.4489713505,
+      "value": 19.1106487295,
+      "value_lci": 17.7659698211,
+      "value_uci": 20.5318138415,
+      "category_id": 1,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "n": 270,
+      "crude_rate": 6.33519592004,
+      "value": 6.24187014352,
+      "value_lci": 5.51726002356,
+      "value_uci": 7.03483474938,
+      "category_id": 1,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "n": 1009,
+      "crude_rate": 11.9382288354,
+      "value": 12.5096149393,
+      "value_lci": 11.7151071976,
+      "value_uci": 13.3426980635,
+      "category_id": 2,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "n": 413,
+      "crude_rate": 9.85695364523,
+      "value": 12.688589815,
+      "value_lci": 11.4541255576,
+      "value_uci": 14.0135286178,
+      "category_id": 2,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "n": 596,
+      "crude_rate": 13.9843584013,
+      "value": 12.3306400635,
+      "value_lci": 11.3482298794,
+      "value_uci": 13.377199621,
+      "category_id": 2,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "n": 1002,
+      "crude_rate": 11.7683972377,
+      "value": 12.1050346304,
+      "value_lci": 11.3560606496,
+      "value_uci": 12.8902976908,
+      "category_id": 1,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "n": 712,
+      "crude_rate": 16.8649342605,
+      "value": 17.6756003475,
+      "value_lci": 16.3792600652,
+      "value_uci": 19.0482269328,
+      "category_id": 1,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "n": 290,
+      "crude_rate": 6.75588944663,
+      "value": 6.53446891328,
+      "value_lci": 5.80069422491,
+      "value_uci": 7.33534979209,
+      "category_id": 1,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "n": 1176,
+      "crude_rate": 13.8120111292,
+      "value": 14.4551599045,
+      "value_lci": 13.6097704644,
+      "value_uci": 15.3383249991,
+      "category_id": 2,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "n": 499,
+      "crude_rate": 11.8196660056,
+      "value": 14.8909285179,
+      "value_lci": 13.5782946927,
+      "value_uci": 16.2908505014,
+      "category_id": 2,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "n": 677,
+      "crude_rate": 15.7715074323,
+      "value": 14.019391291,
+      "value_lci": 12.9710474742,
+      "value_uci": 15.1315440336,
+      "category_id": 2,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "n": 1018,
+      "crude_rate": 11.8713324813,
+      "value": 12.0964497255,
+      "value_lci": 11.3566635398,
+      "value_uci": 12.8717772807,
+      "category_id": 1,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "n": 742,
+      "crude_rate": 17.4465411644,
+      "value": 17.9778921741,
+      "value_lci": 16.6918850413,
+      "value_uci": 19.3380409666,
+      "category_id": 1,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "n": 276,
+      "crude_rate": 6.38550693522,
+      "value": 6.21500727689,
+      "value_lci": 5.4999738384,
+      "value_uci": 6.99694560602,
+      "category_id": 1,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "n": 1196,
+      "crude_rate": 13.9470664515,
+      "value": 14.2122498452,
+      "value_lci": 13.3902273431,
+      "value_uci": 15.0709029227,
+      "category_id": 2,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "n": 483,
+      "crude_rate": 11.356710758,
+      "value": 13.9670081299,
+      "value_lci": 12.7197305781,
+      "value_uci": 15.298902396,
+      "category_id": 2,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "n": 713,
+      "crude_rate": 16.495892916,
+      "value": 14.4574915605,
+      "value_lci": 13.4028750887,
+      "value_uci": 15.5749019723,
+      "category_id": 2,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "n": 970,
+      "crude_rate": 11.2292348151,
+      "value": 11.3900822433,
+      "value_lci": 10.6772633002,
+      "value_uci": 12.1380136633,
+      "category_id": 1,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "n": 695,
+      "crude_rate": 16.2166034219,
+      "value": 16.6181643566,
+      "value_lci": 15.3918838098,
+      "value_uci": 17.917545342,
+      "category_id": 1,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "n": 275,
+      "crude_rate": 6.31830155783,
+      "value": 6.16200013006,
+      "value_lci": 5.45119021743,
+      "value_uci": 6.93939973947,
+      "category_id": 1,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "n": 1251,
+      "crude_rate": 14.4822399522,
+      "value": 14.4562464025,
+      "value_lci": 13.6406895342,
+      "value_uci": 15.3075032409,
+      "category_id": 2,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "n": 510,
+      "crude_rate": 11.8999535902,
+      "value": 14.2407991836,
+      "value_lci": 13.0062740896,
+      "value_uci": 15.5572461154,
+      "category_id": 2,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "n": 741,
+      "crude_rate": 17.0249507431,
+      "value": 14.6716936215,
+      "value_lci": 13.6214005459,
+      "value_uci": 15.7836825712,
+      "category_id": 2,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "n": 1005,
+      "crude_rate": 11.5456918457,
+      "value": 11.6912294304,
+      "value_lci": 10.9727292982,
+      "value_uci": 12.444444822,
+      "category_id": 1,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "n": 719,
+      "crude_rate": 16.6419737427,
+      "value": 17.0668741477,
+      "value_lci": 15.8294629613,
+      "value_uci": 18.3765537081,
+      "category_id": 1,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "n": 286,
+      "crude_rate": 6.52350760793,
+      "value": 6.3155847131,
+      "value_lci": 5.60108068682,
+      "value_uci": 7.09579378656,
+      "category_id": 1,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "n": 1391,
+      "crude_rate": 15.9801565745,
+      "value": 15.9888856399,
+      "value_lci": 15.1334942701,
+      "value_uci": 16.8796518381,
+      "category_id": 2,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "n": 580,
+      "crude_rate": 13.4246797925,
+      "value": 16.0296607536,
+      "value_lci": 14.7249718001,
+      "value_uci": 17.41524095,
+      "category_id": 2,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "n": 811,
+      "crude_rate": 18.4984778672,
+      "value": 15.9481105263,
+      "value_lci": 14.8571909273,
+      "value_uci": 17.1001280858,
+      "category_id": 2,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "n": 958,
+      "crude_rate": 10.9147817591,
+      "value": 11.0253848928,
+      "value_lci": 10.332316027,
+      "value_uci": 11.7527598986,
+      "category_id": 1,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "n": 695,
+      "crude_rate": 15.9437385612,
+      "value": 16.2691624867,
+      "value_lci": 15.0713045808,
+      "value_uci": 17.5381823548,
+      "category_id": 1,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "n": 263,
+      "crude_rate": 5.95290639903,
+      "value": 5.78160729891,
+      "value_lci": 5.1001316975,
+      "value_uci": 6.52850781008,
+      "category_id": 1,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "n": 1594,
+      "crude_rate": 18.1609207974,
+      "value": 17.7801192461,
+      "value_lci": 16.8910441674,
+      "value_uci": 18.7037177106,
+      "category_id": 2,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "n": 649,
+      "crude_rate": 14.8884695342,
+      "value": 17.4437127185,
+      "value_lci": 16.1004552226,
+      "value_uci": 18.8659119021,
+      "category_id": 2,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "n": 945,
+      "crude_rate": 21.3897207114,
+      "value": 18.1165257737,
+      "value_lci": 16.966539448,
+      "value_uci": 19.3264640803,
+      "category_id": 2,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "n": 994,
+      "crude_rate": 11.182584778,
+      "value": 11.3055489884,
+      "value_lci": 10.6066166282,
+      "value_uci": 12.0384326166,
+      "category_id": 1,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "n": 721,
+      "crude_rate": 16.3279448473,
+      "value": 16.685268622,
+      "value_lci": 15.4763152441,
+      "value_uci": 17.964624424,
+      "category_id": 1,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "n": 273,
+      "crude_rate": 6.10317859354,
+      "value": 5.92582935478,
+      "value_lci": 5.23994599843,
+      "value_uci": 6.67635888057,
+      "category_id": 1,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "n": 1729,
+      "crude_rate": 19.4513974659,
+      "value": 18.6749559572,
+      "value_lci": 17.7786700614,
+      "value_uci": 19.6048565676,
+      "category_id": 2,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "n": 693,
+      "crude_rate": 15.6938499018,
+      "value": 18.086970902,
+      "value_lci": 16.7416395413,
+      "value_uci": 19.5090322698,
+      "category_id": 2,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "n": 1036,
+      "crude_rate": 23.1607803037,
+      "value": 19.2629410123,
+      "value_lci": 18.0928264452,
+      "value_uci": 20.4917433792,
+      "category_id": 2,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "n": 996,
+      "crude_rate": 11.0585036479,
+      "value": 11.0335705967,
+      "value_lci": 10.353699259,
+      "value_uci": 11.7465319424,
+      "category_id": 1,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "n": 719,
+      "crude_rate": 16.0635912672,
+      "value": 16.1803591523,
+      "value_lci": 15.0104103585,
+      "value_uci": 17.4186657166,
+      "category_id": 1,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "n": 277,
+      "crude_rate": 6.11386848296,
+      "value": 5.88678204102,
+      "value_lci": 5.20926022054,
+      "value_uci": 6.62793372144,
+      "category_id": 1,
+      "year": 2024,
+      "sex_id": 2
+    },
+    {
+      "n": 1774,
+      "crude_rate": 19.6965717584,
+      "value": 18.7803181696,
+      "value_lci": 17.8897285755,
+      "value_uci": 19.7039259203,
+      "category_id": 2,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "n": 703,
+      "crude_rate": 15.7061260929,
+      "value": 17.9907625936,
+      "value_lci": 16.6602460447,
+      "value_uci": 19.3966200037,
+      "category_id": 2,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "n": 1071,
+      "crude_rate": 23.638820019,
+      "value": 19.5698737456,
+      "value_lci": 18.3999133372,
+      "value_uci": 20.7976593673,
+      "category_id": 2,
+      "year": 2024,
+      "sex_id": 2
+    }
+  ]
+}

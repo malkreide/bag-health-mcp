@@ -7,6 +7,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Hinzugefuegt — die Fixtures sind aufgezeichnet, nicht mehr ausgedacht
+
+Jeder Payload dieser Suite war ein Literal im Testmodul, keiner je von der
+Quelle geholt. Dazu kommt: Der einzige `@pytest.mark.live`-Test ist
+uebersprungen — `pytest -m live` sammelt hier **null** Tests ein. Nichts in
+diesem Repo hat seine Annahmen je gegen die echten Hosts gehalten.
+
+Neu: **`scripts/record_fixtures.py`** zeichnet von `ind.obsan.admin.ch` und
+`www.versorgungsatlas.ch` auf und schreibt `tests/fixtures/*` samt
+`PROVENANCE.md` mit Quelle, **Aufzeichnungsdatum**, Auswahlregel und SHA-256 je
+Datei. Ohne Datum ist «aufgezeichnet» nach zwei Jahren von «ausgedacht» nicht
+mehr zu unterscheiden.
+
+**Was der Wechsel aufgedeckt hat — drei Befunde:**
+
+1. **Die Sitemap-Fixture beschrieb eine Form, die es nicht gibt.** Sie bestand
+   aus vier `/de/indicator/...`-URLs. Die Quelle liefert davon **keine
+   einzige**: gemessen 285 `fr`, 223 `it`, 41 `en` und 285 **sprachneutrale**
+   Eintraege, und die neutralen tragen die deutschen Slugs. Deutsch kommt ohne
+   Sprachsegment. Jedes deutsche Suchergebnis laeuft damit ueber den
+   `lang == ""`-Zweig — den kein Test je beruehrt hat. Der Code selbst ist in
+   Ordnung; ungetestet war er trotzdem. Neu festgehalten von
+   `test_german_results_ride_on_the_language_neutral_catalogue_entries`, und
+   die Gegenprobe ist gefuehrt: Mit auf `/de/` zurueckgedrehter Fixture faellt
+   genau dieser Test.
+
+2. **Der Katalog listet weit mehr, als das Serien-Tool liefern kann.** In einer
+   Stichprobe von 12 sprachneutralen Indikatoren hatten nur **3** ueberhaupt
+   eine Serie — 9 gaben auf `/g/json` **und** `/gum/json` 404. Der Mehrheitsfall
+   liegt jetzt als eigene Fixture (`obsan_page_no_series.html`) vor; das
+   Aufzeichnungsskript prueft beim Lauf nach, dass er weiterhin 404 ist.
+   **Nicht behoben:** Dass die Suche Indikatoren anbietet, die das Serien-Tool
+   nicht ausliefert, bleibt offen — das ist eine Verhaltensaenderung und
+   gehoert in einen eigenen PR.
+
+3. **Die Versorgungsatlas-Fixture unterschlug die Aspekte.** Die Quelle fuehrt
+   drei Aspekte von `_003` (a/b/c) und zwei von `_006`; die handgeschriebene
+   Fixture kannte je einen. Kein Test hat je mehrere Aspekte desselben
+   Indikators gesehen — wofuer das Feld `aspect` gerade da ist.
+
+**Ein Test bestand leer und tut es nicht mehr.** Die Sucht-Schweiz-Eingrenzung
+assertiert `all(id.startswith("monam/") …)`; ueber einer leeren Liste ist das
+wahr. Die Fixture enthaelt jetzt einen `monam`-Eintrag, und die Nicht-Leerheit
+ist Teil der Zusicherung.
+
+Erwartungen werden durchgehend **aus der Fixture abgeleitet** statt
+hingeschrieben — Punktzahlen, Jahre, Regionen. Eine feste Zahl waere beim
+naechsten Aufzeichnen falsch, ohne dass sich etwas Geprueftes geaendert haette.
+
+Der Rahmen dazu steht im Skill [`mcp-data-fidelity`](https://github.com/malkreide/mcp-data-fidelity-skill)
+unter Regel 5 und im Katalog-Check `OPS-009`.
+
+
 ### Changed
 
 - **Retry policy against the upstream: spread, obedient and time-bounded

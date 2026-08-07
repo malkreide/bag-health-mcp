@@ -1,0 +1,5227 @@
+{
+  "name": "_010_gum",
+  "title": {
+    "de": "Suizidmethoden, exkl. Suizidhilfe",
+    "fr": "Méthodes de suicide, sans les suicides assistés"
+  },
+  "description": {
+    "de": "Verteilung in Prozenten",
+    "fr": "Distribution en pourcent"
+  },
+  "source": {
+    "de": "BFS – Statistik der Todesursachen (CoD) und Statistik der Bevölkerung und der Haushalte (STATPOP)",
+    "fr": "OFS – Statistique des causes de décès (CoD) et Statistique de la population et des ménages (STATPOP)"
+  },
+  "value": {
+    "de": "Verteilung in %",
+    "fr": "Distribution en %"
+  },
+  "n": {
+    "de": "Stichprobengrösse",
+    "fr": "Taille de l'échantillon"
+  },
+  "value_lci": {
+    "de": "Untere Grenze Vertrauensintervall",
+    "fr": "Limite inférieure de l'intervalle de confiance"
+  },
+  "value_uci": {
+    "de": "Obere Grenze Vertrauensintervall",
+    "fr": "Limite supérieure de l'intervalle de confiance"
+  },
+  "segment_id": {
+    "de": "Segment",
+    "fr": "Segment",
+    "codes": {
+      "1": {
+        "de": "Vergiftung",
+        "fr": "Empoisonnement"
+      },
+      "2": {
+        "de": "Erhängen",
+        "fr": "Pendaison"
+      },
+      "3": {
+        "de": "Ertrinken",
+        "fr": "Noyade"
+      },
+      "4": {
+        "de": "Schusswaffen",
+        "fr": "Armes à feu"
+      },
+      "5": {
+        "de": "Sturz",
+        "fr": "Saut dans le vide"
+      },
+      "6": {
+        "de": "Übrige Methoden",
+        "fr": "Autres méthodes"
+      },
+      "7": {
+        "de": "Schienensuizid",
+        "fr": "Suicide sur les rails"
+      }
+    }
+  },
+  "year": {
+    "de": "Jahr",
+    "fr": "Année"
+  },
+  "sex_id": {
+    "de": "Geschlecht",
+    "fr": "Sexe",
+    "codes": {
+      "0": {
+        "de": "Total",
+        "fr": "Total",
+        "it": "Totale",
+        "en": "Total"
+      },
+      "1": {
+        "de": "Männer",
+        "fr": "Hommes",
+        "it": "Uomini",
+        "en": "Men"
+      },
+      "2": {
+        "de": "Frauen",
+        "fr": "Femmes",
+        "it": "Donne",
+        "en": "Women"
+      }
+    }
+  },
+  "remarks": {
+    "de": "Quelle: BFS – Statistik der Todesursachen (CoD) und Statistik der Bevölkerung und der Haushalte (STATPOP)",
+    "fr": "Source: OFS – Statistique des causes de décès (CoD) et Statistique de la population et des ménages (STATPOP)"
+  },
+  "country": {
+    "de": "Schweiz",
+    "fr": "Suisse",
+    "it": "Svizzera",
+    "en": "Switzerland"
+  },
+  "indicator": {
+    "de": {
+      "title": "Suizid und Suizidhilfe",
+      "url": "https://ind.obsan.admin.ch/indicator/obsan/suizid-und-suizidhilfe"
+    },
+    "fr": {
+      "title": "Suicide et suicide assisté",
+      "url": "https://ind.obsan.admin.ch/fr/indicator/obsan/suicide-et-suicide-assiste"
+    }
+  },
+  "author": {
+    "de": "Schweizerisches Gesundheitsobsevratorium (Obsan)",
+    "fr": "Observatoire suisse de la santé (Obsan)"
+  },
+  "phone": "+41 58 463 60 45",
+  "email": "obsan@bfs.admin.ch",
+  "version": "20251209",
+  "created_at": "2026-08-07T18:27:14.536Z",
+  "last_updated_at": "2025-12-22",
+  "data": [
+    {
+      "value": 15.0602409639,
+      "n": 200,
+      "value_lci": 13.1341340092,
+      "value_uci": 16.9863479185,
+      "segment_id": 1,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "value": 11.5267947422,
+      "n": 114,
+      "value_lci": 9.53308407112,
+      "value_uci": 13.5205054132,
+      "segment_id": 1,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "value": 25.3687315634,
+      "n": 86,
+      "value_lci": 20.7133271721,
+      "value_uci": 30.0241359547,
+      "segment_id": 1,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "value": 25.2259036145,
+      "n": 335,
+      "value_lci": 22.8870239415,
+      "value_uci": 27.5647832874,
+      "segment_id": 2,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "value": 24.6713852376,
+      "n": 244,
+      "value_lci": 21.9799822465,
+      "value_uci": 27.3627882288,
+      "segment_id": 2,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "value": 26.8436578171,
+      "n": 91,
+      "value_lci": 22.102390278,
+      "value_uci": 31.5849253562,
+      "segment_id": 2,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "value": 5.12048192771,
+      "n": 68,
+      "value_lci": 3.93348230579,
+      "value_uci": 6.30748154963,
+      "segment_id": 3,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "value": 3.13447927199,
+      "n": 31,
+      "value_lci": 2.04662860427,
+      "value_uci": 4.22232993972,
+      "segment_id": 3,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "value": 10.9144542773,
+      "n": 37,
+      "value_lci": 7.57825288544,
+      "value_uci": 14.2506556691,
+      "segment_id": 3,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "value": 31.0993975904,
+      "n": 413,
+      "value_lci": 28.6065459964,
+      "value_uci": 33.5922491843,
+      "segment_id": 4,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "value": 40.4448938322,
+      "n": 400,
+      "value_lci": 37.3808616374,
+      "value_uci": 43.5089260269,
+      "segment_id": 4,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "value": 3.83480825959,
+      "n": 13,
+      "value_lci": 1.78020296993,
+      "value_uci": 5.88941354924,
+      "segment_id": 4,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "value": 10.7680722892,
+      "n": 143,
+      "value_lci": 9.09875825098,
+      "value_uci": 12.4373863273,
+      "segment_id": 5,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "value": 8.39231547017,
+      "n": 83,
+      "value_lci": 6.66126860343,
+      "value_uci": 10.1233623369,
+      "segment_id": 5,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "value": 17.6991150442,
+      "n": 60,
+      "value_lci": 13.6156799913,
+      "value_uci": 21.7825500972,
+      "segment_id": 5,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "value": 4.81927710843,
+      "n": 64,
+      "value_lci": 3.66589190487,
+      "value_uci": 5.972662312,
+      "segment_id": 6,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "value": 4.75227502528,
+      "n": 47,
+      "value_lci": 3.42402430052,
+      "value_uci": 6.08052575004,
+      "segment_id": 6,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "value": 5.01474926254,
+      "n": 17,
+      "value_lci": 2.67967701511,
+      "value_uci": 7.34982150997,
+      "segment_id": 6,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "value": 7.90662650602,
+      "n": 105,
+      "value_lci": 6.45344878907,
+      "value_uci": 9.35980422298,
+      "segment_id": 7,
+      "year": 1998,
+      "sex_id": 0
+    },
+    {
+      "value": 7.07785642063,
+      "n": 70,
+      "value_lci": 5.47677854282,
+      "value_uci": 8.67893429843,
+      "segment_id": 7,
+      "year": 1998,
+      "sex_id": 1
+    },
+    {
+      "value": 10.3244837758,
+      "n": 35,
+      "value_lci": 7.06897597993,
+      "value_uci": 13.5799915717,
+      "segment_id": 7,
+      "year": 1998,
+      "sex_id": 2
+    },
+    {
+      "value": 14.262560778,
+      "n": 176,
+      "value_lci": 12.3087743668,
+      "value_uci": 16.2163471891,
+      "segment_id": 1,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "value": 10.5027932961,
+      "n": 94,
+      "value_lci": 8.49034446653,
+      "value_uci": 12.5152421257,
+      "segment_id": 1,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "value": 24.1887905605,
+      "n": 82,
+      "value_lci": 19.6071457939,
+      "value_uci": 28.7704353271,
+      "segment_id": 1,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "value": 28.038897893,
+      "n": 346,
+      "value_lci": 25.529194203,
+      "value_uci": 30.5486015831,
+      "segment_id": 2,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "value": 29.7206703911,
+      "n": 266,
+      "value_lci": 26.7207425909,
+      "value_uci": 32.7205981912,
+      "segment_id": 2,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "value": 23.598820059,
+      "n": 80,
+      "value_lci": 19.0558193851,
+      "value_uci": 28.1418207329,
+      "segment_id": 2,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "value": 6.72609400324,
+      "n": 83,
+      "value_lci": 5.32665290182,
+      "value_uci": 8.12553510466,
+      "segment_id": 3,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "value": 4.02234636872,
+      "n": 36,
+      "value_lci": 2.73263510179,
+      "value_uci": 5.31205763564,
+      "segment_id": 3,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "value": 13.8643067847,
+      "n": 47,
+      "value_lci": 10.166976225,
+      "value_uci": 17.5616373444,
+      "segment_id": 3,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "value": 28.038897893,
+      "n": 346,
+      "value_lci": 25.529194203,
+      "value_uci": 30.5486015831,
+      "segment_id": 4,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "value": 36.8715083799,
+      "n": 330,
+      "value_lci": 33.7046703226,
+      "value_uci": 40.0383464371,
+      "segment_id": 4,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "value": 4.7197640118,
+      "n": 16,
+      "value_lci": 2.45089628189,
+      "value_uci": 6.98863174171,
+      "segment_id": 4,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "value": 10.2106969206,
+      "n": 126,
+      "value_lci": 8.5189590565,
+      "value_uci": 11.9024347847,
+      "segment_id": 5,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "value": 7.2625698324,
+      "n": 65,
+      "value_lci": 5.5590767039,
+      "value_uci": 8.9660629609,
+      "segment_id": 5,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "value": 17.994100295,
+      "n": 61,
+      "value_lci": 13.8841625719,
+      "value_uci": 22.1040380181,
+      "segment_id": 5,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "value": 4.70016207455,
+      "n": 58,
+      "value_lci": 3.51767725361,
+      "value_uci": 5.8826468955,
+      "segment_id": 6,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "value": 4.58100558659,
+      "n": 41,
+      "value_lci": 3.20865356862,
+      "value_uci": 5.95335760456,
+      "segment_id": 6,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "value": 5.01474926254,
+      "n": 17,
+      "value_lci": 2.67967701511,
+      "value_uci": 7.34982150997,
+      "segment_id": 6,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "value": 8.0226904376,
+      "n": 99,
+      "value_lci": 6.50496418962,
+      "value_uci": 9.54041668558,
+      "segment_id": 7,
+      "year": 1999,
+      "sex_id": 0
+    },
+    {
+      "value": 7.03910614525,
+      "n": 63,
+      "value_lci": 5.36000599911,
+      "value_uci": 8.7182062914,
+      "segment_id": 7,
+      "year": 1999,
+      "sex_id": 1
+    },
+    {
+      "value": 10.6194690265,
+      "n": 36,
+      "value_lci": 7.32321638882,
+      "value_uci": 13.9157216643,
+      "segment_id": 7,
+      "year": 1999,
+      "sex_id": 2
+    },
+    {
+      "value": 15.2358855375,
+      "n": 197,
+      "value_lci": 13.2744965296,
+      "value_uci": 17.1972745454,
+      "segment_id": 1,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "value": 11.2299465241,
+      "n": 105,
+      "value_lci": 9.20245106792,
+      "value_uci": 13.2574419802,
+      "segment_id": 1,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "value": 25.6983240223,
+      "n": 92,
+      "value_lci": 21.150113872,
+      "value_uci": 30.2465341727,
+      "segment_id": 1,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "value": 27.6875483372,
+      "n": 358,
+      "value_lci": 25.2453964797,
+      "value_uci": 30.1297001947,
+      "segment_id": 2,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "value": 29.3048128342,
+      "n": 274,
+      "value_lci": 26.3819919285,
+      "value_uci": 32.2276337399,
+      "segment_id": 2,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "value": 23.4636871508,
+      "n": 84,
+      "value_lci": 19.052853131,
+      "value_uci": 27.8745211706,
+      "segment_id": 2,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "value": 6.65119876257,
+      "n": 86,
+      "value_lci": 5.29123227179,
+      "value_uci": 8.01116525334,
+      "segment_id": 3,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "value": 3.31550802139,
+      "n": 31,
+      "value_lci": 2.16579021921,
+      "value_uci": 4.46522582357,
+      "segment_id": 3,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "value": 15.3631284916,
+      "n": 55,
+      "value_lci": 11.6098702226,
+      "value_uci": 19.1163867606,
+      "segment_id": 3,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "value": 27.1461716937,
+      "n": 351,
+      "value_lci": 24.7189784388,
+      "value_uci": 29.5733649487,
+      "segment_id": 4,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "value": 35.935828877,
+      "n": 336,
+      "value_lci": 32.8547044026,
+      "value_uci": 39.0169533514,
+      "segment_id": 4,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "value": 4.18994413408,
+      "n": 15,
+      "value_lci": 2.10450038222,
+      "value_uci": 6.27538788594,
+      "segment_id": 4,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "value": 10.1314771848,
+      "n": 131,
+      "value_lci": 8.48458920875,
+      "value_uci": 11.7783651609,
+      "segment_id": 5,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "value": 8.55614973262,
+      "n": 80,
+      "value_lci": 6.75995158276,
+      "value_uci": 10.3523478825,
+      "segment_id": 5,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "value": 14.2458100559,
+      "n": 51,
+      "value_lci": 10.6078320688,
+      "value_uci": 17.883788043,
+      "segment_id": 5,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "value": 4.87238979118,
+      "n": 63,
+      "value_lci": 3.69736189469,
+      "value_uci": 6.04741768768,
+      "segment_id": 6,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "value": 4.91978609626,
+      "n": 46,
+      "value_lci": 3.53093402709,
+      "value_uci": 6.30863816542,
+      "segment_id": 6,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "value": 4.74860335196,
+      "n": 17,
+      "value_lci": 2.53496107117,
+      "value_uci": 6.96224563274,
+      "segment_id": 6,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "value": 8.27532869296,
+      "n": 107,
+      "value_lci": 6.7716343001,
+      "value_uci": 9.77902308582,
+      "segment_id": 7,
+      "year": 2000,
+      "sex_id": 0
+    },
+    {
+      "value": 6.73796791444,
+      "n": 63,
+      "value_lci": 5.12823171294,
+      "value_uci": 8.34770411593,
+      "segment_id": 7,
+      "year": 2000,
+      "sex_id": 1
+    },
+    {
+      "value": 12.2905027933,
+      "n": 44,
+      "value_lci": 8.87309383634,
+      "value_uci": 15.7079117502,
+      "segment_id": 7,
+      "year": 2000,
+      "sex_id": 2
+    },
+    {
+      "value": 16.211745244,
+      "n": 196,
+      "value_lci": 14.1312992972,
+      "value_uci": 18.2921911908,
+      "segment_id": 1,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "value": 13.0726256983,
+      "n": 117,
+      "value_lci": 10.859900962,
+      "value_uci": 15.2853504347,
+      "segment_id": 1,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "value": 25.1592356688,
+      "n": 79,
+      "value_lci": 20.3333581216,
+      "value_uci": 29.985113216,
+      "segment_id": 1,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "value": 26.2200165426,
+      "n": 317,
+      "value_lci": 23.7372508443,
+      "value_uci": 28.7027822408,
+      "segment_id": 2,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "value": 27.1508379888,
+      "n": 243,
+      "value_lci": 24.2315859229,
+      "value_uci": 30.0700900547,
+      "segment_id": 2,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "value": 23.5668789809,
+      "n": 74,
+      "value_lci": 18.8467887398,
+      "value_uci": 28.286969222,
+      "segment_id": 2,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "value": 6.28618693135,
+      "n": 76,
+      "value_lci": 4.91610850031,
+      "value_uci": 7.65626536239,
+      "segment_id": 3,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "value": 3.68715083799,
+      "n": 33,
+      "value_lci": 2.45019195312,
+      "value_uci": 4.92410972286,
+      "segment_id": 3,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "value": 13.6942675159,
+      "n": 43,
+      "value_lci": 9.87088548896,
+      "value_uci": 17.5176495429,
+      "segment_id": 3,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "value": 28.8668320926,
+      "n": 349,
+      "value_lci": 26.3089199864,
+      "value_uci": 31.4247441988,
+      "segment_id": 4,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "value": 36.6480446927,
+      "n": 328,
+      "value_lci": 33.4852346228,
+      "value_uci": 39.8108547627,
+      "segment_id": 4,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "value": 6.68789808917,
+      "n": 21,
+      "value_lci": 3.90964197617,
+      "value_uci": 9.46615420217,
+      "segment_id": 4,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "value": 11.7452440033,
+      "n": 142,
+      "value_lci": 9.9278459431,
+      "value_uci": 13.5626420635,
+      "segment_id": 5,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "value": 10.2793296089,
+      "n": 92,
+      "value_lci": 8.28592091578,
+      "value_uci": 12.2727383021,
+      "segment_id": 5,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "value": 15.923566879,
+      "n": 50,
+      "value_lci": 11.8543036254,
+      "value_uci": 19.9928301326,
+      "segment_id": 5,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "value": 3.72208436725,
+      "n": 45,
+      "value_lci": 2.65350588332,
+      "value_uci": 4.79066285117,
+      "segment_id": 6,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "value": 3.24022346369,
+      "n": 29,
+      "value_lci": 2.07796529688,
+      "value_uci": 4.4024816305,
+      "segment_id": 6,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "value": 5.09554140127,
+      "n": 16,
+      "value_lci": 2.64987653627,
+      "value_uci": 7.54120626628,
+      "segment_id": 6,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "value": 6.94789081886,
+      "n": 84,
+      "value_lci": 5.51260107171,
+      "value_uci": 8.38318056601,
+      "segment_id": 7,
+      "year": 2001,
+      "sex_id": 0
+    },
+    {
+      "value": 5.9217877095,
+      "n": 53,
+      "value_lci": 4.37247657481,
+      "value_uci": 7.47109884419,
+      "segment_id": 7,
+      "year": 2001,
+      "sex_id": 1
+    },
+    {
+      "value": 9.87261146497,
+      "n": 31,
+      "value_lci": 6.55517292488,
+      "value_uci": 13.1900500051,
+      "segment_id": 7,
+      "year": 2001,
+      "sex_id": 2
+    },
+    {
+      "value": 15.4019534185,
+      "n": 205,
+      "value_lci": 13.4602372645,
+      "value_uci": 17.3436695724,
+      "segment_id": 1,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "value": 10.3854389722,
+      "n": 97,
+      "value_lci": 8.42536372217,
+      "value_uci": 12.3455142222,
+      "segment_id": 1,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "value": 27.2040302267,
+      "n": 108,
+      "value_lci": 22.807600234,
+      "value_uci": 31.6004602194,
+      "segment_id": 1,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "value": 27.498121713,
+      "n": 366,
+      "value_lci": 25.0962831285,
+      "value_uci": 29.8999602975,
+      "segment_id": 2,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "value": 28.2655246253,
+      "n": 264,
+      "value_lci": 25.3724241709,
+      "value_uci": 31.1586250796,
+      "segment_id": 2,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "value": 25.6926952141,
+      "n": 102,
+      "value_lci": 21.3760092346,
+      "value_uci": 30.0093811937,
+      "segment_id": 2,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "value": 5.86025544703,
+      "n": 78,
+      "value_lci": 4.59679266098,
+      "value_uci": 7.12371823308,
+      "segment_id": 3,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "value": 3.64025695931,
+      "n": 34,
+      "value_lci": 2.43692663292,
+      "value_uci": 4.84358728571,
+      "segment_id": 3,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "value": 11.0831234257,
+      "n": 44,
+      "value_lci": 7.98175719461,
+      "value_uci": 14.1844896568,
+      "segment_id": 3,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "value": 26.3711495116,
+      "n": 351,
+      "value_lci": 24.0008336977,
+      "value_uci": 28.7414653256,
+      "segment_id": 4,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "value": 36.1884368308,
+      "n": 338,
+      "value_lci": 33.1009463398,
+      "value_uci": 39.2759273219,
+      "segment_id": 4,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "value": 3.27455919395,
+      "n": 13,
+      "value_lci": 1.51632528626,
+      "value_uci": 5.03279310165,
+      "segment_id": 4,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "value": 12.5469571751,
+      "n": 167,
+      "value_lci": 10.7650940366,
+      "value_uci": 14.3288203136,
+      "segment_id": 5,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "value": 9.95717344754,
+      "n": 93,
+      "value_lci": 8.03335705536,
+      "value_uci": 11.8809898397,
+      "segment_id": 5,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "value": 18.6397984887,
+      "n": 74,
+      "value_lci": 14.7924946671,
+      "value_uci": 22.4871023103,
+      "segment_id": 5,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "value": 4.5830202855,
+      "n": 61,
+      "value_lci": 3.45813976573,
+      "value_uci": 5.70790080527,
+      "segment_id": 6,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "value": 5.03211991435,
+      "n": 47,
+      "value_lci": 3.62757740607,
+      "value_uci": 6.43666242262,
+      "segment_id": 6,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "value": 3.52644836272,
+      "n": 14,
+      "value_lci": 1.70422014431,
+      "value_uci": 5.34867658113,
+      "segment_id": 6,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "value": 7.73854244929,
+      "n": 103,
+      "value_lci": 6.30120939324,
+      "value_uci": 9.17587550533,
+      "segment_id": 7,
+      "year": 2002,
+      "sex_id": 0
+    },
+    {
+      "value": 6.53104925054,
+      "n": 61,
+      "value_lci": 4.94361338569,
+      "value_uci": 8.11848511538,
+      "segment_id": 7,
+      "year": 2002,
+      "sex_id": 1
+    },
+    {
+      "value": 10.5793450882,
+      "n": 42,
+      "value_lci": 7.540712546,
+      "value_uci": 13.6179776303,
+      "segment_id": 7,
+      "year": 2002,
+      "sex_id": 2
+    },
+    {
+      "value": 14.9130832571,
+      "n": 163,
+      "value_lci": 12.7979705572,
+      "value_uci": 17.0281959569,
+      "segment_id": 1,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "value": 9.83397190294,
+      "n": 77,
+      "value_lci": 7.74369721789,
+      "value_uci": 11.924246588,
+      "segment_id": 1,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "value": 27.7419354839,
+      "n": 86,
+      "value_lci": 22.730239008,
+      "value_uci": 32.7536319597,
+      "segment_id": 1,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "value": 27.0814272644,
+      "n": 296,
+      "value_lci": 24.4428291202,
+      "value_uci": 29.7200254086,
+      "segment_id": 2,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "value": 30.1404853129,
+      "n": 236,
+      "value_lci": 26.91937712,
+      "value_uci": 33.3615935058,
+      "segment_id": 2,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "value": 19.3548387097,
+      "n": 60,
+      "value_lci": 14.9324475255,
+      "value_uci": 23.7772298938,
+      "segment_id": 2,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "value": 4.02561756633,
+      "n": 44,
+      "value_lci": 2.85850614585,
+      "value_uci": 5.19272898682,
+      "segment_id": 3,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "value": 2.04342273308,
+      "n": 16,
+      "value_lci": 1.05027622234,
+      "value_uci": 3.03656924382,
+      "segment_id": 3,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "value": 9.03225806452,
+      "n": 28,
+      "value_lci": 5.8236616348,
+      "value_uci": 12.2408544942,
+      "segment_id": 3,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "value": 27.4473924977,
+      "n": 300,
+      "value_lci": 24.7977001138,
+      "value_uci": 30.0970848817,
+      "segment_id": 4,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "value": 36.5261813538,
+      "n": 286,
+      "value_lci": 33.1461801205,
+      "value_uci": 39.9061825871,
+      "segment_id": 4,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "value": 4.51612903226,
+      "n": 14,
+      "value_lci": 2.19167265928,
+      "value_uci": 6.84058540523,
+      "segment_id": 4,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "value": 13.5407136322,
+      "n": 148,
+      "value_lci": 11.5090818491,
+      "value_uci": 15.5723454153,
+      "segment_id": 5,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "value": 10.0893997446,
+      "n": 79,
+      "value_lci": 7.97515371819,
+      "value_uci": 12.203645771,
+      "segment_id": 5,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "value": 22.2580645161,
+      "n": 69,
+      "value_lci": 17.6017254992,
+      "value_uci": 26.9144035331,
+      "segment_id": 5,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "value": 4.94053064959,
+      "n": 54,
+      "value_lci": 3.65375483344,
+      "value_uci": 6.22730646574,
+      "segment_id": 6,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "value": 4.08684546616,
+      "n": 32,
+      "value_lci": 2.69705091235,
+      "value_uci": 5.47664001996,
+      "segment_id": 6,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "value": 7.09677419355,
+      "n": 22,
+      "value_lci": 4.22256012792,
+      "value_uci": 9.97098825918,
+      "segment_id": 6,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "value": 8.05123513266,
+      "n": 88,
+      "value_lci": 6.43567694973,
+      "value_uci": 9.6667933156,
+      "segment_id": 7,
+      "year": 2003,
+      "sex_id": 0
+    },
+    {
+      "value": 7.27969348659,
+      "n": 57,
+      "value_lci": 5.45595994332,
+      "value_uci": 9.10342702986,
+      "segment_id": 7,
+      "year": 2003,
+      "sex_id": 1
+    },
+    {
+      "value": 10,
+      "n": 31,
+      "value_lci": 6.64189342831,
+      "value_uci": 13.3581065717,
+      "segment_id": 7,
+      "year": 2003,
+      "sex_id": 2
+    },
+    {
+      "value": 17.6625659051,
+      "n": 201,
+      "value_lci": 15.4435726825,
+      "value_uci": 19.8815591276,
+      "segment_id": 1,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "value": 13.6363636364,
+      "n": 108,
+      "value_lci": 11.241175499,
+      "value_uci": 16.0315517738,
+      "segment_id": 1,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "value": 26.8786127168,
+      "n": 93,
+      "value_lci": 22.1841012974,
+      "value_uci": 31.5731241362,
+      "segment_id": 1,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "value": 27.5043936731,
+      "n": 313,
+      "value_lci": 24.9061056306,
+      "value_uci": 30.1026817156,
+      "segment_id": 2,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "value": 29.2929292929,
+      "n": 232,
+      "value_lci": 26.1165108466,
+      "value_uci": 32.4693477393,
+      "segment_id": 2,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "value": 23.4104046243,
+      "n": 81,
+      "value_lci": 18.926523281,
+      "value_uci": 27.8942859675,
+      "segment_id": 2,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "value": 5.62390158172,
+      "n": 64,
+      "value_lci": 4.28336003223,
+      "value_uci": 6.96444313121,
+      "segment_id": 3,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "value": 2.77777777778,
+      "n": 22,
+      "value_lci": 1.63079629526,
+      "value_uci": 3.92475926029,
+      "segment_id": 3,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "value": 12.1387283237,
+      "n": 42,
+      "value_lci": 8.68052835954,
+      "value_uci": 15.5969282879,
+      "segment_id": 3,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "value": 23.8137082601,
+      "n": 271,
+      "value_lci": 21.335245797,
+      "value_uci": 26.2921707232,
+      "segment_id": 4,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "value": 32.5757575758,
+      "n": 258,
+      "value_lci": 29.3047602808,
+      "value_uci": 35.8467548707,
+      "segment_id": 4,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "value": 3.75722543353,
+      "n": 13,
+      "value_lci": 1.74358252091,
+      "value_uci": 5.77086834614,
+      "segment_id": 4,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "value": 12.7416520211,
+      "n": 145,
+      "value_lci": 10.8014507848,
+      "value_uci": 14.6818532574,
+      "segment_id": 5,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "value": 9.84848484848,
+      "n": 78,
+      "value_lci": 7.76880678586,
+      "value_uci": 11.9281629111,
+      "segment_id": 5,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "value": 19.3641618497,
+      "n": 67,
+      "value_lci": 15.1798102696,
+      "value_uci": 23.5485134298,
+      "segment_id": 5,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "value": 5.00878734622,
+      "n": 57,
+      "value_lci": 3.7395629056,
+      "value_uci": 6.27801178684,
+      "segment_id": 6,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "value": 5.05050505051,
+      "n": 40,
+      "value_lci": 3.52209945337,
+      "value_uci": 6.57891064764,
+      "segment_id": 6,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "value": 4.91329479769,
+      "n": 17,
+      "value_lci": 2.62447777596,
+      "value_uci": 7.20211181941,
+      "segment_id": 6,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "value": 7.64499121265,
+      "n": 87,
+      "value_lci": 6.09885007324,
+      "value_uci": 9.19113235207,
+      "segment_id": 7,
+      "year": 2004,
+      "sex_id": 0
+    },
+    {
+      "value": 6.81818181818,
+      "n": 54,
+      "value_lci": 5.05894314181,
+      "value_uci": 8.57742049455,
+      "segment_id": 7,
+      "year": 2004,
+      "sex_id": 1
+    },
+    {
+      "value": 9.53757225434,
+      "n": 33,
+      "value_lci": 6.42716107865,
+      "value_uci": 12.64798343,
+      "segment_id": 7,
+      "year": 2004,
+      "sex_id": 2
+    },
+    {
+      "value": 12.6239855726,
+      "n": 140,
+      "value_lci": 10.6662806222,
+      "value_uci": 14.581690523,
+      "segment_id": 1,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "value": 9.7651421508,
+      "n": 79,
+      "value_lci": 7.71530245887,
+      "value_uci": 11.8149818427,
+      "segment_id": 1,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "value": 20.3333333333,
+      "n": 61,
+      "value_lci": 15.7527942572,
+      "value_uci": 24.9138724095,
+      "segment_id": 1,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "value": 29.5761947701,
+      "n": 328,
+      "value_lci": 26.8859997065,
+      "value_uci": 32.2663898337,
+      "segment_id": 2,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "value": 32.3856613103,
+      "n": 262,
+      "value_lci": 29.1542723908,
+      "value_uci": 35.6170502297,
+      "segment_id": 2,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "value": 22,
+      "n": 66,
+      "value_lci": 17.2855327745,
+      "value_uci": 26.7144672255,
+      "segment_id": 2,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "value": 6.04147880974,
+      "n": 67,
+      "value_lci": 4.6370730773,
+      "value_uci": 7.44588454217,
+      "segment_id": 3,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "value": 3.58467243511,
+      "n": 29,
+      "value_lci": 2.30089061015,
+      "value_uci": 4.86845426006,
+      "segment_id": 3,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "value": 12.6666666667,
+      "n": 38,
+      "value_lci": 8.88141143468,
+      "value_uci": 16.4519218987,
+      "segment_id": 3,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "value": 23.6248872858,
+      "n": 262,
+      "value_lci": 21.1210062927,
+      "value_uci": 26.128768279,
+      "segment_id": 4,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "value": 30.4079110012,
+      "n": 246,
+      "value_lci": 27.2312807047,
+      "value_uci": 33.5845412977,
+      "segment_id": 4,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "value": 5.33333333333,
+      "n": 16,
+      "value_lci": 2.77609099686,
+      "value_uci": 7.8905756698,
+      "segment_id": 4,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "value": 13.8863841298,
+      "n": 154,
+      "value_lci": 11.8480124404,
+      "value_uci": 15.9247558193,
+      "segment_id": 5,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "value": 11.1248454883,
+      "n": 90,
+      "value_lci": 8.95349154111,
+      "value_uci": 13.2961994354,
+      "segment_id": 5,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "value": 21.3333333333,
+      "n": 64,
+      "value_lci": 16.6710494604,
+      "value_uci": 25.9956172062,
+      "segment_id": 5,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "value": 6.49233543733,
+      "n": 72,
+      "value_lci": 5.03996647583,
+      "value_uci": 7.94470439884,
+      "segment_id": 6,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "value": 6.67490729295,
+      "n": 54,
+      "value_lci": 4.95139145622,
+      "value_uci": 8.39842312969,
+      "segment_id": 6,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "value": 6,
+      "n": 18,
+      "value_lci": 3.29720235931,
+      "value_uci": 8.70279764069,
+      "segment_id": 6,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "value": 7.75473399459,
+      "n": 86,
+      "value_lci": 6.17818172121,
+      "value_uci": 9.33128626797,
+      "segment_id": 7,
+      "year": 2005,
+      "sex_id": 0
+    },
+    {
+      "value": 6.05686032138,
+      "n": 49,
+      "value_lci": 4.40964733037,
+      "value_uci": 7.7040733124,
+      "segment_id": 7,
+      "year": 2005,
+      "sex_id": 1
+    },
+    {
+      "value": 12.3333333333,
+      "n": 37,
+      "value_lci": 8.59109484836,
+      "value_uci": 16.0755718183,
+      "segment_id": 7,
+      "year": 2005,
+      "sex_id": 2
+    },
+    {
+      "value": 15.9380692168,
+      "n": 175,
+      "value_lci": 13.7696575156,
+      "value_uci": 18.1064809179,
+      "segment_id": 1,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "value": 10.9090909091,
+      "n": 84,
+      "value_lci": 8.70220453707,
+      "value_uci": 13.1159772811,
+      "segment_id": 1,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "value": 27.743902439,
+      "n": 91,
+      "value_lci": 22.8730427131,
+      "value_uci": 32.6147621649,
+      "segment_id": 1,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "value": 26.1384335155,
+      "n": 287,
+      "value_lci": 23.5354390617,
+      "value_uci": 28.7414279693,
+      "segment_id": 2,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "value": 29.7402597403,
+      "n": 229,
+      "value_lci": 26.504363066,
+      "value_uci": 32.9761564145,
+      "segment_id": 2,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "value": 17.6829268293,
+      "n": 58,
+      "value_lci": 13.5323674408,
+      "value_uci": 21.8334862177,
+      "segment_id": 2,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "value": 4.73588342441,
+      "n": 52,
+      "value_lci": 3.47756840227,
+      "value_uci": 5.99419844655,
+      "segment_id": 3,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "value": 2.85714285714,
+      "n": 22,
+      "value_lci": 1.67779910318,
+      "value_uci": 4.03648661111,
+      "segment_id": 3,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "value": 9.14634146341,
+      "n": 30,
+      "value_lci": 6.01031648704,
+      "value_uci": 12.2823664398,
+      "segment_id": 3,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "value": 23.5883424408,
+      "n": 259,
+      "value_lci": 21.073257078,
+      "value_uci": 26.1034278036,
+      "segment_id": 4,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "value": 32.0779220779,
+      "n": 247,
+      "value_lci": 28.7736363618,
+      "value_uci": 35.382207794,
+      "segment_id": 4,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "value": 3.65853658537,
+      "n": 12,
+      "value_lci": 1.61611722839,
+      "value_uci": 5.70095594235,
+      "segment_id": 4,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "value": 13.9344262295,
+      "n": 153,
+      "value_lci": 11.882869706,
+      "value_uci": 15.9859827531,
+      "segment_id": 5,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "value": 11.4285714286,
+      "n": 88,
+      "value_lci": 9.17634632253,
+      "value_uci": 13.6807965346,
+      "segment_id": 5,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "value": 19.8170731707,
+      "n": 65,
+      "value_lci": 15.4805137053,
+      "value_uci": 24.1536326361,
+      "segment_id": 5,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "value": 5.37340619308,
+      "n": 59,
+      "value_lci": 4.03756249224,
+      "value_uci": 6.70924989392,
+      "segment_id": 6,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "value": 4.67532467532,
+      "n": 36,
+      "value_lci": 3.1808878791,
+      "value_uci": 6.16976147155,
+      "segment_id": 6,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "value": 7.01219512195,
+      "n": 23,
+      "value_lci": 4.23424405678,
+      "value_uci": 9.79014618712,
+      "segment_id": 6,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "value": 10.29143898,
+      "n": 113,
+      "value_lci": 8.49141121399,
+      "value_uci": 12.0914667459,
+      "segment_id": 7,
+      "year": 2006,
+      "sex_id": 0
+    },
+    {
+      "value": 8.31168831169,
+      "n": 64,
+      "value_lci": 6.35748110987,
+      "value_uci": 10.2658955135,
+      "segment_id": 7,
+      "year": 2006,
+      "sex_id": 1
+    },
+    {
+      "value": 14.9390243902,
+      "n": 49,
+      "value_lci": 11.0609967946,
+      "value_uci": 18.8170519859,
+      "segment_id": 7,
+      "year": 2006,
+      "sex_id": 2
+    },
+    {
+      "value": 14.6797153025,
+      "n": 165,
+      "value_lci": 12.6076115279,
+      "value_uci": 16.7518190771,
+      "segment_id": 1,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "value": 10.1965601966,
+      "n": 83,
+      "value_lci": 8.11339757284,
+      "value_uci": 12.2797228203,
+      "segment_id": 1,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "value": 26.4516129032,
+      "n": 82,
+      "value_lci": 21.514354294,
+      "value_uci": 31.3888715125,
+      "segment_id": 1,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "value": 26.6903914591,
+      "n": 300,
+      "value_lci": 24.1004827302,
+      "value_uci": 29.280300188,
+      "segment_id": 2,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "value": 29.2383292383,
+      "n": 238,
+      "value_lci": 26.1070257603,
+      "value_uci": 32.3696327164,
+      "segment_id": 2,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "value": 20,
+      "n": 62,
+      "value_lci": 15.5225245711,
+      "value_uci": 24.4774754289,
+      "segment_id": 2,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "value": 5.78291814947,
+      "n": 65,
+      "value_lci": 4.41624429998,
+      "value_uci": 7.14959199896,
+      "segment_id": 3,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "value": 4.05405405405,
+      "n": 33,
+      "value_lci": 2.6963412083,
+      "value_uci": 5.41176689981,
+      "segment_id": 3,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "value": 10.3225806452,
+      "n": 32,
+      "value_lci": 6.91686085323,
+      "value_uci": 13.7283004371,
+      "segment_id": 3,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "value": 23.487544484,
+      "n": 264,
+      "value_lci": 21.0054894018,
+      "value_uci": 25.9695995662,
+      "segment_id": 4,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "value": 31.5724815725,
+      "n": 257,
+      "value_lci": 28.3727054048,
+      "value_uci": 34.7722577401,
+      "segment_id": 4,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "value": 2.25806451613,
+      "n": 7,
+      "value_lci": 0.595104296732,
+      "value_uci": 3.92102473553,
+      "segment_id": 4,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "value": 13.8790035587,
+      "n": 156,
+      "value_lci": 11.8547719415,
+      "value_uci": 15.9032351759,
+      "segment_id": 5,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "value": 11.1793611794,
+      "n": 91,
+      "value_lci": 9.0100828141,
+      "value_uci": 13.3486395446,
+      "segment_id": 5,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "value": 20.9677419355,
+      "n": 65,
+      "value_lci": 16.4110334393,
+      "value_uci": 25.5244504317,
+      "segment_id": 5,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "value": 4.35943060498,
+      "n": 49,
+      "value_lci": 3.16389504499,
+      "value_uci": 5.55496616497,
+      "segment_id": 6,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "value": 4.54545454545,
+      "n": 37,
+      "value_lci": 3.1114952896,
+      "value_uci": 5.97941380131,
+      "segment_id": 6,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "value": 3.87096774194,
+      "n": 12,
+      "value_lci": 1.71168118418,
+      "value_uci": 6.03025429969,
+      "segment_id": 6,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "value": 11.1209964413,
+      "n": 125,
+      "value_lci": 9.28023301533,
+      "value_uci": 12.9617598672,
+      "segment_id": 7,
+      "year": 2007,
+      "sex_id": 0
+    },
+    {
+      "value": 9.21375921376,
+      "n": 75,
+      "value_lci": 7.22272698021,
+      "value_uci": 11.2047914473,
+      "segment_id": 7,
+      "year": 2007,
+      "sex_id": 1
+    },
+    {
+      "value": 16.1290322581,
+      "n": 50,
+      "value_lci": 12.0120101205,
+      "value_uci": 20.2460543956,
+      "segment_id": 7,
+      "year": 2007,
+      "sex_id": 2
+    },
+    {
+      "value": 13.3962264151,
+      "n": 142,
+      "value_lci": 11.3424346815,
+      "value_uci": 15.4500181487,
+      "segment_id": 1,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "value": 10.4913678619,
+      "n": 79,
+      "value_lci": 8.2976173208,
+      "value_uci": 12.685118403,
+      "segment_id": 1,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "value": 20.5211726384,
+      "n": 63,
+      "value_lci": 15.9782504294,
+      "value_uci": 25.0640948474,
+      "segment_id": 1,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "value": 28.4905660377,
+      "n": 302,
+      "value_lci": 25.7689367924,
+      "value_uci": 31.212195283,
+      "segment_id": 2,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "value": 32.1381142098,
+      "n": 242,
+      "value_lci": 28.79491789,
+      "value_uci": 35.4813105297,
+      "segment_id": 2,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "value": 19.5439739414,
+      "n": 60,
+      "value_lci": 15.0833643474,
+      "value_uci": 24.0045835353,
+      "segment_id": 2,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "value": 6.88679245283,
+      "n": 73,
+      "value_lci": 5.35989139804,
+      "value_uci": 8.41369350762,
+      "segment_id": 3,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "value": 3.85126162019,
+      "n": 29,
+      "value_lci": 2.4736968454,
+      "value_uci": 5.22882639497,
+      "segment_id": 3,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "value": 14.332247557,
+      "n": 44,
+      "value_lci": 10.3906314424,
+      "value_uci": 18.2738636716,
+      "segment_id": 3,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "value": 22.5471698113,
+      "n": 239,
+      "value_lci": 20.0273968131,
+      "value_uci": 25.0669428096,
+      "segment_id": 4,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "value": 30.6772908367,
+      "n": 231,
+      "value_lci": 27.3759908627,
+      "value_uci": 33.9785908106,
+      "segment_id": 4,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "value": 2.60586319218,
+      "n": 8,
+      "value_lci": 0.813810810349,
+      "value_uci": 4.39791557402,
+      "segment_id": 4,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "value": 13.4905660377,
+      "n": 143,
+      "value_lci": 11.430678191,
+      "value_uci": 15.5504538845,
+      "segment_id": 5,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "value": 10.6241699867,
+      "n": 80,
+      "value_lci": 8.41821689787,
+      "value_uci": 12.8301230756,
+      "segment_id": 5,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "value": 20.5211726384,
+      "n": 63,
+      "value_lci": 15.9782504294,
+      "value_uci": 25.0640948474,
+      "segment_id": 5,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "value": 6.88679245283,
+      "n": 73,
+      "value_lci": 5.35989139804,
+      "value_uci": 8.41369350762,
+      "segment_id": 6,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "value": 5.17928286853,
+      "n": 39,
+      "value_lci": 3.59283737119,
+      "value_uci": 6.76572836586,
+      "segment_id": 6,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "value": 11.0749185668,
+      "n": 34,
+      "value_lci": 7.54478697835,
+      "value_uci": 14.6050501552,
+      "segment_id": 6,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "value": 8.30188679245,
+      "n": 88,
+      "value_lci": 6.63822379522,
+      "value_uci": 9.96554978969,
+      "segment_id": 7,
+      "year": 2008,
+      "sex_id": 0
+    },
+    {
+      "value": 7.0385126162,
+      "n": 53,
+      "value_lci": 5.20733402678,
+      "value_uci": 8.86969120563,
+      "segment_id": 7,
+      "year": 2008,
+      "sex_id": 1
+    },
+    {
+      "value": 11.4006514658,
+      "n": 35,
+      "value_lci": 7.82554823521,
+      "value_uci": 14.9757546964,
+      "segment_id": 7,
+      "year": 2008,
+      "sex_id": 2
+    },
+    {
+      "value": 13.5746606335,
+      "n": 150,
+      "value_lci": 11.5519908794,
+      "value_uci": 15.5973303876,
+      "segment_id": 1,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "value": 10.2781136638,
+      "n": 85,
+      "value_lci": 8.20415159281,
+      "value_uci": 12.3520757349,
+      "segment_id": 1,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "value": 23.381294964,
+      "n": 65,
+      "value_lci": 18.3750560795,
+      "value_uci": 28.3875338485,
+      "segment_id": 1,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "value": 29.6832579186,
+      "n": 328,
+      "value_lci": 26.9853625893,
+      "value_uci": 32.3811532478,
+      "segment_id": 2,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "value": 30.9552599758,
+      "n": 256,
+      "value_lci": 27.7978757788,
+      "value_uci": 34.1126441729,
+      "segment_id": 2,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "value": 25.8992805755,
+      "n": 72,
+      "value_lci": 20.7176678872,
+      "value_uci": 31.0808932639,
+      "segment_id": 2,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "value": 4.34389140271,
+      "n": 48,
+      "value_lci": 3.14014285176,
+      "value_uci": 5.54763995367,
+      "segment_id": 3,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "value": 3.26481257557,
+      "n": 27,
+      "value_lci": 2.05109883194,
+      "value_uci": 4.47852631921,
+      "segment_id": 3,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "value": 7.55395683453,
+      "n": 21,
+      "value_lci": 4.42829997854,
+      "value_uci": 10.6796136905,
+      "segment_id": 3,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "value": 22.8959276018,
+      "n": 253,
+      "value_lci": 20.4147507373,
+      "value_uci": 25.3771044663,
+      "segment_id": 4,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "value": 29.746070133,
+      "n": 246,
+      "value_lci": 26.6239830396,
+      "value_uci": 32.8681572264,
+      "segment_id": 4,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "value": 2.51798561151,
+      "n": 7,
+      "value_lci": 0.664886044604,
+      "value_uci": 4.37108517842,
+      "segment_id": 4,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "value": 14.0271493213,
+      "n": 155,
+      "value_lci": 11.9764342805,
+      "value_uci": 16.0778643621,
+      "segment_id": 5,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "value": 11.9709794438,
+      "n": 99,
+      "value_lci": 9.75394377082,
+      "value_uci": 14.1880151167,
+      "segment_id": 5,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "value": 20.1438848921,
+      "n": 56,
+      "value_lci": 15.399984191,
+      "value_uci": 24.8877855932,
+      "segment_id": 5,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "value": 5.24886877828,
+      "n": 58,
+      "value_lci": 3.931931769,
+      "value_uci": 6.56580578756,
+      "segment_id": 6,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "value": 5.19951632406,
+      "n": 43,
+      "value_lci": 3.68322847992,
+      "value_uci": 6.7158041682,
+      "segment_id": 6,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "value": 5.39568345324,
+      "n": 15,
+      "value_lci": 2.72336264789,
+      "value_uci": 8.06800425858,
+      "segment_id": 6,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "value": 10.2262443439,
+      "n": 113,
+      "value_lci": 8.4369873527,
+      "value_uci": 12.0155013351,
+      "segment_id": 7,
+      "year": 2009,
+      "sex_id": 0
+    },
+    {
+      "value": 8.58524788392,
+      "n": 71,
+      "value_lci": 6.67196376676,
+      "value_uci": 10.4985320011,
+      "segment_id": 7,
+      "year": 2009,
+      "sex_id": 1
+    },
+    {
+      "value": 15.1079136691,
+      "n": 42,
+      "value_lci": 10.8720133087,
+      "value_uci": 19.3438140294,
+      "segment_id": 7,
+      "year": 2009,
+      "sex_id": 2
+    },
+    {
+      "value": 16.3346613546,
+      "n": 164,
+      "value_lci": 14.0440581353,
+      "value_uci": 18.6252645739,
+      "segment_id": 1,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "value": 11.3416320885,
+      "n": 82,
+      "value_lci": 9.02474014609,
+      "value_uci": 13.6585240309,
+      "segment_id": 1,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "value": 29.1814946619,
+      "n": 82,
+      "value_lci": 23.8336660467,
+      "value_uci": 34.5293232771,
+      "segment_id": 1,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "value": 28.187250996,
+      "n": 283,
+      "value_lci": 25.3995310027,
+      "value_uci": 30.9749709893,
+      "segment_id": 2,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "value": 30.5670816044,
+      "n": 221,
+      "value_lci": 27.2010527568,
+      "value_uci": 33.933110452,
+      "segment_id": 2,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "value": 22.0640569395,
+      "n": 62,
+      "value_lci": 17.1858309177,
+      "value_uci": 26.9422829613,
+      "segment_id": 2,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "value": 4.18326693227,
+      "n": 42,
+      "value_lci": 2.94275632856,
+      "value_uci": 5.42377753599,
+      "segment_id": 3,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "value": 2.90456431535,
+      "n": 21,
+      "value_lci": 1.67755448634,
+      "value_uci": 4.13157414436,
+      "segment_id": 3,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "value": 7.47330960854,
+      "n": 21,
+      "value_lci": 4.3798792901,
+      "value_uci": 10.566739927,
+      "segment_id": 3,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "value": 22.1115537849,
+      "n": 222,
+      "value_lci": 19.5401625247,
+      "value_uci": 24.682945045,
+      "segment_id": 4,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "value": 29.4605809129,
+      "n": 213,
+      "value_lci": 26.1298102712,
+      "value_uci": 32.7913515545,
+      "segment_id": 4,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "value": 3.20284697509,
+      "n": 9,
+      "value_lci": 1.13151493484,
+      "value_uci": 5.27417901534,
+      "segment_id": 4,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "value": 12.5498007968,
+      "n": 126,
+      "value_lci": 10.497122785,
+      "value_uci": 14.6024788087,
+      "segment_id": 5,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "value": 9.26694329184,
+      "n": 67,
+      "value_lci": 7.14829357532,
+      "value_uci": 11.3855930084,
+      "segment_id": 5,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "value": 20.9964412811,
+      "n": 59,
+      "value_lci": 16.2052169076,
+      "value_uci": 25.7876656547,
+      "segment_id": 5,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "value": 5.97609561753,
+      "n": 60,
+      "value_lci": 4.5073387102,
+      "value_uci": 7.44485252486,
+      "segment_id": 6,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "value": 6.50069156293,
+      "n": 47,
+      "value_lci": 4.69936640246,
+      "value_uci": 8.3020167234,
+      "segment_id": 6,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "value": 4.62633451957,
+      "n": 13,
+      "value_lci": 2.15527566412,
+      "value_uci": 7.09739337503,
+      "segment_id": 6,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "value": 10.6573705179,
+      "n": 107,
+      "value_lci": 8.74542104911,
+      "value_uci": 12.5693199867,
+      "segment_id": 7,
+      "year": 2010,
+      "sex_id": 0
+    },
+    {
+      "value": 9.95850622407,
+      "n": 72,
+      "value_lci": 7.77061069534,
+      "value_uci": 12.1464017528,
+      "segment_id": 7,
+      "year": 2010,
+      "sex_id": 1
+    },
+    {
+      "value": 12.4555160142,
+      "n": 35,
+      "value_lci": 8.57092239854,
+      "value_uci": 16.3401096299,
+      "segment_id": 7,
+      "year": 2010,
+      "sex_id": 2
+    },
+    {
+      "value": 13.829787234,
+      "n": 143,
+      "value_lci": 11.7221618887,
+      "value_uci": 15.9374125793,
+      "segment_id": 1,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "value": 10.8322324967,
+      "n": 82,
+      "value_lci": 8.6132903734,
+      "value_uci": 13.05117462,
+      "segment_id": 1,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "value": 22.0216606498,
+      "n": 61,
+      "value_lci": 17.1112913338,
+      "value_uci": 26.9320299659,
+      "segment_id": 1,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "value": 33.1721470019,
+      "n": 343,
+      "value_lci": 30.2975787448,
+      "value_uci": 36.0467152591,
+      "segment_id": 2,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "value": 35.9313077939,
+      "n": 272,
+      "value_lci": 32.5056617811,
+      "value_uci": 39.3569538068,
+      "segment_id": 2,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "value": 25.6317689531,
+      "n": 71,
+      "value_lci": 20.4582606702,
+      "value_uci": 30.8052772359,
+      "segment_id": 2,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "value": 5.02901353965,
+      "n": 52,
+      "value_lci": 3.69474281416,
+      "value_uci": 6.36328426515,
+      "segment_id": 3,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "value": 3.30250990753,
+      "n": 25,
+      "value_lci": 2.02662145478,
+      "value_uci": 4.57839836027,
+      "segment_id": 3,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "value": 9.74729241877,
+      "n": 27,
+      "value_lci": 6.23270580474,
+      "value_uci": 13.2618790328,
+      "segment_id": 3,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "value": 20.3094777563,
+      "n": 210,
+      "value_lci": 17.8532999941,
+      "value_uci": 22.7656555185,
+      "segment_id": 4,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "value": 25.6274768824,
+      "n": 194,
+      "value_lci": 22.5104379664,
+      "value_uci": 28.7445157985,
+      "segment_id": 4,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "value": 5.7761732852,
+      "n": 16,
+      "value_lci": 3.01176230578,
+      "value_uci": 8.54058426462,
+      "segment_id": 4,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "value": 12.3791102515,
+      "n": 128,
+      "value_lci": 10.3683716036,
+      "value_uci": 14.3898488993,
+      "segment_id": 5,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "value": 9.77542932629,
+      "n": 74,
+      "value_lci": 7.65505091511,
+      "value_uci": 11.8958077375,
+      "segment_id": 5,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "value": 19.4945848375,
+      "n": 54,
+      "value_lci": 14.8002758132,
+      "value_uci": 24.1888938619,
+      "segment_id": 5,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "value": 6.57640232108,
+      "n": 68,
+      "value_lci": 5.06308653869,
+      "value_uci": 8.08971810347,
+      "segment_id": 6,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "value": 6.34081902246,
+      "n": 48,
+      "value_lci": 4.6008925399,
+      "value_uci": 8.08074550501,
+      "segment_id": 6,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "value": 7.2202166065,
+      "n": 20,
+      "value_lci": 4.15328618288,
+      "value_uci": 10.2871470301,
+      "segment_id": 6,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "value": 8.70406189555,
+      "n": 90,
+      "value_lci": 6.98301068283,
+      "value_uci": 10.4251131083,
+      "segment_id": 7,
+      "year": 2011,
+      "sex_id": 0
+    },
+    {
+      "value": 8.19022457067,
+      "n": 62,
+      "value_lci": 6.23239263152,
+      "value_uci": 10.1480565098,
+      "segment_id": 7,
+      "year": 2011,
+      "sex_id": 1
+    },
+    {
+      "value": 10.1083032491,
+      "n": 28,
+      "value_lci": 6.53638876008,
+      "value_uci": 13.6802177381,
+      "segment_id": 7,
+      "year": 2011,
+      "sex_id": 2
+    },
+    {
+      "value": 12.7290260366,
+      "n": 132,
+      "value_lci": 10.6970976985,
+      "value_uci": 14.7609543748,
+      "segment_id": 1,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "value": 10.5053191489,
+      "n": 79,
+      "value_lci": 8.30881592827,
+      "value_uci": 12.7018223696,
+      "segment_id": 1,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "value": 18.5964912281,
+      "n": 53,
+      "value_lci": 14.0520478361,
+      "value_uci": 23.1409346201,
+      "segment_id": 1,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "value": 31.1475409836,
+      "n": 323,
+      "value_lci": 28.3243029303,
+      "value_uci": 33.9707790369,
+      "segment_id": 2,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "value": 32.3138297872,
+      "n": 243,
+      "value_lci": 28.9636138937,
+      "value_uci": 35.6640456808,
+      "segment_id": 2,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "value": 28.0701754386,
+      "n": 80,
+      "value_lci": 22.8218507517,
+      "value_uci": 33.3185001255,
+      "segment_id": 2,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "value": 4.53230472517,
+      "n": 47,
+      "value_lci": 3.264175071,
+      "value_uci": 5.80043437934,
+      "segment_id": 3,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "value": 1.99468085106,
+      "n": 15,
+      "value_lci": 0.993090481472,
+      "value_uci": 2.99627122066,
+      "segment_id": 3,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "value": 11.2280701754,
+      "n": 32,
+      "value_lci": 7.54055326596,
+      "value_uci": 14.9155870849,
+      "segment_id": 3,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "value": 19.768563163,
+      "n": 205,
+      "value_lci": 17.3406355987,
+      "value_uci": 22.1964907273,
+      "segment_id": 4,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "value": 26.5957446809,
+      "n": 200,
+      "value_lci": 23.4305873433,
+      "value_uci": 29.7609020184,
+      "segment_id": 4,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "value": 1.75438596491,
+      "n": 5,
+      "value_lci": 0.220960085236,
+      "value_uci": 3.28781184459,
+      "segment_id": 4,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "value": 11.5718418515,
+      "n": 120,
+      "value_lci": 9.62167206885,
+      "value_uci": 13.5220116341,
+      "segment_id": 5,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "value": 9.3085106383,
+      "n": 70,
+      "value_lci": 7.22712777778,
+      "value_uci": 11.3898934988,
+      "segment_id": 5,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "value": 17.5438596491,
+      "n": 50,
+      "value_lci": 13.1014592033,
+      "value_uci": 21.9862600949,
+      "segment_id": 5,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "value": 6.9431051109,
+      "n": 72,
+      "value_lci": 5.39347860266,
+      "value_uci": 8.49273161913,
+      "segment_id": 6,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "value": 6.25,
+      "n": 47,
+      "value_lci": 4.5159793938,
+      "value_uci": 7.9840206062,
+      "segment_id": 6,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "value": 8.77192982456,
+      "n": 25,
+      "value_lci": 5.46781258401,
+      "value_uci": 12.0760470651,
+      "segment_id": 6,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "value": 13.3076181292,
+      "n": 138,
+      "value_lci": 11.2369212876,
+      "value_uci": 15.3783149709,
+      "segment_id": 7,
+      "year": 2012,
+      "sex_id": 0
+    },
+    {
+      "value": 13.0319148936,
+      "n": 98,
+      "value_lci": 10.6202737825,
+      "value_uci": 15.4435560047,
+      "segment_id": 7,
+      "year": 2012,
+      "sex_id": 1
+    },
+    {
+      "value": 14.0350877193,
+      "n": 40,
+      "value_lci": 9.97802418773,
+      "value_uci": 18.0921512509,
+      "segment_id": 7,
+      "year": 2012,
+      "sex_id": 2
+    },
+    {
+      "value": 14.3925233645,
+      "n": 154,
+      "value_lci": 12.2859550255,
+      "value_uci": 16.4990917034,
+      "segment_id": 1,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "value": 10.3053435115,
+      "n": 81,
+      "value_lci": 8.17525373865,
+      "value_uci": 12.4354332842,
+      "segment_id": 1,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "value": 25.7042253521,
+      "n": 73,
+      "value_lci": 20.5909348395,
+      "value_uci": 30.8175158647,
+      "segment_id": 1,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "value": 30.0934579439,
+      "n": 322,
+      "value_lci": 27.3408383935,
+      "value_uci": 32.8460774943,
+      "segment_id": 2,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "value": 32.0610687023,
+      "n": 252,
+      "value_lci": 28.7911892804,
+      "value_uci": 35.3309481242,
+      "segment_id": 2,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "value": 24.6478873239,
+      "n": 70,
+      "value_lci": 19.6052966424,
+      "value_uci": 29.6904780055,
+      "segment_id": 2,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "value": 5.42056074766,
+      "n": 58,
+      "value_lci": 4.06171015425,
+      "value_uci": 6.77941134108,
+      "segment_id": 3,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "value": 3.94402035623,
+      "n": 31,
+      "value_lci": 2.58033190682,
+      "value_uci": 5.30770880565,
+      "segment_id": 3,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "value": 9.50704225352,
+      "n": 27,
+      "value_lci": 6.07505035504,
+      "value_uci": 12.939034152,
+      "segment_id": 3,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "value": 20.7476635514,
+      "n": 222,
+      "value_lci": 18.3141046141,
+      "value_uci": 23.1812224887,
+      "segment_id": 4,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "value": 27.0992366412,
+      "n": 213,
+      "value_lci": 23.9851696436,
+      "value_uci": 30.2133036389,
+      "segment_id": 4,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "value": 3.16901408451,
+      "n": 9,
+      "value_lci": 1.11933715966,
+      "value_uci": 5.21869100935,
+      "segment_id": 4,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "value": 12.0560747664,
+      "n": 129,
+      "value_lci": 10.1019282526,
+      "value_uci": 14.0102212802,
+      "segment_id": 5,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "value": 10.6870229008,
+      "n": 84,
+      "value_lci": 8.52246584275,
+      "value_uci": 12.8515799588,
+      "segment_id": 5,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "value": 15.8450704225,
+      "n": 45,
+      "value_lci": 11.572364353,
+      "value_uci": 20.117776492,
+      "segment_id": 5,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "value": 5.14018691589,
+      "n": 55,
+      "value_lci": 3.81498571364,
+      "value_uci": 6.46538811813,
+      "segment_id": 6,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "value": 4.83460559796,
+      "n": 38,
+      "value_lci": 3.33179781182,
+      "value_uci": 6.33741338411,
+      "segment_id": 6,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "value": 5.98591549296,
+      "n": 17,
+      "value_lci": 3.21018113186,
+      "value_uci": 8.76164985406,
+      "segment_id": 6,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "value": 12.1495327103,
+      "n": 130,
+      "value_lci": 10.1888692362,
+      "value_uci": 14.1101961844,
+      "segment_id": 7,
+      "year": 2013,
+      "sex_id": 0
+    },
+    {
+      "value": 11.0687022901,
+      "n": 87,
+      "value_lci": 8.87054354169,
+      "value_uci": 13.2668610385,
+      "segment_id": 7,
+      "year": 2013,
+      "sex_id": 1
+    },
+    {
+      "value": 15.1408450704,
+      "n": 43,
+      "value_lci": 10.9467278981,
+      "value_uci": 19.3349622428,
+      "segment_id": 7,
+      "year": 2013,
+      "sex_id": 2
+    },
+    {
+      "value": 13.4241245136,
+      "n": 138,
+      "value_lci": 11.3366728511,
+      "value_uci": 15.5115761762,
+      "segment_id": 1,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "value": 9.15119363395,
+      "n": 69,
+      "value_lci": 7.08843833747,
+      "value_uci": 11.2139489304,
+      "segment_id": 1,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "value": 25.1824817518,
+      "n": 69,
+      "value_lci": 20.0106155359,
+      "value_uci": 30.3543479678,
+      "segment_id": 1,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "value": 29.3774319066,
+      "n": 302,
+      "value_lci": 26.5883988419,
+      "value_uci": 32.1664649713,
+      "segment_id": 2,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "value": 31.5649867374,
+      "n": 238,
+      "value_lci": 28.2399901099,
+      "value_uci": 34.8899833649,
+      "segment_id": 2,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "value": 23.3576642336,
+      "n": 64,
+      "value_lci": 18.3163305907,
+      "value_uci": 28.3989978764,
+      "segment_id": 2,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "value": 5.05836575875,
+      "n": 52,
+      "value_lci": 3.71650188189,
+      "value_uci": 6.40022963562,
+      "segment_id": 3,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "value": 3.71352785146,
+      "n": 28,
+      "value_lci": 2.36075398169,
+      "value_uci": 5.06630172122,
+      "segment_id": 3,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "value": 8.75912408759,
+      "n": 24,
+      "value_lci": 5.39074136187,
+      "value_uci": 12.1275068133,
+      "segment_id": 3,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "value": 18.1906614786,
+      "n": 187,
+      "value_lci": 15.8285484105,
+      "value_uci": 20.5527745467,
+      "segment_id": 4,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "value": 24.1379310345,
+      "n": 182,
+      "value_lci": 21.0765908788,
+      "value_uci": 27.1992711902,
+      "segment_id": 4,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "value": 1.82481751825,
+      "n": 5,
+      "value_lci": 0.23001486894,
+      "value_uci": 3.41962016756,
+      "segment_id": 4,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "value": 13.326848249,
+      "n": 137,
+      "value_lci": 11.2458054276,
+      "value_uci": 15.4078910704,
+      "segment_id": 5,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "value": 11.5384615385,
+      "n": 87,
+      "value_lci": 9.25286050857,
+      "value_uci": 13.8240625683,
+      "segment_id": 5,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "value": 18.2481751825,
+      "n": 50,
+      "value_lci": 13.6460882556,
+      "value_uci": 22.8502621093,
+      "segment_id": 5,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "value": 6.12840466926,
+      "n": 63,
+      "value_lci": 4.6597631136,
+      "value_uci": 7.59704622492,
+      "segment_id": 6,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "value": 5.96816976127,
+      "n": 45,
+      "value_lci": 4.27341347193,
+      "value_uci": 7.66292605062,
+      "segment_id": 6,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "value": 6.56934306569,
+      "n": 18,
+      "value_lci": 3.61744034379,
+      "value_uci": 9.5212457876,
+      "segment_id": 6,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "value": 14.4941634241,
+      "n": 149,
+      "value_lci": 12.338557081,
+      "value_uci": 16.6497697672,
+      "segment_id": 7,
+      "year": 2014,
+      "sex_id": 0
+    },
+    {
+      "value": 13.925729443,
+      "n": 105,
+      "value_lci": 11.4489069801,
+      "value_uci": 16.4025519058,
+      "segment_id": 7,
+      "year": 2014,
+      "sex_id": 1
+    },
+    {
+      "value": 16.0583941606,
+      "n": 44,
+      "value_lci": 11.683817188,
+      "value_uci": 20.4329711331,
+      "segment_id": 7,
+      "year": 2014,
+      "sex_id": 2
+    },
+    {
+      "value": 12.324929972,
+      "n": 132,
+      "value_lci": 10.3530611165,
+      "value_uci": 14.2967988275,
+      "segment_id": 1,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "value": 9.09090909091,
+      "n": 72,
+      "value_lci": 7.08444126603,
+      "value_uci": 11.0973769158,
+      "segment_id": 1,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "value": 21.5053763441,
+      "n": 60,
+      "value_lci": 16.6545693398,
+      "value_uci": 26.3561833484,
+      "segment_id": 1,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "value": 31.746031746,
+      "n": 340,
+      "value_lci": 28.9537681589,
+      "value_uci": 34.5382953332,
+      "segment_id": 2,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "value": 34.595959596,
+      "n": 274,
+      "value_lci": 31.2759459805,
+      "value_uci": 37.9159732114,
+      "segment_id": 2,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "value": 23.6559139785,
+      "n": 66,
+      "value_lci": 18.6385214025,
+      "value_uci": 28.6733065545,
+      "segment_id": 2,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "value": 4.38842203548,
+      "n": 47,
+      "value_lci": 3.15969002308,
+      "value_uci": 5.61715404788,
+      "segment_id": 3,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "value": 3.28282828283,
+      "n": 26,
+      "value_lci": 2.03917087156,
+      "value_uci": 4.5264856941,
+      "segment_id": 3,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "value": 7.52688172043,
+      "n": 21,
+      "value_lci": 4.41204121429,
+      "value_uci": 10.6417222266,
+      "segment_id": 3,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "value": 19.7012138189,
+      "n": 211,
+      "value_lci": 17.3153331458,
+      "value_uci": 22.0870944919,
+      "segment_id": 4,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "value": 25.8838383838,
+      "n": 205,
+      "value_lci": 22.8268366529,
+      "value_uci": 28.9408401147,
+      "segment_id": 4,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "value": 2.15053763441,
+      "n": 6,
+      "value_lci": 0.43786932373,
+      "value_uci": 3.86320594509,
+      "segment_id": 4,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "value": 13.6321195145,
+      "n": 146,
+      "value_lci": 11.5738342724,
+      "value_uci": 15.6904047565,
+      "segment_id": 5,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "value": 12.1212121212,
+      "n": 96,
+      "value_lci": 9.84328439984,
+      "value_uci": 14.3991398426,
+      "segment_id": 5,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "value": 17.9211469534,
+      "n": 50,
+      "value_lci": 13.3930151807,
+      "value_uci": 22.4492787261,
+      "segment_id": 5,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "value": 6.34920634921,
+      "n": 68,
+      "value_lci": 4.88647964967,
+      "value_uci": 7.81193304875,
+      "segment_id": 6,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "value": 6.18686868687,
+      "n": 49,
+      "value_lci": 4.5053869666,
+      "value_uci": 7.86835040713,
+      "segment_id": 6,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "value": 6.81003584229,
+      "n": 19,
+      "value_lci": 3.83576997034,
+      "value_uci": 9.78430171425,
+      "segment_id": 6,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "value": 11.858076564,
+      "n": 127,
+      "value_lci": 9.91877153562,
+      "value_uci": 13.7973815923,
+      "segment_id": 7,
+      "year": 2015,
+      "sex_id": 0
+    },
+    {
+      "value": 8.83838383838,
+      "n": 70,
+      "value_lci": 6.85723400495,
+      "value_uci": 10.8195336718,
+      "segment_id": 7,
+      "year": 2015,
+      "sex_id": 1
+    },
+    {
+      "value": 20.4301075269,
+      "n": 57,
+      "value_lci": 15.669852411,
+      "value_uci": 25.1903626428,
+      "segment_id": 7,
+      "year": 2015,
+      "sex_id": 2
+    },
+    {
+      "value": 12.5,
+      "n": 127,
+      "value_lci": 10.4629940963,
+      "value_uci": 14.5370059037,
+      "segment_id": 1,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "value": 10.0131752306,
+      "n": 76,
+      "value_lci": 7.87283472182,
+      "value_uci": 12.1535157393,
+      "segment_id": 1,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "value": 19.8443579767,
+      "n": 51,
+      "value_lci": 14.935598927,
+      "value_uci": 24.7531170263,
+      "segment_id": 1,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "value": 30.7086614173,
+      "n": 312,
+      "value_lci": 27.8674524723,
+      "value_uci": 33.5498703623,
+      "segment_id": 2,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "value": 32.0158102767,
+      "n": 243,
+      "value_lci": 28.6892629173,
+      "value_uci": 35.3423576361,
+      "segment_id": 2,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "value": 26.8482490272,
+      "n": 69,
+      "value_lci": 21.393729678,
+      "value_uci": 32.3027683765,
+      "segment_id": 2,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "value": 3.83858267717,
+      "n": 39,
+      "value_lci": 2.65521655471,
+      "value_uci": 5.02194879962,
+      "segment_id": 3,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "value": 2.63504611331,
+      "n": 20,
+      "value_lci": 1.49294924624,
+      "value_uci": 3.77714298037,
+      "segment_id": 3,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "value": 7.39299610895,
+      "n": 19,
+      "value_lci": 4.17253324386,
+      "value_uci": 10.613458974,
+      "segment_id": 3,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "value": 20.8661417323,
+      "n": 212,
+      "value_lci": 18.3632878183,
+      "value_uci": 23.3689956463,
+      "segment_id": 4,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "value": 27.0092226614,
+      "n": 205,
+      "value_lci": 23.8433201595,
+      "value_uci": 30.1751251633,
+      "segment_id": 4,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "value": 2.72373540856,
+      "n": 7,
+      "value_lci": 0.720315242252,
+      "value_uci": 4.72715557487,
+      "segment_id": 4,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "value": 12.8937007874,
+      "n": 131,
+      "value_lci": 10.8295242853,
+      "value_uci": 14.9578772895,
+      "segment_id": 5,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "value": 10.1449275362,
+      "n": 77,
+      "value_lci": 7.99212957686,
+      "value_uci": 12.2977254956,
+      "segment_id": 5,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "value": 21.0116731518,
+      "n": 54,
+      "value_lci": 15.9975162974,
+      "value_uci": 26.0258300061,
+      "segment_id": 5,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "value": 7.38188976378,
+      "n": 75,
+      "value_lci": 5.77137396271,
+      "value_uci": 8.99240556485,
+      "segment_id": 6,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "value": 6.98287220026,
+      "n": 53,
+      "value_lci": 5.16565847435,
+      "value_uci": 8.80008592618,
+      "segment_id": 6,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "value": 8.56031128405,
+      "n": 22,
+      "value_lci": 5.1168255488,
+      "value_uci": 12.0037970193,
+      "segment_id": 6,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "value": 11.811023622,
+      "n": 120,
+      "value_lci": 9.82317103849,
+      "value_uci": 13.7988762056,
+      "segment_id": 7,
+      "year": 2016,
+      "sex_id": 0
+    },
+    {
+      "value": 11.1989459816,
+      "n": 85,
+      "value_lci": 8.95038259734,
+      "value_uci": 13.4475093658,
+      "segment_id": 7,
+      "year": 2016,
+      "sex_id": 1
+    },
+    {
+      "value": 13.6186770428,
+      "n": 35,
+      "value_lci": 9.39720880406,
+      "value_uci": 17.8401452815,
+      "segment_id": 7,
+      "year": 2016,
+      "sex_id": 2
+    },
+    {
+      "value": 11.8887823586,
+      "n": 124,
+      "value_lci": 9.92133431843,
+      "value_uci": 13.8562303987,
+      "segment_id": 1,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "value": 8.40879689521,
+      "n": 65,
+      "value_lci": 6.44808099937,
+      "value_uci": 10.3695127911,
+      "segment_id": 1,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "value": 21.8518518519,
+      "n": 59,
+      "value_lci": 16.8912567831,
+      "value_uci": 26.8124469206,
+      "segment_id": 1,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "value": 33.4611697028,
+      "n": 349,
+      "value_lci": 30.5928528673,
+      "value_uci": 36.3294865383,
+      "segment_id": 2,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "value": 34.2820181113,
+      "n": 265,
+      "value_lci": 30.9285347514,
+      "value_uci": 37.6355014711,
+      "segment_id": 2,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "value": 31.1111111111,
+      "n": 84,
+      "value_lci": 25.5538262499,
+      "value_uci": 36.6683959723,
+      "segment_id": 2,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "value": 3.83509108341,
+      "n": 40,
+      "value_lci": 2.66770332335,
+      "value_uci": 5.00247884347,
+      "segment_id": 3,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "value": 2.06985769728,
+      "n": 16,
+      "value_lci": 1.0639704697,
+      "value_uci": 3.07574492487,
+      "segment_id": 3,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "value": 8.88888888889,
+      "n": 24,
+      "value_lci": 5.47271697231,
+      "value_uci": 12.3050608055,
+      "segment_id": 3,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "value": 18.9837008629,
+      "n": 198,
+      "value_lci": 16.5997592041,
+      "value_uci": 21.3676425217,
+      "segment_id": 4,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "value": 24.7089262613,
+      "n": 191,
+      "value_lci": 21.661595901,
+      "value_uci": 27.7562566216,
+      "segment_id": 4,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "value": 2.59259259259,
+      "n": 7,
+      "value_lci": 0.684965692263,
+      "value_uci": 4.50021949292,
+      "segment_id": 4,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "value": 13.9980824545,
+      "n": 146,
+      "value_lci": 11.8889331567,
+      "value_uci": 16.1072317523,
+      "segment_id": 5,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "value": 13.1953428202,
+      "n": 102,
+      "value_lci": 10.8042154616,
+      "value_uci": 15.5864701787,
+      "segment_id": 5,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "value": 16.2962962963,
+      "n": 44,
+      "value_lci": 11.8627923277,
+      "value_uci": 20.7298002649,
+      "segment_id": 5,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "value": 4.98561840844,
+      "n": 52,
+      "value_lci": 3.66257780596,
+      "value_uci": 6.30865901091,
+      "segment_id": 6,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "value": 4.78654592497,
+      "n": 37,
+      "value_lci": 3.27826884396,
+      "value_uci": 6.29482300597,
+      "segment_id": 6,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "value": 5.55555555556,
+      "n": 15,
+      "value_lci": 2.80587486746,
+      "value_uci": 8.30523624365,
+      "segment_id": 6,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "value": 12.8475551294,
+      "n": 134,
+      "value_lci": 10.8134705187,
+      "value_uci": 14.8816397402,
+      "segment_id": 7,
+      "year": 2017,
+      "sex_id": 0
+    },
+    {
+      "value": 12.5485122898,
+      "n": 97,
+      "value_lci": 10.2080557682,
+      "value_uci": 14.8889688113,
+      "segment_id": 7,
+      "year": 2017,
+      "sex_id": 1
+    },
+    {
+      "value": 13.7037037037,
+      "n": 37,
+      "value_lci": 9.57564973671,
+      "value_uci": 17.8317576707,
+      "segment_id": 7,
+      "year": 2017,
+      "sex_id": 2
+    },
+    {
+      "value": 13.2734530938,
+      "n": 133,
+      "value_lci": 11.1690715908,
+      "value_uci": 15.3778345968,
+      "segment_id": 1,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "value": 10.393258427,
+      "n": 74,
+      "value_lci": 8.14627731499,
+      "value_uci": 12.6402395389,
+      "segment_id": 1,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "value": 20.3448275862,
+      "n": 59,
+      "value_lci": 15.6840784904,
+      "value_uci": 25.005576682,
+      "segment_id": 1,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "value": 28.9421157685,
+      "n": 290,
+      "value_lci": 26.1293875978,
+      "value_uci": 31.7548439391,
+      "segment_id": 2,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "value": 30.3370786517,
+      "n": 216,
+      "value_lci": 26.9522168928,
+      "value_uci": 33.7219404106,
+      "segment_id": 2,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "value": 25.5172413793,
+      "n": 74,
+      "value_lci": 20.4698560198,
+      "value_uci": 30.5646267388,
+      "segment_id": 2,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "value": 5.68862275449,
+      "n": 57,
+      "value_lci": 4.25200212275,
+      "value_uci": 7.12524338623,
+      "segment_id": 3,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "value": 3.65168539326,
+      "n": 26,
+      "value_lci": 2.27059547694,
+      "value_uci": 5.03277530958,
+      "segment_id": 3,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "value": 10.6896551724,
+      "n": 31,
+      "value_lci": 7.11236262987,
+      "value_uci": 14.266947715,
+      "segment_id": 3,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "value": 18.2634730539,
+      "n": 183,
+      "value_lci": 15.8670898729,
+      "value_uci": 20.6598562349,
+      "segment_id": 4,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "value": 24.5786516854,
+      "n": 175,
+      "value_lci": 21.4085047673,
+      "value_uci": 27.7487986035,
+      "segment_id": 4,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "value": 2.75862068966,
+      "n": 8,
+      "value_lci": 0.862380810297,
+      "value_uci": 4.65486056901,
+      "segment_id": 4,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "value": 14.4710578842,
+      "n": 145,
+      "value_lci": 12.2890155148,
+      "value_uci": 16.6531002536,
+      "segment_id": 5,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "value": 13.0617977528,
+      "n": 93,
+      "value_lci": 10.5806077575,
+      "value_uci": 15.5429877482,
+      "segment_id": 5,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "value": 17.9310344828,
+      "n": 52,
+      "value_lci": 13.4896959414,
+      "value_uci": 22.3723730241,
+      "segment_id": 5,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "value": 6.58682634731,
+      "n": 66,
+      "value_lci": 5.04832224278,
+      "value_uci": 8.12533045183,
+      "segment_id": 6,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "value": 6.1797752809,
+      "n": 44,
+      "value_lci": 4.40686078062,
+      "value_uci": 7.95268978118,
+      "segment_id": 6,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "value": 7.58620689655,
+      "n": 22,
+      "value_lci": 4.52069881317,
+      "value_uci": 10.6517149799,
+      "segment_id": 6,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "value": 12.7744510978,
+      "n": 128,
+      "value_lci": 10.7040739365,
+      "value_uci": 14.8448282591,
+      "segment_id": 7,
+      "year": 2018,
+      "sex_id": 0
+    },
+    {
+      "value": 11.797752809,
+      "n": 84,
+      "value_lci": 9.42259381125,
+      "value_uci": 14.1729118067,
+      "segment_id": 7,
+      "year": 2018,
+      "sex_id": 1
+    },
+    {
+      "value": 15.1724137931,
+      "n": 44,
+      "value_lci": 11.0188812262,
+      "value_uci": 19.32594636,
+      "segment_id": 7,
+      "year": 2018,
+      "sex_id": 2
+    },
+    {
+      "value": 14.5383104126,
+      "n": 148,
+      "value_lci": 12.3693706746,
+      "value_uci": 16.7072501505,
+      "segment_id": 1,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "value": 11.590296496,
+      "n": 86,
+      "value_lci": 9.28170988554,
+      "value_uci": 13.8988831064,
+      "segment_id": 1,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "value": 22.4637681159,
+      "n": 62,
+      "value_lci": 17.5093696585,
+      "value_uci": 27.4181665733,
+      "segment_id": 1,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "value": 30.9430255403,
+      "n": 315,
+      "value_lci": 28.098630314,
+      "value_uci": 33.7874207665,
+      "segment_id": 2,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "value": 31.4016172507,
+      "n": 233,
+      "value_lci": 28.054415586,
+      "value_uci": 34.7488189153,
+      "segment_id": 2,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "value": 29.7101449275,
+      "n": 82,
+      "value_lci": 24.2851917831,
+      "value_uci": 35.1350980719,
+      "segment_id": 2,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "value": 4.02750491159,
+      "n": 41,
+      "value_lci": 2.81775329282,
+      "value_uci": 5.23725653036,
+      "segment_id": 3,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "value": 2.42587601078,
+      "n": 18,
+      "value_lci": 1.31631659606,
+      "value_uci": 3.5354354255,
+      "segment_id": 3,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "value": 8.33333333333,
+      "n": 23,
+      "value_lci": 5.05228688192,
+      "value_uci": 11.6143797847,
+      "segment_id": 3,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "value": 17.9764243615,
+      "n": 183,
+      "value_lci": 15.6136307698,
+      "value_uci": 20.3392179531,
+      "segment_id": 4,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "value": 23.0458221024,
+      "n": 171,
+      "value_lci": 20.0087078036,
+      "value_uci": 26.0829364012,
+      "segment_id": 4,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "value": 4.34782608696,
+      "n": 12,
+      "value_lci": 1.92690414416,
+      "value_uci": 6.76874802975,
+      "segment_id": 4,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "value": 13.0648330059,
+      "n": 133,
+      "value_lci": 10.9910922766,
+      "value_uci": 15.1385737352,
+      "segment_id": 5,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "value": 11.4555256065,
+      "n": 85,
+      "value_lci": 9.15865159004,
+      "value_uci": 13.7523996229,
+      "segment_id": 5,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "value": 17.3913043478,
+      "n": 48,
+      "value_lci": 12.8916801613,
+      "value_uci": 21.8909285343,
+      "segment_id": 5,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "value": 7.66208251473,
+      "n": 78,
+      "value_lci": 6.0253857278,
+      "value_uci": 9.29877930167,
+      "segment_id": 6,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "value": 7.95148247978,
+      "n": 59,
+      "value_lci": 6.00037414202,
+      "value_uci": 9.90259081755,
+      "segment_id": 6,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "value": 6.88405797101,
+      "n": 19,
+      "value_lci": 3.8784553381,
+      "value_uci": 9.88966060393,
+      "segment_id": 6,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "value": 11.7878192534,
+      "n": 120,
+      "value_lci": 9.80361766464,
+      "value_uci": 13.7720208422,
+      "segment_id": 7,
+      "year": 2019,
+      "sex_id": 0
+    },
+    {
+      "value": 12.1293800539,
+      "n": 90,
+      "value_lci": 9.77492675934,
+      "value_uci": 14.4838333485,
+      "segment_id": 7,
+      "year": 2019,
+      "sex_id": 1
+    },
+    {
+      "value": 10.8695652174,
+      "n": 30,
+      "value_lci": 7.17454872418,
+      "value_uci": 14.5645817106,
+      "segment_id": 7,
+      "year": 2019,
+      "sex_id": 2
+    },
+    {
+      "value": 12.7835051546,
+      "n": 124,
+      "value_lci": 10.6784993827,
+      "value_uci": 14.8885109265,
+      "segment_id": 1,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "value": 10.071942446,
+      "n": 70,
+      "value_lci": 7.8289353597,
+      "value_uci": 12.3149495324,
+      "segment_id": 1,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "value": 19.6363636364,
+      "n": 54,
+      "value_lci": 14.911865557,
+      "value_uci": 24.3608617157,
+      "segment_id": 1,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "value": 31.3402061856,
+      "n": 304,
+      "value_lci": 28.415843907,
+      "value_uci": 34.2645684641,
+      "segment_id": 2,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "value": 32.0863309353,
+      "n": 223,
+      "value_lci": 28.6072458681,
+      "value_uci": 35.5654160024,
+      "segment_id": 2,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "value": 29.4545454545,
+      "n": 81,
+      "value_lci": 24.033213076,
+      "value_uci": 34.8758778331,
+      "segment_id": 2,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "value": 4.32989690722,
+      "n": 42,
+      "value_lci": 3.04681051168,
+      "value_uci": 5.61298330275,
+      "segment_id": 3,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "value": 3.02158273381,
+      "n": 21,
+      "value_lci": 1.74578680304,
+      "value_uci": 4.29737866459,
+      "segment_id": 3,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "value": 7.63636363636,
+      "n": 21,
+      "value_lci": 4.47780338523,
+      "value_uci": 10.7949238875,
+      "segment_id": 3,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "value": 18.1443298969,
+      "n": 176,
+      "value_lci": 15.7147910251,
+      "value_uci": 20.5738687687,
+      "segment_id": 4,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "value": 24.0287769784,
+      "n": 167,
+      "value_lci": 20.8444561773,
+      "value_uci": 27.2130977795,
+      "segment_id": 4,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "value": 3.27272727273,
+      "n": 9,
+      "value_lci": 1.15668308228,
+      "value_uci": 5.38877146318,
+      "segment_id": 4,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "value": 11.2371134021,
+      "n": 109,
+      "value_lci": 9.24610958976,
+      "value_uci": 13.2281172144,
+      "segment_id": 5,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "value": 10.071942446,
+      "n": 70,
+      "value_lci": 7.8289353597,
+      "value_uci": 12.3149495324,
+      "segment_id": 5,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "value": 14.1818181818,
+      "n": 39,
+      "value_lci": 10.0327462421,
+      "value_uci": 18.3308901215,
+      "segment_id": 5,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "value": 10.412371134,
+      "n": 101,
+      "value_lci": 8.48694065622,
+      "value_uci": 12.3378016118,
+      "segment_id": 6,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "value": 10.2158273381,
+      "n": 71,
+      "value_lci": 7.95866348792,
+      "value_uci": 12.4729911883,
+      "segment_id": 6,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "value": 10.9090909091,
+      "n": 30,
+      "value_lci": 7.20137603193,
+      "value_uci": 14.6168057863,
+      "segment_id": 6,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "value": 11.7525773196,
+      "n": 114,
+      "value_lci": 9.72234108341,
+      "value_uci": 13.7828135558,
+      "segment_id": 7,
+      "year": 2020,
+      "sex_id": 0
+    },
+    {
+      "value": 10.5035971223,
+      "n": 73,
+      "value_lci": 8.21853380053,
+      "value_uci": 12.7886604441,
+      "segment_id": 7,
+      "year": 2020,
+      "sex_id": 1
+    },
+    {
+      "value": 14.9090909091,
+      "n": 41,
+      "value_lci": 10.6730268689,
+      "value_uci": 19.1451549493,
+      "segment_id": 7,
+      "year": 2020,
+      "sex_id": 2
+    },
+    {
+      "value": 12.736318408,
+      "n": 128,
+      "value_lci": 10.6716808671,
+      "value_uci": 14.8009559488,
+      "segment_id": 1,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "value": 9.04033379694,
+      "n": 65,
+      "value_lci": 6.93928936436,
+      "value_uci": 11.1413782295,
+      "segment_id": 1,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "value": 22.027972028,
+      "n": 63,
+      "value_lci": 17.1959320052,
+      "value_uci": 26.8600120508,
+      "segment_id": 1,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "value": 31.8407960199,
+      "n": 320,
+      "value_lci": 28.9557063674,
+      "value_uci": 34.7258856724,
+      "segment_id": 2,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "value": 35.3268428373,
+      "n": 254,
+      "value_lci": 31.824706741,
+      "value_uci": 38.8289789336,
+      "segment_id": 2,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "value": 23.0769230769,
+      "n": 66,
+      "value_lci": 18.164552463,
+      "value_uci": 27.9892936909,
+      "segment_id": 2,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "value": 4.17910447761,
+      "n": 42,
+      "value_lci": 2.9398034009,
+      "value_uci": 5.41840555432,
+      "segment_id": 3,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "value": 3.19888734353,
+      "n": 23,
+      "value_lci": 1.90957475738,
+      "value_uci": 4.48819992969,
+      "segment_id": 3,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "value": 6.64335664336,
+      "n": 19,
+      "value_lci": 3.73973351061,
+      "value_uci": 9.5469797761,
+      "segment_id": 3,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "value": 15.4228855721,
+      "n": 155,
+      "value_lci": 13.1861515165,
+      "value_uci": 17.6596196278,
+      "segment_id": 4,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "value": 19.8887343533,
+      "n": 143,
+      "value_lci": 16.9641177253,
+      "value_uci": 22.8133509813,
+      "segment_id": 4,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "value": 4.1958041958,
+      "n": 12,
+      "value_lci": 1.85818523637,
+      "value_uci": 6.53342315524,
+      "segment_id": 4,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "value": 13.9303482587,
+      "n": 140,
+      "value_lci": 11.7859220333,
+      "value_uci": 16.0747744841,
+      "segment_id": 5,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "value": 12.2392211405,
+      "n": 88,
+      "value_lci": 9.83792512567,
+      "value_uci": 14.6405171553,
+      "segment_id": 5,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "value": 18.1818181818,
+      "n": 52,
+      "value_lci": 13.684874827,
+      "value_uci": 22.6787615367,
+      "segment_id": 5,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "value": 9.65174129353,
+      "n": 97,
+      "value_lci": 7.82293448609,
+      "value_uci": 11.480548101,
+      "segment_id": 6,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "value": 8.6230876217,
+      "n": 62,
+      "value_lci": 6.56640056971,
+      "value_uci": 10.6797746737,
+      "segment_id": 6,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "value": 12.2377622378,
+      "n": 35,
+      "value_lci": 8.41674761714,
+      "value_uci": 16.0587768584,
+      "segment_id": 6,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "value": 12.2388059701,
+      "n": 123,
+      "value_lci": 10.2091338486,
+      "value_uci": 14.2684780917,
+      "segment_id": 7,
+      "year": 2021,
+      "sex_id": 0
+    },
+    {
+      "value": 11.6828929068,
+      "n": 84,
+      "value_lci": 9.32938213654,
+      "value_uci": 14.0364036771,
+      "segment_id": 7,
+      "year": 2021,
+      "sex_id": 1
+    },
+    {
+      "value": 13.6363636364,
+      "n": 39,
+      "value_lci": 9.6351789618,
+      "value_uci": 17.6375483109,
+      "segment_id": 7,
+      "year": 2021,
+      "sex_id": 2
+    },
+    {
+      "value": 12.630480167,
+      "n": 121,
+      "value_lci": 10.5231545998,
+      "value_uci": 14.7378057343,
+      "segment_id": 1,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "value": 9.78417266187,
+      "n": 68,
+      "value_lci": 7.5699063956,
+      "value_uci": 11.9984389281,
+      "segment_id": 1,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "value": 20.1520912548,
+      "n": 53,
+      "value_lci": 15.2723131379,
+      "value_uci": 25.0318693716,
+      "segment_id": 1,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "value": 28.7056367432,
+      "n": 275,
+      "value_lci": 25.8358282213,
+      "value_uci": 31.5754452651,
+      "segment_id": 2,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "value": 29.0647482014,
+      "n": 202,
+      "value_lci": 25.6806671099,
+      "value_uci": 32.448829293,
+      "segment_id": 2,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "value": 27.7566539924,
+      "n": 73,
+      "value_lci": 22.3092357171,
+      "value_uci": 33.2040722677,
+      "segment_id": 2,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "value": 4.17536534447,
+      "n": 40,
+      "value_lci": 2.90646487401,
+      "value_uci": 5.44426581492,
+      "segment_id": 3,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "value": 3.02158273381,
+      "n": 21,
+      "value_lci": 1.74578680304,
+      "value_uci": 4.29737866459,
+      "segment_id": 3,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "value": 7.22433460076,
+      "n": 19,
+      "value_lci": 4.07496082709,
+      "value_uci": 10.3737083744,
+      "segment_id": 3,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "value": 20.8768267223,
+      "n": 200,
+      "value_lci": 18.2985719946,
+      "value_uci": 23.4550814501,
+      "segment_id": 4,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "value": 27.1942446043,
+      "n": 189,
+      "value_lci": 23.8779906757,
+      "value_uci": 30.5104985329,
+      "segment_id": 4,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "value": 4.1825095057,
+      "n": 11,
+      "value_lci": 1.74722836275,
+      "value_uci": 6.61779064866,
+      "segment_id": 4,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "value": 15.0313152401,
+      "n": 144,
+      "value_lci": 12.7642204932,
+      "value_uci": 17.298409987,
+      "segment_id": 5,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "value": 14.6762589928,
+      "n": 102,
+      "value_lci": 12.0389012127,
+      "value_uci": 17.3136167729,
+      "segment_id": 5,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "value": 15.969581749,
+      "n": 42,
+      "value_lci": 11.5132934984,
+      "value_uci": 20.4258699997,
+      "segment_id": 5,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "value": 8.0375782881,
+      "n": 77,
+      "value_lci": 6.31289427015,
+      "value_uci": 9.76226230605,
+      "segment_id": 6,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "value": 6.76258992806,
+      "n": 47,
+      "value_lci": 4.89114070187,
+      "value_uci": 8.63403915424,
+      "segment_id": 6,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "value": 11.4068441065,
+      "n": 30,
+      "value_lci": 7.53969354644,
+      "value_uci": 15.2739946665,
+      "segment_id": 6,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "value": 10.5427974948,
+      "n": 101,
+      "value_lci": 8.59462539246,
+      "value_uci": 12.4909695971,
+      "segment_id": 7,
+      "year": 2022,
+      "sex_id": 0
+    },
+    {
+      "value": 9.4964028777,
+      "n": 66,
+      "value_lci": 7.31146593639,
+      "value_uci": 11.681339819,
+      "segment_id": 7,
+      "year": 2022,
+      "sex_id": 1
+    },
+    {
+      "value": 13.3079847909,
+      "n": 35,
+      "value_lci": 9.17604543662,
+      "value_uci": 17.4399241451,
+      "segment_id": 7,
+      "year": 2022,
+      "sex_id": 2
+    },
+    {
+      "value": 11.3682092555,
+      "n": 113,
+      "value_lci": 9.39149483624,
+      "value_uci": 13.3449236748,
+      "segment_id": 1,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "value": 8.46047156727,
+      "n": 61,
+      "value_lci": 6.42430110849,
+      "value_uci": 10.4966420261,
+      "segment_id": 1,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "value": 19.0476190476,
+      "n": 52,
+      "value_lci": 14.3601813158,
+      "value_uci": 23.7350567794,
+      "segment_id": 1,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "value": 34.0040241449,
+      "n": 338,
+      "value_lci": 31.053990126,
+      "value_uci": 36.9540581637,
+      "segment_id": 2,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "value": 36.7545076283,
+      "n": 265,
+      "value_lci": 33.2268810559,
+      "value_uci": 40.2821342007,
+      "segment_id": 2,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "value": 26.7399267399,
+      "n": 73,
+      "value_lci": 21.4565189667,
+      "value_uci": 32.0233345132,
+      "segment_id": 2,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "value": 3.82293762575,
+      "n": 38,
+      "value_lci": 2.628846423,
+      "value_uci": 5.01702882851,
+      "segment_id": 3,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "value": 3.19001386963,
+      "n": 23,
+      "value_lci": 1.90422732597,
+      "value_uci": 4.47580041328,
+      "segment_id": 3,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "value": 5.49450549451,
+      "n": 15,
+      "value_lci": 2.7743534151,
+      "value_uci": 8.21465757392,
+      "segment_id": 3,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "value": 17.2032193159,
+      "n": 171,
+      "value_lci": 14.852965713,
+      "value_uci": 19.5534729188,
+      "segment_id": 4,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "value": 22.4687933426,
+      "n": 162,
+      "value_lci": 19.414992868,
+      "value_uci": 25.5225938171,
+      "segment_id": 4,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "value": 3.2967032967,
+      "n": 9,
+      "value_lci": 1.16532312563,
+      "value_uci": 5.42808346778,
+      "segment_id": 4,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "value": 14.185110664,
+      "n": 141,
+      "value_lci": 12.0124053516,
+      "value_uci": 16.3578159764,
+      "segment_id": 5,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "value": 11.3730929265,
+      "n": 82,
+      "value_lci": 9.05017105926,
+      "value_uci": 13.6960147937,
+      "segment_id": 5,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "value": 21.6117216117,
+      "n": 59,
+      "value_lci": 16.6984520105,
+      "value_uci": 26.5249912129,
+      "segment_id": 5,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "value": 8.55130784708,
+      "n": 85,
+      "value_lci": 6.80986927847,
+      "value_uci": 10.2927464157,
+      "segment_id": 6,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "value": 8.04438280166,
+      "n": 58,
+      "value_lci": 6.05440602562,
+      "value_uci": 10.0343595777,
+      "segment_id": 6,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "value": 9.89010989011,
+      "n": 27,
+      "value_lci": 6.32652475605,
+      "value_uci": 13.4536950242,
+      "segment_id": 6,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "value": 10.8651911469,
+      "n": 108,
+      "value_lci": 8.92722809396,
+      "value_uci": 12.8031541998,
+      "segment_id": 7,
+      "year": 2023,
+      "sex_id": 0
+    },
+    {
+      "value": 9.70873786408,
+      "n": 70,
+      "value_lci": 7.54244703409,
+      "value_uci": 11.8750286941,
+      "segment_id": 7,
+      "year": 2023,
+      "sex_id": 1
+    },
+    {
+      "value": 13.9194139194,
+      "n": 38,
+      "value_lci": 9.78738423932,
+      "value_uci": 18.0514435995,
+      "segment_id": 7,
+      "year": 2023,
+      "sex_id": 2
+    },
+    {
+      "value": 12.3493975904,
+      "n": 123,
+      "value_lci": 10.3026443037,
+      "value_uci": 14.396150877,
+      "segment_id": 1,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "value": 10.0139082058,
+      "n": 72,
+      "value_lci": 7.8144886968,
+      "value_uci": 12.2133277149,
+      "segment_id": 1,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "value": 18.4115523466,
+      "n": 51,
+      "value_lci": 13.8189200896,
+      "value_uci": 23.0041846035,
+      "segment_id": 1,
+      "year": 2024,
+      "sex_id": 2
+    },
+    {
+      "value": 30.421686747,
+      "n": 303,
+      "value_lci": 27.5595277851,
+      "value_uci": 33.2838457088,
+      "segment_id": 2,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "value": 30.876216968,
+      "n": 222,
+      "value_lci": 27.4913284786,
+      "value_uci": 34.2611054574,
+      "segment_id": 2,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "value": 29.2418772563,
+      "n": 81,
+      "value_lci": 23.8518258236,
+      "value_uci": 34.631928689,
+      "segment_id": 2,
+      "year": 2024,
+      "sex_id": 2
+    },
+    {
+      "value": 4.51807228916,
+      "n": 45,
+      "value_lci": 3.2259538199,
+      "value_uci": 5.81019075842,
+      "segment_id": 3,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "value": 2.9207232267,
+      "n": 21,
+      "value_lci": 1.68697357494,
+      "value_uci": 4.15447287847,
+      "segment_id": 3,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "value": 8.6642599278,
+      "n": 24,
+      "value_lci": 5.33085367575,
+      "value_uci": 11.9976661798,
+      "segment_id": 3,
+      "year": 2024,
+      "sex_id": 2
+    },
+    {
+      "value": 18.3734939759,
+      "n": 183,
+      "value_lci": 15.9642729953,
+      "value_uci": 20.7827149565,
+      "segment_id": 4,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "value": 24.2002781641,
+      "n": 174,
+      "value_lci": 21.0622086507,
+      "value_uci": 27.3383476775,
+      "segment_id": 4,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "value": 3.24909747292,
+      "n": 9,
+      "value_lci": 1.14817021412,
+      "value_uci": 5.35002473173,
+      "segment_id": 4,
+      "year": 2024,
+      "sex_id": 2
+    },
+    {
+      "value": 16.7670682731,
+      "n": 167,
+      "value_lci": 14.443040468,
+      "value_uci": 19.0910960782,
+      "segment_id": 5,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "value": 15.438108484,
+      "n": 111,
+      "value_lci": 12.79080968,
+      "value_uci": 18.085407288,
+      "segment_id": 5,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "value": 20.2166064982,
+      "n": 56,
+      "value_lci": 15.457641457,
+      "value_uci": 24.9755715394,
+      "segment_id": 5,
+      "year": 2024,
+      "sex_id": 2
+    },
+    {
+      "value": 6.72690763052,
+      "n": 67,
+      "value_lci": 5.16860760698,
+      "value_uci": 8.28520765406,
+      "segment_id": 6,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "value": 6.39777468707,
+      "n": 46,
+      "value_lci": 4.60479185011,
+      "value_uci": 8.19075752402,
+      "segment_id": 6,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "value": 7.58122743682,
+      "n": 21,
+      "value_lci": 4.44467903175,
+      "value_uci": 10.7177758419,
+      "segment_id": 6,
+      "year": 2024,
+      "sex_id": 2
+    },
+    {
+      "value": 10.843373494,
+      "n": 108,
+      "value_lci": 8.90907194537,
+      "value_uci": 12.7776750426,
+      "segment_id": 7,
+      "year": 2024,
+      "sex_id": 0
+    },
+    {
+      "value": 10.1529902643,
+      "n": 73,
+      "value_lci": 7.94006180793,
+      "value_uci": 12.3659187206,
+      "segment_id": 7,
+      "year": 2024,
+      "sex_id": 1
+    },
+    {
+      "value": 12.6353790614,
+      "n": 35,
+      "value_lci": 8.69839125808,
+      "value_uci": 16.5723668647,
+      "segment_id": 7,
+      "year": 2024,
+      "sex_id": 2
+    }
+  ]
+}
