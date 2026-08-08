@@ -9,9 +9,11 @@ Adds two source-agnostic tools on top of the BAG IDD tools (see
 
 Access model (verified live, see ``docs/probe-*.md``):
 
-* **Obsan** (`ind.obsan.admin.ch`) — clean JSON API ``/api/<id>/g/json`` (fallback
-  ``/gum/json``). Indicator ids resolved from the SSR page's ``__NEXT_DATA__``.
-  Catalogue via ``sitemap.xml``. This is ARCH A (live API) and the workhorse.
+* **Obsan** (`ind.obsan.admin.ch`) — clean JSON API ``/api/<id>/<cut>/json``.
+  Which cuts exist differs per indicator and is declared on the SSR page, next to
+  the internal id, in ``__NEXT_DATA__``; both are read from there rather than
+  guessed (see ``_OBSAN_VARIANT_ORDER``). Catalogue via ``sitemap.xml``. This is
+  ARCH A (live API) and the workhorse.
 * **Versorgungsatlas** — static catalogue ``/search/search_<lang>.json`` (search)
   plus SSR indicator pages for metadata. The numeric value files sit behind the
   SPA runtime and are not reliably retrievable over plain HTTP, so series calls
@@ -202,7 +204,15 @@ async def _obsan_search(
                 indicator_id=indicator_id,
                 title=_humanize_slug(slug),
                 topic=entry["topic"],
-                regional_dimension="mostly national (see series)",
+                # The sitemap carries URLs, nothing else — it does not say which
+                # cuts an indicator publishes, and finding out costs one page
+                # fetch per hit. So this says so, instead of the "mostly
+                # national" that used to stand here: measured 2026-08-08, 50 of
+                # 60 sampled indicators do have a cantonal cut.
+                regional_dimension=(
+                    "not stated in the catalogue — the series call reports which "
+                    "cuts exist (national / by canton / by age / by social position)"
+                ),
             )
         )
         if len(matches) >= params.limit:
@@ -222,7 +232,12 @@ async def _obsan_search(
             "Pass an indicator_id to bag_health_mcp__get_indicator_series("
             f"source='{params.source}', indicator_id=...) for the time series. "
             "Titles here are derived from the slug; the series call returns the "
-            "authoritative title, unit and source."
+            "authoritative title, unit and source, names which cut of the "
+            "indicator it returned ('variant') and which other cuts exist. Pass "
+            "region='ZH' there for a cantonal series where the indicator has one. "
+            "Not every catalogue entry has data behind it — measured 2026-08-08, "
+            "8 of 60 sampled indicators publish no series at all, and the series "
+            "call says so plainly rather than returning an empty result."
         ),
         provenance=Provenance(
             source=attribution, attribution=attribution, license=INDICATOR_LICENSE
@@ -230,13 +245,73 @@ async def _obsan_search(
     )
 
 
-async def _obsan_resolve_id(indicator_id: str, lang: Language) -> str:
-    """Map an Obsan '<topic>/<slug>' path to its internal id ('_330').
+# --- Which cuts an Obsan indicator actually publishes -----------------------
+#
+# The indicator page lists them: ``props.pageProps.jsonLDs.links.od3.<id>`` maps
+# each available API variant to its full ``apiUrl``. This client used to ignore
+# that list and guess two fixed suffixes instead — ``/g/json``, falling back to
+# ``/gum/json``.
+#
+# Measured over 60 language-neutral indicators on 2026-08-08:
+#
+#     kg  (nach Kantonen)      50     gum (Verteilung)      9
+#     ag  (nach Altersklasse)  49     agum                  5
+#     sd  (nach sozialer Lage) 24     g   (national)        3
+#                                     bg                    1
+#
+#     weder g noch gum: 49 von 60   ·   gar keine Variante: 8 von 60
+#
+# So the two suffixes the client asked for were the two rarest; 49 of 60
+# indicators answered 404 on both, and 41 of those 49 do have data — under a
+# suffix nobody asked for. The catalogue was never offering more than the source
+# has. The question was wrong, not the answer.
+#
+# The order below is the preference when several exist. It is a preference, not
+# a fallback chain: whichever cut is returned is named in the response, because
+# they are different measurements with different units, not degraded copies of
+# one another.
+_OBSAN_VARIANT_ORDER = ("g", "kg", "ag", "sd", "gum", "agum", "bg")
 
-    An already-internal id ('_123') is returned unchanged.
+# What each suffix is, for the response text. Read off the payloads' own
+# ``title``/``value`` labels on 2026-08-08; anything not listed here is still
+# fetched and still labelled — from the payload, not from this table.
+_OBSAN_VARIANT_MEANING = {
+    "g": "national time series",
+    "kg": "by canton (kanton_nr, BFS numbering; 0 = Switzerland)",
+    "ag": "national, by age class",
+    "sd": "national, by social position (group_id / characteristic_id)",
+    "gum": "distribution across segments (segment_id) — a share, not the headline rate",
+    "agum": "distribution across segments, by age class",
+    "bg": "additional breakdown published for this indicator",
+}
+
+
+def _obsan_variants(page_data: dict[str, Any], internal: str) -> dict[str, str]:
+    """The API variants the indicator page declares, ``{suffix: apiUrl}``."""
+    links = ((page_data.get("props", {}).get("pageProps", {}) or {}).get("jsonLDs", {}) or {}).get(
+        "links", {}
+    ) or {}
+    od3 = (links.get("od3") or {}).get(internal) or {}
+    out: dict[str, str] = {}
+    for suffix, entry in od3.items():
+        url = (entry or {}).get("apiUrl") if isinstance(entry, dict) else None
+        if isinstance(url, str) and url.startswith(OBSAN_BASE):
+            out[suffix] = url
+    return out
+
+
+async def _obsan_resolve(indicator_id: str, lang: Language) -> tuple[str, dict[str, str] | None]:
+    """Resolve an Obsan indicator to ``(internal_id, declared_variants)``.
+
+    ``declared_variants`` is ``None`` — meaning *unknown*, not *none* — when the
+    caller passed a bare internal id like ``_330``. There is no page to read in
+    that case, so the series call has to probe instead of choose. The two states
+    are kept apart on purpose: an empty dict is a measured "this indicator
+    publishes nothing", and answering that from a guess would be the same
+    mistake in the other direction.
     """
     if _INTERNAL_ID_RE.match(indicator_id):
-        return indicator_id
+        return indicator_id, None
     if "/" not in indicator_id:
         _fail(
             "Obsan indicator_id must be an internal id like '_330' or a "
@@ -265,30 +340,189 @@ async def _obsan_resolve_id(indicator_id: str, lang: Language) -> str:
             f"Could not resolve Obsan indicator '{indicator_id}' to a data id "
             "(page structure may have changed)."
         )
-    return internal
+    return internal, _obsan_variants(data, internal)
+
+
+# Official BFS canton numbers, plus 0 for the national total, as the ``kg`` cut
+# uses them. The German names are carried along on purpose rather than dropped:
+# every ``kg`` payload ships its own ``kanton_nr.codes`` table, so this mapping
+# is checked against the source on each call instead of trusted. A wrong canton
+# number is the worst shape a wrong answer can take — it is complete, plausible,
+# correctly formatted, and about somewhere else.
+_BFS_CANTONS: dict[str, tuple[int, str]] = {
+    "ZH": (1, "Zürich"),
+    "BE": (2, "Bern"),
+    "LU": (3, "Luzern"),
+    "UR": (4, "Uri"),
+    "SZ": (5, "Schwyz"),
+    "OW": (6, "Obwalden"),
+    "NW": (7, "Nidwalden"),
+    "GL": (8, "Glarus"),
+    "ZG": (9, "Zug"),
+    "FR": (10, "Freiburg"),
+    "SO": (11, "Solothurn"),
+    "BS": (12, "Basel-Stadt"),
+    "BL": (13, "Basel-Landschaft"),
+    "SH": (14, "Schaffhausen"),
+    "AR": (15, "Appenzell Ausserrhoden"),
+    "AI": (16, "Appenzell Innerrhoden"),
+    "SG": (17, "St. Gallen"),
+    "GR": (18, "Graubünden"),
+    "AG": (19, "Aargau"),
+    "TG": (20, "Thurgau"),
+    "TI": (21, "Tessin"),
+    "VD": (22, "Waadt"),
+    "VS": (23, "Wallis"),
+    "NE": (24, "Neuenburg"),
+    "GE": (25, "Genf"),
+    "JU": (26, "Jura"),
+}
+_BFS_BY_NUMBER = {nr: code for code, (nr, _name) in _BFS_CANTONS.items()}
+
+
+def _canton_number(code: str, payload: dict[str, Any]) -> int:
+    """The BFS number for a canton code, verified against the payload's own table.
+
+    ``code`` is 'CH' (→ 0) or a two-letter canton code. Raises rather than guess
+    when the source's German name for that number is not the expected one: at
+    that point one of the two tables has moved, and picking either would answer
+    confidently about the wrong canton.
+    """
+    if code == "CH":
+        return 0
+    entry = _BFS_CANTONS.get(code)
+    if entry is None:
+        _fail(
+            f"'{code}' is not a Swiss canton code. Use one of: "
+            f"{', '.join(sorted(_BFS_CANTONS))}, or 'CH' for the national total."
+        )
+    number, expected_name = entry
+    codes = (payload.get("kanton_nr") or {}).get("codes") or {}
+    got = (codes.get(str(number)) or {}).get("de")
+    if got is not None and got.strip().casefold() != expected_name.casefold():
+        _fail(
+            f"Canton mapping disagrees with the source: BFS number {number} is "
+            f"'{expected_name}' here but '{got}' upstream. Refusing to guess — "
+            "the canton numbering in this client needs re-checking."
+        )
+    return number
+
+
+def _split_period(raw: Any) -> tuple[int | None, str | None]:
+    """Split an Obsan ``year`` value into ``(year, period)``.
+
+    Obsan writes a single year as an int and a pooled band as a string —
+    ``"1998-02"`` is the five-year window 1998–2002, not February 1998 (the
+    ``kg`` cut of indicator _010 is titled "5-Jahresmittelwert"). Both forms
+    reach the same field, so both are read here: the band keeps its full label
+    in ``period`` and contributes its first year to ``year``, which is what the
+    year filter compares against. Feeding ``"1998-02"`` straight into an ``int``
+    field, as before, raises a validation error the caller never sees coming.
+    """
+    if isinstance(raw, bool):
+        return None, None
+    if isinstance(raw, int):
+        return raw, None
+    if isinstance(raw, str):
+        head = raw.strip()[:4]
+        return (int(head) if head.isdigit() else None), raw.strip()
+    return None, None
+
+
+def _dimension_legend(payload: dict[str, Any], lang: Language, keys: set[str]) -> dict[str, str]:
+    """Build the dimension legend from the payload's own code tables.
+
+    Obsan ships a labelled ``codes`` block for every dimension it uses —
+    ``sex_id``, ``category_id``, ``age_class``, ``kanton_nr`` and so on, each
+    translated. Reading them beats the fixed strings that used to stand here
+    ("category breakdown (see source remarks)"), which said the same thing for
+    an indicator split by suicide-vs-assisted-suicide and one split by life
+    expectancy at birth vs at 65.
+    """
+
+    def label(field: Any) -> str | None:
+        if isinstance(field, dict):
+            v = field.get(lang) or field.get("de")
+            return v if isinstance(v, str) else None
+        return field if isinstance(field, str) else None
+
+    dims: dict[str, str] = {}
+    for key in sorted(keys):
+        block = payload.get(key)
+        if not isinstance(block, dict) or "codes" not in block:
+            continue
+        codes = block.get("codes") or {}
+        rendered = ", ".join(
+            f"{code} = {label(name)}"
+            for code, name in sorted(codes.items(), key=lambda kv: str(kv[0]))
+            if label(name)
+        )
+        heading = label(block) or key
+        dims[key] = f"{heading}: {rendered}" if rendered else heading
+    return dims
+
+
+async def _obsan_fetch_variant(
+    internal: str, declared: dict[str, str] | None, want: list[str]
+) -> tuple[str, dict[str, Any]]:
+    """Fetch the first cut in ``want`` that exists, returning ``(suffix, payload)``.
+
+    With ``declared`` known the choice needs no probing — the page already said
+    which cuts exist. With ``declared`` None (a bare internal id, no page) the
+    candidates are probed in order, which is the old behaviour narrowed to the
+    one case where there is genuinely nothing to read.
+    """
+    if declared is not None:
+        available = [s for s in want if s in declared]
+        if not available:
+            offered = sorted(declared)
+            _fail(
+                f"Obsan indicator '{internal}' publishes no time series"
+                + (f" — the source offers only: {', '.join(offered)}." if offered else ".")
+                + " Not every catalogue entry has one; try a neighbouring "
+                "indicator from bag_health_mcp__search_health_indicators."
+            )
+        suffix = available[0]
+        async with _client() as c:
+            r = await _get_with_retry(
+                c,
+                declared[suffix],
+                context=f"fetching Obsan series '{internal}' ({suffix} variant)",
+            )
+        return suffix, r.json()
+
+    async with _client() as c:
+        for suffix in want:
+            r = await _get_with_retry(
+                c,
+                f"{OBSAN_BASE}/api/{internal}/{suffix}/json",
+                context=f"fetching Obsan series '{internal}' ({suffix} variant)",
+                allow_404=True,
+            )
+            if r.status_code != 404:
+                return suffix, r.json()
+    _fail(
+        f"Obsan indicator '{internal}' publishes none of the known cuts "
+        f"({', '.join(want)}). Pass the '<topic>/<slug>' form instead of the "
+        "internal id — then the indicator page states which cuts exist."
+    )
 
 
 async def _obsan_series(
     params: GetIndicatorSeriesInput, *, attribution: str
 ) -> IndicatorSeriesOutput:
     lang = params.language
-    internal = await _obsan_resolve_id(params.indicator_id, lang)
+    internal, declared = await _obsan_resolve(params.indicator_id, lang)
 
-    async with _client() as c:
-        r = await _get_with_retry(
-            c,
-            f"{OBSAN_BASE}/api/{internal}/g/json",
-            context=f"fetching Obsan series '{internal}'",
-            allow_404=True,
-        )
-        if r.status_code == 404:
-            # Not every indicator exposes the '/g' variant; fall back to '/gum'.
-            r = await _get_with_retry(
-                c,
-                f"{OBSAN_BASE}/api/{internal}/gum/json",
-                context=f"fetching Obsan series '{internal}' (gum variant)",
-            )
-    payload = r.json()
+    requested_region = (params.region or "CH").upper()
+    # A canton was asked for: the cantonal cut goes first, otherwise the order
+    # stands as published. 'kg' also carries the national total (kanton_nr 0),
+    # so it serves a plain 'CH' request too when no 'g' cut exists.
+    want = list(_OBSAN_VARIANT_ORDER)
+    if requested_region != "CH":
+        want = ["kg"] + [s for s in want if s != "kg"]
+
+    suffix, payload = await _obsan_fetch_variant(internal, declared, want)
 
     def _lang(field: Any) -> str | None:
         return field.get(lang) or field.get("de") if isinstance(field, dict) else None
@@ -297,58 +531,92 @@ async def _obsan_series(
     unit = _lang(payload.get("value", {}))
     source_label = _lang(payload.get("source", {})) or attribution
 
-    raw = payload.get("data", [])
-    points = [
-        IndicatorSeriesPoint(
-            year=p.get("year"),
-            value=p.get("value"),
-            value_lower_ci=p.get("value_lci"),
-            value_upper_ci=p.get("value_uci"),
-            sample_size=p.get("n"),
-            sex_id=p.get("sex_id"),
-            category_id=p.get("category_id"),
+    raw = [p for p in payload.get("data", []) if isinstance(p, dict)]
+    region = "CH"
+    region_note: str | None = None
+
+    if suffix == "kg":
+        wanted_nr = _canton_number(requested_region, payload)
+        present = sorted({p.get("kanton_nr") for p in raw if p.get("kanton_nr") is not None})
+        if wanted_nr not in present:
+            names = ", ".join(_BFS_BY_NUMBER.get(nr, str(nr)) for nr in present if nr != 0)
+            _fail(
+                f"'{requested_region}' is not published for this indicator. "
+                f"Available: CH{', ' + names if names else ''}."
+            )
+        raw = [p for p in raw if p.get("kanton_nr") == wanted_nr]
+        region = requested_region
+    elif requested_region != "CH":
+        # 'kg' leads the preference order whenever a canton is asked for, so
+        # reaching here means the indicator has no cantonal cut at all.
+        offered = sorted(declared) if declared is not None else [suffix]
+        region_note = (
+            f"This indicator has no cantonal cut, so no '{requested_region}' "
+            f"breakdown is available; the national '{suffix}' cut is returned "
+            f"instead. Cuts the source publishes for it: {', '.join(offered)}."
         )
-        for p in raw
-        if isinstance(p, dict)
-    ]
+
+    points: list[IndicatorSeriesPoint] = []
+    for p in raw:
+        year, period = _split_period(p.get("year"))
+        points.append(
+            IndicatorSeriesPoint(
+                year=year,
+                period=period,
+                value=p.get("value"),
+                value_lower_ci=p.get("value_lci"),
+                value_upper_ci=p.get("value_uci"),
+                sample_size=p.get("n"),
+                sex_id=p.get("sex_id"),
+                category_id=p.get("category_id"),
+                canton_nr=p.get("kanton_nr"),
+                canton=_BFS_BY_NUMBER.get(p["kanton_nr"], "CH")
+                if p.get("kanton_nr") is not None
+                else None,
+                age_class=p.get("age_class"),
+                group_id=p.get("group_id"),
+                characteristic_id=p.get("characteristic_id"),
+                segment_id=p.get("segment_id"),
+            )
+        )
     points = _apply_year_filter(points, params.year_from, params.year_to)
 
-    # Dimension legend so the model can read sex_id/category_id and CI fields.
-    dims: dict[str, str] = {}
-    if any(p.sex_id is not None for p in points):
-        dims["sex_id"] = "0 = total; other codes = sex breakdown (see source remarks)"
-    if any(p.category_id is not None for p in points):
-        dims["category_id"] = "category breakdown (see source remarks)"
+    dims = _dimension_legend(
+        payload,
+        lang,
+        {k for p in raw for k in p} | {"kanton_nr"},
+    )
     if any(p.value_lower_ci is not None for p in points):
         dims["value_lower_ci/value_upper_ci"] = "95% confidence interval bounds"
-
-    # Regional dimension: Obsan consumption/HBSC indicators are national only.
-    region_note = None
-    if params.region and params.region.upper() not in ("CH",):
-        region_note = (
-            f"This indicator is published at national (Switzerland) level; no "
-            f"'{params.region.upper()}' breakdown is available. HBSC youth surveys "
-            "are not cantonally representative, so a canton-vs-Switzerland "
-            "comparison is not possible from this series."
+    if any(p.period for p in points):
+        dims["period"] = (
+            "The source labels these observations with a pooled span rather than "
+            "a single year (see the title and note); 'year' holds its first year."
         )
+
+    variant_meaning = _OBSAN_VARIANT_MEANING.get(suffix, "cut published by the source")
+    remarks = _lang(payload.get("remarks", {}))
 
     return IndicatorSeriesOutput(
         source=params.source,
         indicator_id=params.indicator_id,
         title=title,
         unit=unit,
-        region="CH",
+        region=region,
         region_note=region_note,
         values_available=bool(points),
         dimensions=dims,
         total_points=len(points),
         points=points,
+        variant=suffix,
+        variants_available=sorted(declared) if declared is not None else [suffix],
         interpretation=(
-            f"'{title}'. Values in unit '{unit}'. National Swiss time series; "
-            "confidence intervals given where the source provides them. Source: "
-            f"{source_label}."
+            f"'{title}'. Values in unit '{unit}'. Cut '{suffix}' — {variant_meaning}"
+            + (f", filtered to {region}" if suffix == "kg" else "")
+            + ". Confidence intervals given where the source provides them. "
+            f"Source: {source_label}."
         ),
-        note=None,
+        note=remarks,
         provenance=Provenance(
             source=source_label,
             data_version=str(payload.get("version") or "") or None,
@@ -665,8 +933,14 @@ async def _va_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
         "context): the figures are population-level survey aggregates only. "
         "<use_case>Find which indicators exist for a topic (e.g. youth alcohol) before "
         "fetching a series.</use_case>"
-        "<important_notes>Most indicators are national; cantonal breakdowns are rare "
-        "(HBSC youth surveys are not cantonally representative).</important_notes>"
+        "<important_notes>The catalogue does not state which cuts an indicator "
+        "publishes — get_indicator_series reports that per indicator ('variant', "
+        "'variants_available'). Most Obsan indicators DO have a cantonal cut (50 of 60 "
+        "sampled); the HBSC youth series (source='suchtschweiz', ages 11-15) is the "
+        "exception and is national only, as HBSC is not cantonally representative. Other "
+        "'monam' indicators come from the Swiss Health Survey and are cantonal. A few "
+        "catalogue entries have no series at all; the series call names that case rather "
+        "than returning nothing.</important_notes>"
         "<example>bag_health_mcp__search_health_indicators(source='suchtschweiz', "
         "topic='alkohol') -> Obsan HBSC alcohol-prevalence indicators.</example>"
     ),
@@ -691,22 +965,27 @@ async def bag_search_health_indicators(
     description=(
         "Fetch one health indicator's time series from Obsan, the Versorgungsatlas or "
         "Sucht Schweiz (HBSC). Use an indicator_id from bag_health_mcp__search_health_indicators. "
-        "Obsan/suchtschweiz return national year/value points (with 95% confidence "
-        "intervals and sex/category dimensions where available); versorgungsatlas returns "
-        "a cantonal year/value series (26 cantons + a 'CH' national total, with 95% CIs "
-        "and a canton-vs-Switzerland ratio) — pass region='ZH' for a canton. "
+        "Obsan publishes an indicator in several CUTS (national, by canton, by age class, "
+        "by social position, as a distribution); this tool picks one, names it in "
+        "'variant' and lists the others in 'variants_available'. They are different "
+        "measurements with different units, not interchangeable. Pass region='ZH' for the "
+        "cantonal cut where the indicator has one. Versorgungsatlas returns a cantonal "
+        "year/value series (26 cantons + a 'CH' total, 95% CIs, canton-vs-Switzerland ratio). "
         "IMPORTANT: AGGREGATED population statistics only — NOT individual advice, "
         "diagnosis or case assessment, no personal data. For 'suchtschweiz' (school-context "
         "prevention topics) the values are national HBSC survey aggregates by age/sex. "
-        "<use_case>Get a national trend (obsan/suchtschweiz) or a cantonal series with a "
-        "Switzerland comparison (versorgungsatlas).</use_case>"
-        "<important_notes>obsan/suchtschweiz indicators are national — passing a canton "
-        "returns the national series with an explanatory note (HBSC is not cantonally "
-        "representative). versorgungsatlas supports cantons: region='ZH' returns ZH plus a "
-        "canton-vs-CH comparison.</important_notes>"
-        "<example>bag_health_mcp__get_indicator_series(source='versorgungsatlas', "
-        "indicator_id='_003/b', region='ZH') -> ZH cantonal series with 95% CIs and its "
-        "ratio to the Swiss average.</example>"
+        "<use_case>Get a national trend, or a cantonal series with a Switzerland "
+        "comparison.</use_case>"
+        "<important_notes>Read 'variant' before reading the numbers: 'g'/'kg' are rates, "
+        "'gum' is a distribution in %. The HBSC youth series (source='suchtschweiz', ages "
+        "11-15) is national only — a canton request returns the national cut with a note, "
+        "because HBSC is not cantonally representative. Some Obsan observations are pooled "
+        "spans ('1998-02' = 1998–2002); those carry the full label in 'period' and its "
+        "first year in 'year'. Where an indicator publishes no series, the call fails with "
+        "that reason instead of returning an empty series.</important_notes>"
+        "<example>bag_health_mcp__get_indicator_series(source='obsan', "
+        "indicator_id='obsan/lebenserwartung', region='ZH') -> ZH life expectancy from the "
+        "'kg' cut, with the source's own canton and category legends.</example>"
     ),
 )
 @_traced

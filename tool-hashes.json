@@ -5,11 +5,11 @@
     "bag_health_mcp__get_canton_situation": "febc4225cdef1019d6eb79ed87823b7ce94bafe334081f18484840af01233ca8",
     "bag_health_mcp__get_data_version": "907ae6beaa4b4e38c69d8cac64094a44400e28ecd5406785d42b06f5a2388b13",
     "bag_health_mcp__get_disease_data": "bc62ff4e955a24df1bbf99aff9529a4e9b996d104b63253529cd084f0d4cfdad",
-    "bag_health_mcp__get_indicator_series": "5e6ad715c67caa913fc2160c88259cb179874e4f2d5d1d6548f847dacb7a382c",
+    "bag_health_mcp__get_indicator_series": "914aafedc83efd54ed1f1b21a5094b58bf695978b6034ea70438bbc85aab7a08",
     "bag_health_mcp__get_series_details": "c7d41efa9c4d84e564f2e91a68a3084ffa58b13749b668e44f70fd6f9be1bf00",
     "bag_health_mcp__list_diseases": "c927ae355fbd08cd33962db54e22fad4093220a74bf747ff2603de041f63db68",
     "bag_health_mcp__list_export_files": "19f030929a8a873dcfd2789412c010c7ba1064f2bb9b443e5da305419fa2c1c2",
     "bag_health_mcp__list_series": "914bb949d3774be4c2b26b7648a16e14bf536a0228682598c4a2bb08f2369296",
-    "bag_health_mcp__search_health_indicators": "bf9b2ea68da09b420aaf945784d76ad79989af91b3ed8be8aab988439fcac086"
+    "bag_health_mcp__search_health_indicators": "d4ba2bb4e1722bafb2b78a1334530111682eec9afee384574c6e06f8bbf6ae6a"
   }
 }

@@ -1,0 +1,1058 @@
+{
+  "name": "_003_kg",
+  "title": {
+    "de": "Häufigkeit von starken körperlichen Beschwerden, nach Kantonen",
+    "fr": "Fréquence des troubles physiques importants, par canton"
+  },
+  "description": {
+    "de": "Anteil der Bevölkerung in Privathaushalten in %",
+    "fr": "Proportion de la population vivant en ménage privé en %"
+  },
+  "source": {
+    "de": "BFS – Schweizerische Gesundheitsbefragung (SGB)",
+    "fr": "OFS – Enquête suisse sur la santé (ESS)"
+  },
+  "year": {
+    "de": "Jahr",
+    "fr": "Année"
+  },
+  "kanton_nr": {
+    "de": "Kantonsnummer (nach BFS)",
+    "fr": "Numéro du canton (selon OFS)",
+    "codes": {
+      "0": {
+        "de": "Schweiz",
+        "fr": "Suisse",
+        "it": "Svizzera",
+        "en": "Switzerland"
+      },
+      "1": {
+        "de": "Zürich",
+        "fr": "Zurich",
+        "it": "Zurigo",
+        "en": "Zurich"
+      },
+      "2": {
+        "de": "Bern",
+        "fr": "Berne",
+        "it": "Berna",
+        "en": "Bern"
+      },
+      "3": {
+        "de": "Luzern",
+        "fr": "Lucerne",
+        "it": "Lucerna",
+        "en": "Lucerne"
+      },
+      "4": {
+        "de": "Uri",
+        "fr": "Uri",
+        "it": "Uri",
+        "en": "Uri"
+      },
+      "5": {
+        "de": "Schwyz",
+        "fr": "Schwytz",
+        "it": "Svitto",
+        "en": "Schwyz"
+      },
+      "6": {
+        "de": "Obwalden",
+        "fr": "Obwald",
+        "it": "Obvaldo",
+        "en": "Obwalden"
+      },
+      "7": {
+        "de": "Nidwalden",
+        "fr": "Nidwald",
+        "it": "Nidvaldo",
+        "en": "Nidwalden"
+      },
+      "9": {
+        "de": "Zug",
+        "fr": "Zoug",
+        "it": "Zugo",
+        "en": "Zug"
+      },
+      "10": {
+        "de": "Freiburg",
+        "fr": "Fribourg",
+        "it": "Friburgo",
+        "en": "Fribourg"
+      },
+      "11": {
+        "de": "Solothurn",
+        "fr": "Soleure",
+        "it": "Soletta",
+        "en": "Solothurn"
+      },
+      "12": {
+        "de": "Basel-Stadt",
+        "fr": "Bâle-Ville",
+        "it": "Basilea Città",
+        "en": "Basel-City"
+      },
+      "13": {
+        "de": "Basel-Landschaft",
+        "fr": "Bâle-Campagne",
+        "it": "Basilea Campagna",
+        "en": "Basel-Country"
+      },
+      "15": {
+        "de": "Appenzell Ausserrhoden",
+        "fr": "Appenzell Rh.-Ext.",
+        "it": "Appenzello Esterno",
+        "en": "Appenzell Outer Rhodes"
+      },
+      "17": {
+        "de": "St. Gallen",
+        "fr": "Saint-Gall",
+        "it": "San Gallo",
+        "en": "St. Gallen"
+      },
+      "18": {
+        "de": "Graubünden",
+        "fr": "Grisons",
+        "it": "Grigioni",
+        "en": "Grisons"
+      },
+      "19": {
+        "de": "Aargau",
+        "fr": "Argovie",
+        "it": "Argovia",
+        "en": "Aargau"
+      },
+      "20": {
+        "de": "Thurgau",
+        "fr": "Thurgovie",
+        "it": "Turgovia",
+        "en": "Thurgau"
+      },
+      "21": {
+        "de": "Tessin",
+        "fr": "Tessin",
+        "it": "Ticino",
+        "en": "Ticino"
+      },
+      "22": {
+        "de": "Waadt",
+        "fr": "Vaud",
+        "it": "Vaud",
+        "en": "Vaud"
+      },
+      "23": {
+        "de": "Wallis",
+        "fr": "Valais",
+        "it": "Vallese",
+        "en": "Valais"
+      },
+      "24": {
+        "de": "Neuenburg",
+        "fr": "Neuchâtel",
+        "it": "Neuchâtel",
+        "en": "Neuchâtel"
+      },
+      "25": {
+        "de": "Genf",
+        "fr": "Genève",
+        "it": "Ginevra",
+        "en": "Geneva"
+      },
+      "26": {
+        "de": "Jura",
+        "fr": "Jura",
+        "it": "Giura",
+        "en": "Jura"
+      }
+    }
+  },
+  "value": {
+    "de": "Anteil der Bevölkerung in %",
+    "fr": "Proportion de la population en %"
+  },
+  "value_lci": {
+    "de": "Untere Grenze Vertrauensintervall",
+    "fr": "Limite inférieure de l'intervalle de confiance"
+  },
+  "value_uci": {
+    "de": "Obere Grenze Vertrauensintervall",
+    "fr": "Limite supérieure de l'intervalle de confiance"
+  },
+  "n": {
+    "de": "Stichprobengrösse",
+    "fr": "Taille de l'échantillon"
+  },
+  "value_standardised": {
+    "de": "Stand. Anteil der Bevölkerung in %",
+    "fr": "Proportion stand. de la population en %"
+  },
+  "value_lci_standardised": {
+    "de": "Untere Grenze Vertrauensintervall (standardisiert)",
+    "fr": "Limite inférieure de l'intervalle de confiance (standardisé)"
+  },
+  "value_uci_standardised": {
+    "de": "Obere Grenze Vertrauensintervall (standardisiert)",
+    "fr": "Limite supérieure de l'intervalle de confiance (standardisé)"
+  },
+  "q": {
+    "de": "Quintil",
+    "fr": "Quintile"
+  },
+  "q_standardised": {
+    "de": "Quintil (standardisiert)",
+    "fr": "Quintile (standardisé)"
+  },
+  "sex_id": {
+    "de": "Geschlecht",
+    "fr": "Sexe",
+    "codes": {
+      "0": {
+        "de": "Total",
+        "fr": "Total",
+        "it": "Totale",
+        "en": "Total"
+      },
+      "1": {
+        "de": "Männer",
+        "fr": "Hommes",
+        "it": "Uomini",
+        "en": "Men"
+      },
+      "2": {
+        "de": "Frauen",
+        "fr": "Femmes",
+        "it": "Donne",
+        "en": "Women"
+      }
+    }
+  },
+  "remarks": {
+    "de": "Quelle: BFS – Schweizerische Gesundheitsbefragung (SGB)\nDie Daten sind mit dem 95% Vertrauensintervall dargestellt. Die dargestellten Fehlerbereiche enthalten mit einer Wahrscheinlichkeit von 95% den tatsächlichen Wert in der Bevölkerung.\nn = Anzahl befragte Personen, die die relevante(n) Frage(n) beantwortet haben.\nFür die Kantonsgrafik (Karte) werden nur die Daten der Kantone mit einer erweiterten Stichprobe gezeigt. Im Total der Schweiz sind die Daten aller Kantone enthalten.\nDie Quantile teilen die sortierten Werte (nach Rang) in fünf gleich grosse Gruppen ein. Z.B. im 1. Quantil (hellste Farbe) befinden sich die 20% der Kantone mit den tiefsten Werten.",
+    "fr": "Source: OFS – Enquête suisse sur la santé (ESS)\nLes valeurs sont représentées avec l’intervalle de confiance à 95%. L'intervalle représenté par la barre d'erreur contient, avec une probabilité de 95%, la valeur réelle pour la population.\nn = nombre de personnes interrogées qui ont répondu à la/aux question(s) analysée(s).\nLes données des cantons ne sont représentées que pour ceux dont l’échantillon a été densifié. Le total suisse porte sur les données de l'ensemble des cantons.\nLes quantiles divisent les valeurs obtenues (ordonnées de manière croissante) en cinq groupes égaux. P. ex., le 1er quantile (couleur la plus claire) contient le 20% des cantons aux valeurs les plus basses."
+  },
+  "country": {
+    "de": "Schweiz",
+    "fr": "Suisse",
+    "it": "Svizzera",
+    "en": "Switzerland"
+  },
+  "indicator": {
+    "de": {
+      "title": "Starke körperliche Beschwerden",
+      "url": "https://ind.obsan.admin.ch/indicator/obsan/starke-koerperliche-beschwerden"
+    },
+    "fr": {
+      "title": "Troubles physiques importants",
+      "url": "https://ind.obsan.admin.ch/fr/indicator/obsan/troubles-physiques-importants"
+    }
+  },
+  "author": {
+    "de": "Schweizerisches Gesundheitsobsevratorium (Obsan)",
+    "fr": "Observatoire suisse de la santé (Obsan)"
+  },
+  "phone": "+41 58 463 60 45",
+  "email": "obsan@bfs.admin.ch",
+  "version": "20250116",
+  "created_at": "2026-08-08T07:17:16.709Z",
+  "last_updated_at": "2025-01-17",
+  "data": [
+    {
+      "year": 2022,
+      "kanton_nr": 0,
+      "value": 25.3067550783,
+      "value_lci": 24.5635775995,
+      "value_uci": 26.0499325571,
+      "n": 20395,
+      "value_standardised": 25.3032422586,
+      "value_lci_standardised": 24.5656243035,
+      "value_uci_standardised": 26.0408602137,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 24,
+      "value": 30.5544688117,
+      "value_lci": 26.6840165764,
+      "value_uci": 34.424921047,
+      "n": 608,
+      "value_standardised": 30.7672049423,
+      "value_lci_standardised": 26.9126574734,
+      "value_uci_standardised": 34.6217524112,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 1,
+      "value": 24.5651415422,
+      "value_lci": 22.5291197692,
+      "value_uci": 26.6011633152,
+      "n": 2128,
+      "value_standardised": 24.6568126117,
+      "value_lci_standardised": 22.6485226449,
+      "value_uci_standardised": 26.6651025786,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 3,
+      "value": 21.5909802717,
+      "value_lci": 18.8468927962,
+      "value_uci": 24.3350677473,
+      "n": 1004,
+      "value_standardised": 21.719482202,
+      "value_lci_standardised": 19.0087628133,
+      "value_uci_standardised": 24.4302015907,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 5,
+      "value": 20.2945353589,
+      "value_lci": 17.4645107832,
+      "value_uci": 23.1245599346,
+      "n": 939,
+      "value_standardised": 21.0539998729,
+      "value_lci_standardised": 18.1861605765,
+      "value_uci_standardised": 23.9218391693,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 7,
+      "value": 17.49906701,
+      "value_lci": 13.5881323712,
+      "value_uci": 21.4100016488,
+      "n": 430,
+      "value_standardised": 18.4353738027,
+      "value_lci_standardised": 14.4217939522,
+      "value_uci_standardised": 22.4489536532,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 9,
+      "value": 19.9505326829,
+      "value_lci": 17.2649973621,
+      "value_uci": 22.6360680037,
+      "n": 995,
+      "value_standardised": 20.4287661452,
+      "value_lci_standardised": 17.736566845,
+      "value_uci_standardised": 23.1209654455,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 10,
+      "value": 29.5030393219,
+      "value_lci": 26.4179493505,
+      "value_uci": 32.5881292933,
+      "n": 985,
+      "value_standardised": 29.3175730478,
+      "value_lci_standardised": 26.2946515613,
+      "value_uci_standardised": 32.3404945344,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 12,
+      "value": 28.7245760729,
+      "value_lci": 25.5053596174,
+      "value_uci": 31.9437925285,
+      "n": 931,
+      "value_standardised": 28.5643232072,
+      "value_lci_standardised": 25.2702477865,
+      "value_uci_standardised": 31.8583986279,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 13,
+      "value": 27.9087412033,
+      "value_lci": 24.5750038519,
+      "value_uci": 31.2424785546,
+      "n": 846,
+      "value_standardised": 28.3334264375,
+      "value_lci_standardised": 24.768008127,
+      "value_uci_standardised": 31.8988447479,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 15,
+      "value": 22.2615555486,
+      "value_lci": 18.5033965125,
+      "value_uci": 26.0197145847,
+      "n": 623,
+      "value_standardised": 22.6212127039,
+      "value_lci_standardised": 18.9500119019,
+      "value_uci_standardised": 26.2924135059,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 17,
+      "value": 22.5756959182,
+      "value_lci": 19.7325906565,
+      "value_uci": 25.41880118,
+      "n": 1001,
+      "value_standardised": 23.1828949651,
+      "value_lci_standardised": 20.3945396925,
+      "value_uci_standardised": 25.9712502376,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 18,
+      "value": 20.5216705309,
+      "value_lci": 17.7506296715,
+      "value_uci": 23.2927113903,
+      "n": 955,
+      "value_standardised": 20.8813228412,
+      "value_lci_standardised": 18.0176402488,
+      "value_uci_standardised": 23.7450054336,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 19,
+      "value": 26.0584691701,
+      "value_lci": 23.3590395095,
+      "value_uci": 28.7578988307,
+      "n": 1218,
+      "value_standardised": 26.0354109746,
+      "value_lci_standardised": 23.4170745531,
+      "value_uci_standardised": 28.653747396,
+      "q": 3,
+      "q_standardised": 4,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 20,
+      "value": 25.1462503847,
+      "value_lci": 22.3071283255,
+      "value_uci": 27.9853724439,
+      "n": 1153,
+      "value_standardised": 24.8726709774,
+      "value_lci_standardised": 22.124613337,
+      "value_uci_standardised": 27.6207286177,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 21,
+      "value": 28.2653728356,
+      "value_lci": 25.6913879611,
+      "value_uci": 30.8393577102,
+      "n": 1339,
+      "value_standardised": 28.2707712692,
+      "value_lci_standardised": 25.6894483479,
+      "value_uci_standardised": 30.8520941904,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 22,
+      "value": 30.2317202722,
+      "value_lci": 27.8020555948,
+      "value_uci": 32.6613849496,
+      "n": 1558,
+      "value_standardised": 30.1422864224,
+      "value_lci_standardised": 27.7809613747,
+      "value_uci_standardised": 32.5036114701,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 23,
+      "value": 26.008524926,
+      "value_lci": 23.0715627461,
+      "value_uci": 28.9454871059,
+      "n": 980,
+      "value_standardised": 25.8517681436,
+      "value_lci_standardised": 22.8865791055,
+      "value_uci_standardised": 28.8169571818,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 25,
+      "value": 26.3093873752,
+      "value_lci": 23.3900505169,
+      "value_uci": 29.2287242335,
+      "n": 971,
+      "value_standardised": 25.7207775052,
+      "value_lci_standardised": 22.8776152867,
+      "value_uci_standardised": 28.5639397237,
+      "q": 4,
+      "q_standardised": 3,
+      "sex_id": 0
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 0,
+      "value": 17.6470828245,
+      "value_lci": 16.6738894049,
+      "value_uci": 18.620276244,
+      "n": 9407,
+      "value_standardised": 17.4997298198,
+      "value_lci_standardised": 16.5346037945,
+      "value_uci_standardised": 18.464855845,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 3,
+      "value": 16.2819785464,
+      "value_lci": 12.7167063112,
+      "value_uci": 19.8472507816,
+      "n": 485,
+      "value_standardised": 16.3959020522,
+      "value_lci_standardised": 12.8368183518,
+      "value_uci_standardised": 19.9549857526,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 5,
+      "value": 15.6968699096,
+      "value_lci": 11.9450256997,
+      "value_uci": 19.4487141195,
+      "n": 455,
+      "value_standardised": 16.0408435234,
+      "value_lci_standardised": 12.2638682601,
+      "value_uci_standardised": 19.8178187866,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 7,
+      "value": 11.5969193277,
+      "value_lci": 6.37237226763,
+      "value_uci": 16.8214663878,
+      "n": 206,
+      "value_standardised": 12.597301973,
+      "value_lci_standardised": 7.2844781707,
+      "value_uci_standardised": 17.9101257754,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 9,
+      "value": 13.35871153,
+      "value_lci": 10.0251956284,
+      "value_uci": 16.6922274315,
+      "n": 476,
+      "value_standardised": 13.6104550274,
+      "value_lci_standardised": 10.2768724034,
+      "value_uci_standardised": 16.9440376513,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 10,
+      "value": 22.9074022324,
+      "value_lci": 18.4999781756,
+      "value_uci": 27.3148262892,
+      "n": 446,
+      "value_standardised": 22.8183021024,
+      "value_lci_standardised": 18.5229486237,
+      "value_uci_standardised": 27.1136555812,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 12,
+      "value": 19.9919401064,
+      "value_lci": 15.6396956308,
+      "value_uci": 24.3441845821,
+      "n": 407,
+      "value_standardised": 19.9708222627,
+      "value_lci_standardised": 15.432636487,
+      "value_uci_standardised": 24.5090080383,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 13,
+      "value": 18.7578688563,
+      "value_lci": 14.11840892,
+      "value_uci": 23.3973287927,
+      "n": 376,
+      "value_standardised": 19.3523504091,
+      "value_lci_standardised": 14.4398816673,
+      "value_uci_standardised": 24.264819151,
+      "q": 3,
+      "q_standardised": 4,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 1,
+      "value": 17.153951973,
+      "value_lci": 14.5138309334,
+      "value_uci": 19.7940730126,
+      "n": 998,
+      "value_standardised": 16.7627684566,
+      "value_lci_standardised": 14.1690727535,
+      "value_uci_standardised": 19.3564641597,
+      "q": 3,
+      "q_standardised": 2,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 15,
+      "value": 15.573384157,
+      "value_lci": 10.4993013941,
+      "value_uci": 20.6474669199,
+      "n": 302,
+      "value_standardised": 15.5715465869,
+      "value_lci_standardised": 10.7345954714,
+      "value_uci_standardised": 20.4084977024,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 17,
+      "value": 16.7382338828,
+      "value_lci": 13.1158412807,
+      "value_uci": 20.360626485,
+      "n": 480,
+      "value_standardised": 16.7934863259,
+      "value_lci_standardised": 13.2440201321,
+      "value_uci_standardised": 20.3429525198,
+      "q": 2,
+      "q_standardised": 3,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 18,
+      "value": 14.1493564423,
+      "value_lci": 10.758982785,
+      "value_uci": 17.5397300996,
+      "n": 460,
+      "value_standardised": 13.5859009702,
+      "value_lci_standardised": 10.1921993763,
+      "value_uci_standardised": 16.9796025641,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 19,
+      "value": 16.2005517976,
+      "value_lci": 12.8209078402,
+      "value_uci": 19.5801957551,
+      "n": 573,
+      "value_standardised": 16.0035956395,
+      "value_lci_standardised": 12.7046270799,
+      "value_uci_standardised": 19.3025641992,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 20,
+      "value": 17.1247891852,
+      "value_lci": 13.2938283378,
+      "value_uci": 20.9557500326,
+      "n": 519,
+      "value_standardised": 16.8899106484,
+      "value_lci_standardised": 13.1814754841,
+      "value_uci_standardised": 20.5983458127,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 21,
+      "value": 18.8756879483,
+      "value_lci": 15.4795326046,
+      "value_uci": 22.271843292,
+      "n": 590,
+      "value_standardised": 18.8113867601,
+      "value_lci_standardised": 15.3168379997,
+      "value_uci_standardised": 22.3059355206,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 22,
+      "value": 20.8005530353,
+      "value_lci": 17.5421783392,
+      "value_uci": 24.0589277315,
+      "n": 693,
+      "value_standardised": 20.7578729666,
+      "value_lci_standardised": 17.567161336,
+      "value_uci_standardised": 23.9485845972,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 23,
+      "value": 19.4483561983,
+      "value_lci": 15.4268396554,
+      "value_uci": 23.4698727413,
+      "n": 440,
+      "value_standardised": 19.290147125,
+      "value_lci_standardised": 15.2258883508,
+      "value_uci_standardised": 23.3544058992,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 24,
+      "value": 22.655677119,
+      "value_lci": 17.3765082582,
+      "value_uci": 27.9348459798,
+      "n": 278,
+      "value_standardised": 23.133667675,
+      "value_lci_standardised": 17.8915903093,
+      "value_uci_standardised": 28.3757450407,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 25,
+      "value": 18.9871618833,
+      "value_lci": 15.0066893486,
+      "value_uci": 22.967634418,
+      "n": 424,
+      "value_standardised": 18.5064038002,
+      "value_lci_standardised": 14.6815427025,
+      "value_uci_standardised": 22.3312648978,
+      "q": 4,
+      "q_standardised": 3,
+      "sex_id": 1
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 1,
+      "value": 32.1292464256,
+      "value_lci": 29.1055495889,
+      "value_uci": 35.1529432622,
+      "n": 1130,
+      "value_standardised": 32.5508567668,
+      "value_lci_standardised": 29.4839924132,
+      "value_uci_standardised": 35.6177211205,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 3,
+      "value": 27.1694066517,
+      "value_lci": 23.0517743944,
+      "value_uci": 31.287038909,
+      "n": 519,
+      "value_standardised": 27.0430623518,
+      "value_lci_standardised": 22.953450924,
+      "value_uci_standardised": 31.1326737797,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 5,
+      "value": 25.386679322,
+      "value_lci": 21.1721717382,
+      "value_uci": 29.6011869058,
+      "n": 484,
+      "value_standardised": 26.0671562224,
+      "value_lci_standardised": 21.7506221057,
+      "value_uci_standardised": 30.3836903391,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 9,
+      "value": 26.9246614216,
+      "value_lci": 22.7943950158,
+      "value_uci": 31.0549278273,
+      "n": 519,
+      "value_standardised": 27.2470772631,
+      "value_lci_standardised": 23.0187235435,
+      "value_uci_standardised": 31.4754309828,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 10,
+      "value": 35.6906417335,
+      "value_lci": 31.4076565269,
+      "value_uci": 39.9736269402,
+      "n": 539,
+      "value_standardised": 35.8168439932,
+      "value_lci_standardised": 31.5621811691,
+      "value_uci_standardised": 40.0715068174,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 12,
+      "value": 36.6133696313,
+      "value_lci": 32.0593257543,
+      "value_uci": 41.1674135083,
+      "n": 524,
+      "value_standardised": 37.1578241517,
+      "value_lci_standardised": 32.3819890022,
+      "value_uci_standardised": 41.9336593011,
+      "q": 5,
+      "q_standardised": 4,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 7,
+      "value": 23.3640020317,
+      "value_lci": 17.547063573,
+      "value_uci": 29.1809404905,
+      "n": 224,
+      "value_standardised": 24.2734456323,
+      "value_lci_standardised": 18.2560378756,
+      "value_uci_standardised": 30.290853389,
+      "q": 1,
+      "q_standardised": 1,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 13,
+      "value": 36.2155462182,
+      "value_lci": 31.5479830266,
+      "value_uci": 40.8831094098,
+      "n": 470,
+      "value_standardised": 37.3145024658,
+      "value_lci_standardised": 32.1457035943,
+      "value_uci_standardised": 42.4833013373,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 15,
+      "value": 29.2058917146,
+      "value_lci": 23.6919585753,
+      "value_uci": 34.7198248539,
+      "n": 321,
+      "value_standardised": 29.6708788208,
+      "value_lci_standardised": 24.1468616937,
+      "value_uci_standardised": 35.1948959479,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 17,
+      "value": 28.5143532761,
+      "value_lci": 24.2185622909,
+      "value_uci": 32.8101442613,
+      "n": 521,
+      "value_standardised": 29.5723036042,
+      "value_lci_standardised": 25.2710258588,
+      "value_uci_standardised": 33.8735813496,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 18,
+      "value": 27.2894533858,
+      "value_lci": 22.9956316929,
+      "value_uci": 31.5832750787,
+      "n": 495,
+      "value_standardised": 28.1767447122,
+      "value_lci_standardised": 23.5631234173,
+      "value_uci_standardised": 32.790366007,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 0,
+      "value": 32.7314043152,
+      "value_lci": 31.6441909873,
+      "value_uci": 33.8186176431,
+      "n": 10988,
+      "value_standardised": 33.1067546974,
+      "value_lci_standardised": 31.9910250051,
+      "value_uci_standardised": 34.2224843898,
+      "q": 3,
+      "q_standardised": 4,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 19,
+      "value": 35.8053858552,
+      "value_lci": 31.7878112831,
+      "value_uci": 39.8229604272,
+      "n": 645,
+      "value_standardised": 36.0672263097,
+      "value_lci_standardised": 32.0003418872,
+      "value_uci_standardised": 40.1341107321,
+      "q": 4,
+      "q_standardised": 4,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 20,
+      "value": 32.5419336158,
+      "value_lci": 28.4909237488,
+      "value_uci": 36.5929434828,
+      "n": 634,
+      "value_standardised": 32.8554313063,
+      "value_lci_standardised": 28.7989806642,
+      "value_uci_standardised": 36.9118819484,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 21,
+      "value": 36.3111449151,
+      "value_lci": 32.6403883136,
+      "value_uci": 39.9819015166,
+      "n": 749,
+      "value_standardised": 37.7301557782,
+      "value_lci_standardised": 33.9300187996,
+      "value_uci_standardised": 41.5302927568,
+      "q": 4,
+      "q_standardised": 5,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 22,
+      "value": 38.9184391714,
+      "value_lci": 35.4794809447,
+      "value_uci": 42.357397398,
+      "n": 865,
+      "value_standardised": 39.5266998783,
+      "value_lci_standardised": 36.0449211355,
+      "value_uci_standardised": 43.0084786211,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 23,
+      "value": 32.1011356822,
+      "value_lci": 27.9138637025,
+      "value_uci": 36.288407662,
+      "n": 540,
+      "value_standardised": 32.4133891623,
+      "value_lci_standardised": 28.0946874193,
+      "value_uci_standardised": 36.7320909053,
+      "q": 2,
+      "q_standardised": 2,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 24,
+      "value": 37.9728073612,
+      "value_lci": 32.468991492,
+      "value_uci": 43.4766232304,
+      "n": 330,
+      "value_standardised": 38.4007422097,
+      "value_lci_standardised": 32.7482410241,
+      "value_uci_standardised": 44.0532433952,
+      "q": 5,
+      "q_standardised": 5,
+      "sex_id": 2
+    },
+    {
+      "year": 2022,
+      "kanton_nr": 25,
+      "value": 32.7666400482,
+      "value_lci": 28.6333813103,
+      "value_uci": 36.8998987862,
+      "n": 547,
+      "value_standardised": 32.9351512103,
+      "value_lci_standardised": 28.7274531239,
+      "value_uci_standardised": 37.1428492967,
+      "q": 3,
+      "q_standardised": 3,
+      "sex_id": 2
+    }
+  ]
+}

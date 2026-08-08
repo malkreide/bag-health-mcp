@@ -5,10 +5,11 @@ rule and SHA-256 are listed in ``tests/fixtures/PROVENANCE.md``, written by
 ``scripts/record_fixtures.py``.
 
 Before this, every payload in the suite was a literal in the test module, and
-the repository's only ``@pytest.mark.live`` test is skipped -- ``pytest -m live``
-collects zero tests here. Nothing had ever compared these assumptions against
-the real hosts. When they finally were compared, the sitemap fixture turned out
-to describe a shape the source does not produce (see PROVENANCE.md).
+nothing had ever compared these assumptions against the real hosts. When they
+finally were compared, the sitemap fixture turned out to describe a shape the
+source does not produce, and the Obsan client turned out to be asking for the
+two rarest of the seven cuts an indicator can have (see PROVENANCE.md and
+``obsan_variant_census.json``).
 
 A missing name is an error, never an empty string: the fallback value of a
 lookup would otherwise be the whole cause -- a test against an empty fixture
@@ -55,6 +56,22 @@ def internal_id(page_fixture: str) -> str:
             "changed, re-record and check the server's extractor"
         )
     return match.group(1)
+
+
+def declared_variants(page_fixture: str) -> dict[str, str]:
+    """``{suffix: apiUrl}`` — the API cuts a recorded indicator page declares.
+
+    Read from the fixture for the same reason ``internal_id`` is: this list is
+    what the server chooses from, so a copy of it in the test file would let the
+    test agree with itself while disagreeing with the source.
+    """
+    data = json.loads(
+        re.search(r"__NEXT_DATA__[^>]*>(.*?)</script>", fixture_text(page_fixture), re.S).group(1)
+    )
+    props = data["props"]["pageProps"]
+    od3 = ((props.get("jsonLDs") or {}).get("links") or {}).get("od3") or {}
+    entries = od3.get(props["id"]) or {}
+    return {suffix: entry["apiUrl"] for suffix, entry in entries.items()}
 
 
 def catalogue_ids(sitemap_fixture: str = "obsan_sitemap.xml") -> list[str]:

@@ -480,17 +480,30 @@ class IndicatorSearchOutput(BaseModel):
 
 
 class IndicatorSeriesPoint(BaseModel):
-    """One observation. Dimension ids (sex/category) are passed through as the
-    source encodes them; see the series ``dimensions`` block for their meaning."""
+    """One observation. Dimension ids (sex/category/age/...) are passed through as
+    the source encodes them; see the series ``dimensions`` block for their meaning.
+
+    Every dimension the Obsan payloads carry gets its own field rather than one
+    shared ``category_id``. They are not interchangeable and they co-occur: an
+    ``ag`` cut ships ``age_class`` *and* ``category_id`` in the same row, so
+    folding them together would silently drop one of the two axes and leave
+    several rows per year that look like duplicates of each other.
+    """
 
     year: int | None = None
     period: str | None = None
     value: float | None = None
     value_lower_ci: float | None = None
     value_upper_ci: float | None = None
-    sample_size: int | None = None
+    sample_size: float | None = None
     sex_id: int | None = None
     category_id: int | None = None
+    canton_nr: int | None = None
+    canton: str | None = None
+    age_class: int | None = None
+    group_id: int | None = None
+    characteristic_id: int | None = None
+    segment_id: int | None = None
 
 
 class IndicatorSeriesOutput(BaseModel):
@@ -507,4 +520,12 @@ class IndicatorSeriesOutput(BaseModel):
     interpretation: str = ""
     aggregate_statistics_notice: str = AGGREGATE_STATISTICS_NOTICE
     note: str | None = None
+    # Which cut of the indicator these points are, and which cuts the source
+    # offers besides it. Named in the response because they are not
+    # interchangeable: an Obsan indicator can be published by canton, by age
+    # class, by social position and as a distribution, each with its own unit.
+    # A series that does not say which one it is invites the reader to assume
+    # the one they asked about.
+    variant: str | None = None
+    variants_available: list[str] = Field(default_factory=list)
     provenance: Provenance = Field(default_factory=Provenance)
