@@ -1,8 +1,9 @@
 """Tests for the multi-source health-indicator tools.
 
-Covers the happy path, the Obsan /g -> /gum fallback, Versorgungsatlas graceful
-degradation, the retry-with-backoff path (503 then 200) and a clean network-error
-failure. Run unit tests: pytest -m "not live".
+Covers the happy path, the Obsan cut selection (which variant of an indicator
+exists, read off its page), Versorgungsatlas graceful degradation, the
+retry-with-backoff path (503 then 200) and a clean network-error failure.
+Run unit tests: pytest -m "not live"; the live checks: pytest -m live.
 """
 
 import re
@@ -10,7 +11,7 @@ import re
 import httpx
 import pytest
 import respx
-from fixture_data import fixture_json, fixture_text, internal_id
+from fixture_data import declared_variants, fixture_json, fixture_text, internal_id
 from mcp.server.mcpserver.exceptions import ToolError
 
 import bag_health_mcp.server as srv
@@ -46,16 +47,23 @@ def _fast_and_fresh(monkeypatch):
 
 SITEMAP = fixture_text("obsan_sitemap.xml")
 OBSAN_PAGE = fixture_text("obsan_page.html")
-OBSAN_PAGE_NO_SERIES = fixture_text("obsan_page_no_series.html")
+OBSAN_PAGE_KG_ONLY = fixture_text("obsan_page_cantonal_only.html")
+OBSAN_PAGE_NO_VARIANTS = fixture_text("obsan_page_no_variants.html")
 OBSAN_API = fixture_json("obsan_api_g.json")
 OBSAN_API_GUM = fixture_json("obsan_api_gum.json")
+OBSAN_API_KG = fixture_json("obsan_api_kg.json")
+OBSAN_API_KG_ONLY = fixture_json("obsan_api_kg_only.json")
+OBSAN_API_KG_SPARSE = fixture_json("obsan_api_kg_sparse.json")
+CENSUS = fixture_json("obsan_variant_census.json")
 
 # Aus der Fixture gelesen, nicht danebengeschrieben: eine Kopie waere eine
 # zweite Stelle, an der die Angabe falsch sein kann.
-INTERNAL = internal_id("obsan_page.html")
-INTERNAL_NO_SERIES = internal_id("obsan_page_no_series.html")
+INTERNAL_NO_VARIANTS = internal_id("obsan_page_no_variants.html")
+VARIANTS = declared_variants("obsan_page.html")
+VARIANTS_KG_ONLY = declared_variants("obsan_page_cantonal_only.html")
 INDICATOR_ID = "obsan/suizid-und-suizidhilfe"
-NO_SERIES_ID = "obsan/lebenserwartung"
+KG_ONLY_ID = "obsan/lebenserwartung"
+NO_VARIANTS_ID = "obsan/osteoporose"
 
 VA_SEARCH = fixture_json("va_search_de.json")
 VA_AD = fixture_json("va_ad.json")
@@ -102,15 +110,12 @@ async def test_obsan_series_resolves_path_and_filters_years():
     respx.get(f"{OBSAN}/de/indicator/{INDICATOR_ID}").mock(
         return_value=httpx.Response(200, text=OBSAN_PAGE)
     )
-    respx.get(f"{OBSAN}/api/{INTERNAL}/g/json").mock(
-        return_value=httpx.Response(200, json=OBSAN_API)
-    )
+    respx.get(VARIANTS["g"]).mock(return_value=httpx.Response(200, json=OBSAN_API))
     year_from = 2020
     out = await srv.bag_get_indicator_series(
         GetIndicatorSeriesInput(
             source="obsan",
             indicator_id=INDICATOR_ID,
-            region="ZH",
             year_from=year_from,
             language="de",
         )
@@ -123,16 +128,220 @@ async def test_obsan_series_resolves_path_and_filters_years():
     assert out.total_points == len(expected)
     assert min(p.year for p in out.points) >= year_from
     assert out.points[0].value_lower_ci == expected[0]["value_lci"]
-    # canton requested but indicator is national -> explanatory note
     assert out.region == "CH"
-    assert "ZH" in out.region_note and "cantonally representative" in out.region_note
+    assert out.variant == "g"
+    assert out.variants_available == sorted(VARIANTS)
     assert out.provenance.data_version == OBSAN_API["version"]
+
+
+# --- Welche Schnitte es gibt, sagt die Seite -------------------------------
+#
+# Die Erhebung dazu ist selbst aufgezeichnet (obsan_variant_census.json), also
+# datiert und nachmessbar — nicht eine Zahl in einer Commit-Nachricht, die
+# niemand mehr pruefen kann.
+
+
+def test_the_two_suffixes_the_client_used_to_ask_for_are_the_rare_ones():
+    """Die Begruendung des ganzen Umbaus, als Zusicherung.
+
+    Der Client fragte `/g/json` und, bei 404, `/gum/json` — sonst nichts. Am
+    2026-08-08 ueber 60 sprachneutrale Indikatoren gemessen: 49 haben weder das
+    eine noch das andere, und nur 8 haben ueberhaupt keine Variante. Die
+    Differenz — 41 Indikatoren — sind Reihen, die es gibt und die der Server
+    fuer nicht vorhanden erklaerte. Nicht der Katalog war zu grosszuegig, die
+    Frage war falsch.
+    """
+    counts = CENSUS["variant_counts"]
+    assert CENSUS["without_g_or_gum"] > CENSUS["sampled"] / 2, (
+        "Wenn die Mehrheit `g` oder `gum` haette, waere die alte Abfrage in "
+        "Ordnung gewesen — dann diesen Umbau und seine Begruendung pruefen."
+    )
+    unreachable_before = CENSUS["without_g_or_gum"] - CENSUS["without_any_variant"]
+    assert unreachable_before > 0
+    assert counts["kg"] > counts.get("g", 0), (
+        "Der kantonale Schnitt ist der haeufigste, der nationale der seltenste "
+        "— und der Client fragte nur den seltenen."
+    )
 
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_obsan_series_falls_back_to_gum_variant():
+async def test_obsan_series_reads_the_cantonal_cut_the_page_declares():
+    """Ein Indikator, den die alte Abfrage fuer leer hielt.
+
+    `obsan/lebenserwartung` deklariert genau eine Variante: `kg`. Auf `/g/json`
+    und `/gum/json` — die beiden einzigen, die der Client fragte — antwortet die
+    Quelle 404. Er hat trotzdem eine vollstaendige Reihe, kantonal, seit 1998.
+
+    Die Gegenprobe steckt in dem, was hier NICHT gemockt ist: respx laesst keinen
+    ungemockten Aufruf durch, also faellt dieser Test, sobald wieder jemand
+    `/g/json` fragt. Der Weg ueber die Seite ist damit nicht nur gangbar, sondern
+    der einzige, den dieser Test bestehen laesst.
+    """
+    assert set(VARIANTS_KG_ONLY) == {"kg"}, (
+        "Die Fixture deklariert nicht mehr nur `kg` — dann belegt sie den Fund "
+        "nicht mehr. Neu aufzeichnen mit `python scripts/record_fixtures.py`."
+    )
+    respx.get(f"{OBSAN}/de/indicator/{KG_ONLY_ID}").mock(
+        return_value=httpx.Response(200, text=OBSAN_PAGE_KG_ONLY)
+    )
+    respx.get(VARIANTS_KG_ONLY["kg"]).mock(return_value=httpx.Response(200, json=OBSAN_API_KG_ONLY))
+    out = await srv.bag_get_indicator_series(
+        GetIndicatorSeriesInput(source="obsan", indicator_id=KG_ONLY_ID, region="ZH", language="de")
+    )
+    zurich = [p for p in OBSAN_API_KG_ONLY["data"] if p["kanton_nr"] == 1]
+    assert zurich, "Fixture ohne Zuercher Zeilen — Auswahlregel pruefen"
+    assert out.values_available is True
+    assert out.total_points == len(zurich)
+    assert out.region == "ZH"
+    assert out.variant == "kg"
+    assert all(p.canton == "ZH" for p in out.points)
+    # Die Legende kommt aus dem Payload, nicht aus einer Tabelle im Server:
+    # dieser Indikator ist nach «bei der Geburt» / «bei 65 Jahren» geteilt, und
+    # ohne diese Angabe mischt eine Reihe zwei verschiedene Groessen.
+    assert "category_id" in out.dimensions
+    for code, name in OBSAN_API_KG_ONLY["category_id"]["codes"].items():
+        assert f"{code} = {name['de']}" in out.dimensions["category_id"]
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_obsan_national_total_comes_from_the_cantonal_cut():
+    """Ohne Region ist die Schweiz gemeint — und `kg` fuehrt sie als Nummer 0."""
+    respx.get(f"{OBSAN}/de/indicator/{KG_ONLY_ID}").mock(
+        return_value=httpx.Response(200, text=OBSAN_PAGE_KG_ONLY)
+    )
+    respx.get(VARIANTS_KG_ONLY["kg"]).mock(return_value=httpx.Response(200, json=OBSAN_API_KG_ONLY))
+    out = await srv.bag_get_indicator_series(
+        GetIndicatorSeriesInput(source="obsan", indicator_id=KG_ONLY_ID, language="de")
+    )
+    national = [p for p in OBSAN_API_KG_ONLY["data"] if p["kanton_nr"] == 0]
+    assert national, "Fixture ohne Schweiz-Zeilen — Auswahlregel pruefen"
+    assert out.region == "CH"
+    assert out.total_points == len(national)
+    assert {p.canton_nr for p in out.points} == {0}
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_obsan_pooled_year_spans_keep_their_label():
+    """'1998-02' ist die Spanne 1998-2002, nicht der Februar 1998.
+
+    Diese Form kommt in `g` und `gum` nicht vor, also hat sie bis hierher kein
+    Payload getroffen. In ein `int`-Feld gelegt wirft sie einen
+    Validierungsfehler mitten im Werkzeugaufruf.
+    """
+    pooled = [p for p in OBSAN_API_KG["data"] if isinstance(p["year"], str)]
+    assert pooled, "Fixture ohne gepoolte Spanne — dann prueft dieser Test nichts"
+    respx.get(f"{OBSAN}/de/indicator/{INDICATOR_ID}").mock(
+        return_value=httpx.Response(200, text=OBSAN_PAGE)
+    )
+    respx.get(VARIANTS["kg"]).mock(return_value=httpx.Response(200, json=OBSAN_API_KG))
+    out = await srv.bag_get_indicator_series(
+        GetIndicatorSeriesInput(
+            source="obsan", indicator_id=INDICATOR_ID, region="ZH", language="de"
+        )
+    )
+    assert out.variant == "kg"
+    assert out.points, "keine Punkte — dann sagt der Rest nichts"
+    first = next(p for p in OBSAN_API_KG["data"] if p["kanton_nr"] == 1)
+    got = out.points[0]
+    assert got.period == first["year"]
+    assert got.year == int(str(first["year"])[:4])
+    assert "period" in out.dimensions
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_obsan_year_filter_reads_the_start_of_a_pooled_span():
+    respx.get(f"{OBSAN}/de/indicator/{INDICATOR_ID}").mock(
+        return_value=httpx.Response(200, text=OBSAN_PAGE)
+    )
+    respx.get(VARIANTS["kg"]).mock(return_value=httpx.Response(200, json=OBSAN_API_KG))
+    year_from = 2015
+    out = await srv.bag_get_indicator_series(
+        GetIndicatorSeriesInput(
+            source="obsan",
+            indicator_id=INDICATOR_ID,
+            region="ZH",
+            year_from=year_from,
+            language="de",
+        )
+    )
+    expected = [
+        p
+        for p in OBSAN_API_KG["data"]
+        if p["kanton_nr"] == 1 and int(str(p["year"])[:4]) >= year_from
+    ]
+    assert expected, "Zuschnitt ohne Zeilen ab 2015 — Auswahlregel pruefen"
+    assert out.total_points == len(expected)
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_obsan_names_a_canton_the_indicator_is_not_published_for():
+    """Nicht jeder Indikator erscheint fuer jeden Kanton — und das ist sagbar.
+
+    Der interne Bezeichner wird hier absichtlich direkt uebergeben: dann gibt es
+    keine Seite zu lesen, und der Client muss die Varianten abklopfen. Auch
+    dieser Weg soll die Luecke benennen statt eine leere Reihe zu liefern.
+    """
+    published = {p["kanton_nr"] for p in OBSAN_API_KG_SPARSE["data"]}
+    missing = sorted(set(range(1, 27)) - published)
+    assert missing, "Fixture ohne fehlenden Kanton — dann prueft dieser Test nichts"
+    absent = hi._BFS_BY_NUMBER[missing[0]]
+
+    respx.get(f"{OBSAN}/api/_003/kg/json").mock(
+        return_value=httpx.Response(200, json=OBSAN_API_KG_SPARSE)
+    )
+    with pytest.raises(ToolError) as exc:
+        await srv.bag_get_indicator_series(
+            GetIndicatorSeriesInput(
+                source="obsan", indicator_id="_003", region=absent, language="de"
+            )
+        )
+    message = str(exc.value)
+    assert absent in message and "not published" in message
+    # Und die Antwort sagt, welche es gibt — sonst ist der Fehler eine Sackgasse.
+    assert hi._BFS_BY_NUMBER[sorted(published - {0})[0]] in message
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_obsan_says_so_when_the_indicator_publishes_nothing():
+    """Der Fall, in dem «keine Reihe» wirklich stimmt — 8 von 60.
+
+    Er soll benannt werden und nicht als leeres Ergebnis erscheinen: eine leere
+    Reihe liest sich wie eine Aussage ueber die Welt und ist eine ueber den
+    Client.
+    """
+    assert not declared_variants("obsan_page_no_variants.html"), (
+        "Die Fixture deklariert jetzt Varianten — neu aufzeichnen."
+    )
+    respx.get(f"{OBSAN}/de/indicator/{NO_VARIANTS_ID}").mock(
+        return_value=httpx.Response(200, text=OBSAN_PAGE_NO_VARIANTS)
+    )
+    with pytest.raises(ToolError) as exc:
+        await srv.bag_get_indicator_series(
+            GetIndicatorSeriesInput(source="obsan", indicator_id=NO_VARIANTS_ID, language="de")
+        )
+    assert "no time series" in str(exc.value)
+    assert INTERNAL_NO_VARIANTS in str(exc.value)
+
+
+@pytest.mark.asyncio
+@respx.mock
+async def test_obsan_distribution_cut_is_named_as_one():
+    """`gum` ist eine Verteilung in %, keine schlechtere Rate.
+
+    Frueher rutschte sie stillschweigend als Ersatz fuer `g` durch. Sie traegt
+    eine andere Einheit und eine eigene Dimension (`segment_id`), und beides
+    steht jetzt in der Antwort.
+    """
     respx.get(f"{OBSAN}/api/_500/g/json").mock(return_value=httpx.Response(404))
+    respx.get(f"{OBSAN}/api/_500/kg/json").mock(return_value=httpx.Response(404))
+    respx.get(f"{OBSAN}/api/_500/ag/json").mock(return_value=httpx.Response(404))
+    respx.get(f"{OBSAN}/api/_500/sd/json").mock(return_value=httpx.Response(404))
     respx.get(f"{OBSAN}/api/_500/gum/json").mock(
         return_value=httpx.Response(200, json=OBSAN_API_GUM)
     )
@@ -140,6 +349,31 @@ async def test_obsan_series_falls_back_to_gum_variant():
         GetIndicatorSeriesInput(source="obsan", indicator_id="_500", language="de")
     )
     assert out.total_points == len(OBSAN_API_GUM["data"])
+    assert out.variant == "gum"
+    assert "distribution" in out.interpretation
+    assert out.unit == OBSAN_API_GUM["value"]["de"]
+    assert [p.segment_id for p in out.points] == [p["segment_id"] for p in OBSAN_API_GUM["data"]]
+
+
+def test_canton_numbering_is_checked_against_the_source():
+    """Die BFS-Nummern werden am Payload geprueft, nicht geglaubt.
+
+    Ein falsch zugeordneter Kanton ist die unangenehmste Form von falsch: die
+    Antwort ist vollstaendig, plausibel und handelt von woanders. Sie faellt
+    niemandem auf.
+    """
+    payload = OBSAN_API_KG_ONLY
+    for code, (number, name) in hi._BFS_CANTONS.items():
+        upstream = payload["kanton_nr"]["codes"].get(str(number))
+        if upstream is None:
+            continue
+        assert upstream["de"] == name, f"{code}: {name!r} hier, {upstream['de']!r} dort"
+        assert hi._canton_number(code, payload) == number
+
+    tampered = {"kanton_nr": {"codes": {"1": {"de": "Genf"}}}}
+    with pytest.raises(ToolError) as exc:
+        hi._canton_number("ZH", tampered)
+    assert "Refusing to guess" in str(exc.value)
 
 
 @pytest.mark.asyncio
@@ -306,3 +540,42 @@ async def test_german_results_ride_on_the_language_neutral_catalogue_entries():
     )
     assert out.total_matches == 1
     assert out.indicators[0].indicator_id == INDICATOR_ID
+
+
+# --- Live ------------------------------------------------------------------
+#
+# Eine Fixture belegt die *Form* einer Antwort zu einem Datum. Dass die Quelle
+# ihre Schnitte weiterhin so ausweist — und dass dieser Indikator sie weiterhin
+# hat — belegt nur ein Lauf gegen den echten Host. `pytest -m live`.
+
+
+@pytest.mark.live
+@pytest.mark.asyncio
+async def test_live_obsan_publishes_more_cuts_than_g_and_gum():
+    """Die Annahme, auf der der ganze Umbau steht, gegen die Quelle gehalten."""
+    out = await srv.bag_get_indicator_series(
+        GetIndicatorSeriesInput(source="obsan", indicator_id=KG_ONLY_ID, language="de")
+    )
+    assert out.values_available is True
+    assert out.total_points > 0
+    assert "g" not in out.variants_available and "gum" not in out.variants_available, (
+        "Die Quelle liefert fuer diesen Indikator jetzt `g` oder `gum` — dann "
+        "war die alte Abfrage fuer ihn richtig, und die Fixture-Auswahl gehoert "
+        "geprueft (scripts/record_fixtures.py)."
+    )
+
+
+@pytest.mark.live
+@pytest.mark.asyncio
+async def test_live_obsan_cantonal_series_differs_from_the_national_one():
+    """Kantonal heisst kantonal — sonst waere der Zuschnitt folgenlos."""
+    zh = await srv.bag_get_indicator_series(
+        GetIndicatorSeriesInput(source="obsan", indicator_id=KG_ONLY_ID, region="ZH", language="de")
+    )
+    ch = await srv.bag_get_indicator_series(
+        GetIndicatorSeriesInput(source="obsan", indicator_id=KG_ONLY_ID, language="de")
+    )
+    assert zh.region == "ZH" and ch.region == "CH"
+    assert zh.variant == ch.variant == "kg"
+    assert zh.points and ch.points
+    assert [p.value for p in zh.points] != [p.value for p in ch.points]

@@ -1,0 +1,6512 @@
+{
+  "name": "_001_kg",
+  "title": {
+    "de": "Lebenserwartung, nach Kantonen",
+    "fr": "Espérance de vie, par canton"
+  },
+  "description": {
+    "de": "in Jahren",
+    "fr": "en années"
+  },
+  "source": {
+    "de": "BFS – Statistik der Todesursachen (CoD) und Statistik der Bevölkerung und der Haushalte (STATPOP)",
+    "fr": "OFS – Statistique des causes de décès (CoD) et Statistique de la population et des ménages (STATPOP)"
+  },
+  "kanton_nr": {
+    "de": "Kantonsnummer (nach BFS)",
+    "fr": "Numéro du canton (selon OFS)",
+    "codes": {
+      "0": {
+        "de": "Schweiz",
+        "fr": "Suisse",
+        "it": "Svizzera",
+        "en": "Switzerland"
+      },
+      "1": {
+        "de": "Zürich",
+        "fr": "Zurich",
+        "it": "Zurigo",
+        "en": "Zurich"
+      },
+      "2": {
+        "de": "Bern",
+        "fr": "Berne",
+        "it": "Berna",
+        "en": "Bern"
+      },
+      "3": {
+        "de": "Luzern",
+        "fr": "Lucerne",
+        "it": "Lucerna",
+        "en": "Lucerne"
+      },
+      "4": {
+        "de": "Uri",
+        "fr": "Uri",
+        "it": "Uri",
+        "en": "Uri"
+      },
+      "5": {
+        "de": "Schwyz",
+        "fr": "Schwytz",
+        "it": "Svitto",
+        "en": "Schwyz"
+      },
+      "6": {
+        "de": "Obwalden",
+        "fr": "Obwald",
+        "it": "Obvaldo",
+        "en": "Obwalden"
+      },
+      "7": {
+        "de": "Nidwalden",
+        "fr": "Nidwald",
+        "it": "Nidvaldo",
+        "en": "Nidwalden"
+      },
+      "8": {
+        "de": "Glarus",
+        "fr": "Glaris",
+        "it": "Glarona",
+        "en": "Glarus"
+      },
+      "9": {
+        "de": "Zug",
+        "fr": "Zoug",
+        "it": "Zugo",
+        "en": "Zug"
+      },
+      "10": {
+        "de": "Freiburg",
+        "fr": "Fribourg",
+        "it": "Friburgo",
+        "en": "Fribourg"
+      },
+      "11": {
+        "de": "Solothurn",
+        "fr": "Soleure",
+        "it": "Soletta",
+        "en": "Solothurn"
+      },
+      "12": {
+        "de": "Basel-Stadt",
+        "fr": "Bâle-Ville",
+        "it": "Basilea Città",
+        "en": "Basel-City"
+      },
+      "13": {
+        "de": "Basel-Landschaft",
+        "fr": "Bâle-Campagne",
+        "it": "Basilea Campagna",
+        "en": "Basel-Country"
+      },
+      "14": {
+        "de": "Schaffhausen",
+        "fr": "Schaffhouse",
+        "it": "Sciaffusa",
+        "en": "Schaffhausen"
+      },
+      "15": {
+        "de": "Appenzell Ausserrhoden",
+        "fr": "Appenzell Rh.-Ext.",
+        "it": "Appenzello Esterno",
+        "en": "Appenzell Outer Rhodes"
+      },
+      "16": {
+        "de": "Appenzell Innerrhoden",
+        "fr": "Appenzell Rh.-Int.",
+        "it": "Appenzello Interno",
+        "en": "Appenzell Inner Rhodes"
+      },
+      "17": {
+        "de": "St. Gallen",
+        "fr": "Saint-Gall",
+        "it": "San Gallo",
+        "en": "St. Gallen"
+      },
+      "18": {
+        "de": "Graubünden",
+        "fr": "Grisons",
+        "it": "Grigioni",
+        "en": "Grisons"
+      },
+      "19": {
+        "de": "Aargau",
+        "fr": "Argovie",
+        "it": "Argovia",
+        "en": "Aargau"
+      },
+      "20": {
+        "de": "Thurgau",
+        "fr": "Thurgovie",
+        "it": "Turgovia",
+        "en": "Thurgau"
+      },
+      "21": {
+        "de": "Tessin",
+        "fr": "Tessin",
+        "it": "Ticino",
+        "en": "Ticino"
+      },
+      "22": {
+        "de": "Waadt",
+        "fr": "Vaud",
+        "it": "Vaud",
+        "en": "Vaud"
+      },
+      "23": {
+        "de": "Wallis",
+        "fr": "Valais",
+        "it": "Vallese",
+        "en": "Valais"
+      },
+      "24": {
+        "de": "Neuenburg",
+        "fr": "Neuchâtel",
+        "it": "Neuchâtel",
+        "en": "Neuchâtel"
+      },
+      "25": {
+        "de": "Genf",
+        "fr": "Genève",
+        "it": "Ginevra",
+        "en": "Geneva"
+      },
+      "26": {
+        "de": "Jura",
+        "fr": "Jura",
+        "it": "Giura",
+        "en": "Jura"
+      }
+    }
+  },
+  "value_lci": {
+    "de": "Untere Grenze Vertrauensintervall",
+    "fr": "Limite inférieure de l'intervalle de confiance"
+  },
+  "value_uci": {
+    "de": "Obere Grenze Vertrauensintervall",
+    "fr": "Limite supérieure de l'intervalle de confiance"
+  },
+  "category_id": {
+    "de": "Kategorie",
+    "fr": "Catégorie",
+    "codes": {
+      "1": {
+        "de": "bei der Geburt",
+        "fr": "à la naissance"
+      },
+      "2": {
+        "de": "bei 65 Jahren",
+        "fr": "à 65 ans"
+      }
+    }
+  },
+  "year": {
+    "de": "Jahr",
+    "fr": "Année"
+  },
+  "value": {
+    "de": "Lebenserwartung",
+    "fr": "Espérance de vie"
+  },
+  "q": {
+    "de": "Quintil",
+    "fr": "Quintile"
+  },
+  "sex_id": {
+    "de": "Geschlecht",
+    "fr": "Sexe",
+    "codes": {
+      "0": {
+        "de": "Total",
+        "fr": "Total",
+        "it": "Totale",
+        "en": "Total"
+      },
+      "1": {
+        "de": "Männer",
+        "fr": "Hommes",
+        "it": "Uomini",
+        "en": "Men"
+      },
+      "2": {
+        "de": "Frauen",
+        "fr": "Femmes",
+        "it": "Donne",
+        "en": "Women"
+      }
+    }
+  },
+  "remarks": {
+    "de": "Quelle: BFS – Statistik der Todesursachen (CoD) und Statistik der Bevölkerung und der Haushalte (STATPOP)\nDie Quantile teilen die Werte der Grösse nach in fünf gleich grosse Gruppen ein.",
+    "fr": "Source: OFS – Statistique des causes de décès (CoD) et Statistique de la population et des ménages (STATPOP)\nLes quantiles partagent la distribution ordonnée en cinq parties égales."
+  },
+  "country": {
+    "de": "Schweiz",
+    "fr": "Suisse",
+    "it": "Svizzera",
+    "en": "Switzerland"
+  },
+  "indicator": {
+    "de": {
+      "title": "Lebenserwartung",
+      "url": "https://ind.obsan.admin.ch/indicator/obsan/lebenserwartung"
+    },
+    "fr": {
+      "title": "Espérance de vie",
+      "url": "https://ind.obsan.admin.ch/fr/indicator/obsan/esperance-de-vie"
+    }
+  },
+  "author": {
+    "de": "Schweizerisches Gesundheitsobsevratorium (Obsan)",
+    "fr": "Observatoire suisse de la santé (Obsan)"
+  },
+  "phone": "+41 58 463 60 45",
+  "email": "obsan@bfs.admin.ch",
+  "version": "20251209",
+  "created_at": "2026-08-08T07:17:16.330Z",
+  "last_updated_at": "2025-12-22",
+  "data": [
+    {
+      "kanton_nr": 1,
+      "value_lci": 79.064440097,
+      "value_uci": 79.5661265259,
+      "category_id": 1,
+      "year": 1998,
+      "value": 79.3152833115,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 79.3165707083,
+      "value_uci": 79.519966226,
+      "category_id": 1,
+      "year": 1998,
+      "value": 79.4182684672,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 75.9050844032,
+      "value_uci": 76.6397092079,
+      "category_id": 1,
+      "year": 1998,
+      "value": 76.2723968056,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 76.0986635311,
+      "value_uci": 76.3936279788,
+      "category_id": 1,
+      "year": 1998,
+      "value": 76.2461457549,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.2769926269,
+      "value_uci": 82.5412811108,
+      "category_id": 1,
+      "year": 1998,
+      "value": 82.4091368689,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.804936902,
+      "value_uci": 82.4512603502,
+      "category_id": 1,
+      "year": 1998,
+      "value": 82.1280986261,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.6786556782,
+      "value_uci": 19.0075162356,
+      "category_id": 2,
+      "year": 1998,
+      "value": 18.8430859569,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.6542484434,
+      "value_uci": 18.7891591522,
+      "category_id": 2,
+      "year": 1998,
+      "value": 18.7217037978,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 16.5241078216,
+      "value_uci": 17.002170699,
+      "category_id": 2,
+      "year": 1998,
+      "value": 16.7631392603,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 16.4126118853,
+      "value_uci": 16.6055945131,
+      "category_id": 2,
+      "year": 1998,
+      "value": 16.5091031992,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.2475193352,
+      "value_uci": 20.6769052824,
+      "category_id": 2,
+      "year": 1998,
+      "value": 20.4622123088,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.4220315369,
+      "value_uci": 20.5996021826,
+      "category_id": 2,
+      "year": 1998,
+      "value": 20.5108168598,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 79.4359449759,
+      "value_uci": 79.9203867246,
+      "category_id": 1,
+      "year": 1999,
+      "value": 79.6781658503,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 79.576625777,
+      "value_uci": 79.7783660471,
+      "category_id": 1,
+      "year": 1999,
+      "value": 79.6774959121,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 76.4762556317,
+      "value_uci": 77.1786208123,
+      "category_id": 1,
+      "year": 1999,
+      "value": 76.827438222,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 76.5701538225,
+      "value_uci": 76.8622638442,
+      "category_id": 1,
+      "year": 1999,
+      "value": 76.7162088334,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.3038730347,
+      "value_uci": 82.5683649553,
+      "category_id": 1,
+      "year": 1999,
+      "value": 82.436118995,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.9694147634,
+      "value_uci": 82.6063826545,
+      "category_id": 1,
+      "year": 1999,
+      "value": 82.287898709,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.6238666955,
+      "value_uci": 18.9475310353,
+      "category_id": 2,
+      "year": 1999,
+      "value": 18.7856988654,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.7630895592,
+      "value_uci": 18.897360832,
+      "category_id": 2,
+      "year": 1999,
+      "value": 18.8302251956,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 16.5643245872,
+      "value_uci": 17.0360131253,
+      "category_id": 2,
+      "year": 1999,
+      "value": 16.8001688563,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 16.6166714361,
+      "value_uci": 16.8104071077,
+      "category_id": 2,
+      "year": 1999,
+      "value": 16.7135392719,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.1258670291,
+      "value_uci": 20.5488621019,
+      "category_id": 2,
+      "year": 1999,
+      "value": 20.3373645655,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.4460336025,
+      "value_uci": 20.622160955,
+      "category_id": 2,
+      "year": 1999,
+      "value": 20.5340972788,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 79.3416870095,
+      "value_uci": 79.8300516716,
+      "category_id": 1,
+      "year": 2000,
+      "value": 79.5858693406,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 79.6972131788,
+      "value_uci": 79.8994479759,
+      "category_id": 1,
+      "year": 2000,
+      "value": 79.7983305773,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 76.5406604364,
+      "value_uci": 77.2565780118,
+      "category_id": 1,
+      "year": 2000,
+      "value": 76.8986192241,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 76.7318791441,
+      "value_uci": 77.0251901355,
+      "category_id": 1,
+      "year": 2000,
+      "value": 76.8785346398,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.3852982798,
+      "value_uci": 82.6504529257,
+      "category_id": 1,
+      "year": 2000,
+      "value": 82.5178756028,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.7257314105,
+      "value_uci": 82.361113598,
+      "category_id": 1,
+      "year": 2000,
+      "value": 82.0434225042,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.6595347328,
+      "value_uci": 18.9829248478,
+      "category_id": 2,
+      "year": 2000,
+      "value": 18.8212297903,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.9163293838,
+      "value_uci": 19.0509004092,
+      "category_id": 2,
+      "year": 2000,
+      "value": 18.9836148965,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 16.709259351,
+      "value_uci": 17.1845623614,
+      "category_id": 2,
+      "year": 2000,
+      "value": 16.9469108562,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 16.8026445618,
+      "value_uci": 16.9973970558,
+      "category_id": 2,
+      "year": 2000,
+      "value": 16.9000208088,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.0810377328,
+      "value_uci": 20.5023616866,
+      "category_id": 2,
+      "year": 2000,
+      "value": 20.2916997097,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.576189598,
+      "value_uci": 20.7524689804,
+      "category_id": 2,
+      "year": 2000,
+      "value": 20.6643292892,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 79.8568500042,
+      "value_uci": 80.3625258368,
+      "category_id": 1,
+      "year": 2001,
+      "value": 80.1096879205,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.194617113,
+      "value_uci": 80.3992779401,
+      "category_id": 1,
+      "year": 2001,
+      "value": 80.2969475265,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 77.3585854948,
+      "value_uci": 78.0800536079,
+      "category_id": 1,
+      "year": 2001,
+      "value": 77.7193195513,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 77.221273537,
+      "value_uci": 77.5176732481,
+      "category_id": 1,
+      "year": 2001,
+      "value": 77.3694733926,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.878226829,
+      "value_uci": 83.1471082101,
+      "category_id": 1,
+      "year": 2001,
+      "value": 83.0126675195,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.8759870677,
+      "value_uci": 82.5658502936,
+      "category_id": 1,
+      "year": 2001,
+      "value": 82.2209186807,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.2051079774,
+      "value_uci": 19.5355160713,
+      "category_id": 2,
+      "year": 2001,
+      "value": 19.3703120243,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.2999337367,
+      "value_uci": 19.4365412913,
+      "category_id": 2,
+      "year": 2001,
+      "value": 19.368237514,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 17.3448590002,
+      "value_uci": 17.8325289018,
+      "category_id": 2,
+      "year": 2001,
+      "value": 17.588693951,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 17.1454040309,
+      "value_uci": 17.3432828381,
+      "category_id": 2,
+      "year": 2001,
+      "value": 17.2443434345,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.5175849537,
+      "value_uci": 20.9493455805,
+      "category_id": 2,
+      "year": 2001,
+      "value": 20.7334652671,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.9917768499,
+      "value_uci": 21.1703956371,
+      "category_id": 2,
+      "year": 2001,
+      "value": 21.0810862435,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.2128603266,
+      "value_uci": 80.702132485,
+      "category_id": 1,
+      "year": 2002,
+      "value": 80.4574964058,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.3765872158,
+      "value_uci": 80.5771108329,
+      "category_id": 1,
+      "year": 2002,
+      "value": 80.4768490244,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 77.5987211475,
+      "value_uci": 78.3171821047,
+      "category_id": 1,
+      "year": 2002,
+      "value": 77.9579516261,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 77.5928204924,
+      "value_uci": 77.8831292554,
+      "category_id": 1,
+      "year": 2002,
+      "value": 77.7379748739,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.865968818,
+      "value_uci": 83.1309859782,
+      "category_id": 1,
+      "year": 2002,
+      "value": 82.9984773981,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.3894969259,
+      "value_uci": 83.0285761801,
+      "category_id": 1,
+      "year": 2002,
+      "value": 82.709036553,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.3368553136,
+      "value_uci": 19.6657255653,
+      "category_id": 2,
+      "year": 2002,
+      "value": 19.5012904395,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.3883541508,
+      "value_uci": 19.5233279161,
+      "category_id": 2,
+      "year": 2002,
+      "value": 19.4558410334,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 17.5486396046,
+      "value_uci": 18.0330149846,
+      "category_id": 2,
+      "year": 2002,
+      "value": 17.7908272946,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 17.3709030301,
+      "value_uci": 17.5675640835,
+      "category_id": 2,
+      "year": 2002,
+      "value": 17.4692335568,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.5923071286,
+      "value_uci": 21.0231363757,
+      "category_id": 2,
+      "year": 2002,
+      "value": 20.8077217522,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.9596658598,
+      "value_uci": 21.136152029,
+      "category_id": 2,
+      "year": 2002,
+      "value": 21.0479089444,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.3635599916,
+      "value_uci": 80.8436407801,
+      "category_id": 1,
+      "year": 2003,
+      "value": 80.6036003858,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.4652113629,
+      "value_uci": 80.6615482274,
+      "category_id": 1,
+      "year": 2003,
+      "value": 80.5633797952,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 77.8387454583,
+      "value_uci": 78.5200005628,
+      "category_id": 1,
+      "year": 2003,
+      "value": 78.1793730106,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 77.7539057735,
+      "value_uci": 78.037933731,
+      "category_id": 1,
+      "year": 2003,
+      "value": 77.8959197523,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.8932064269,
+      "value_uci": 83.1530477293,
+      "category_id": 1,
+      "year": 2003,
+      "value": 83.0231270781,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.4251777402,
+      "value_uci": 83.0789708865,
+      "category_id": 1,
+      "year": 2003,
+      "value": 82.7520743134,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.2061287409,
+      "value_uci": 19.5290019935,
+      "category_id": 2,
+      "year": 2003,
+      "value": 19.3675653672,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.3283438488,
+      "value_uci": 19.4613855313,
+      "category_id": 2,
+      "year": 2003,
+      "value": 19.39486469,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 17.1872196104,
+      "value_uci": 17.650486312,
+      "category_id": 2,
+      "year": 2003,
+      "value": 17.4188529612,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 17.3695973902,
+      "value_uci": 17.5625369454,
+      "category_id": 2,
+      "year": 2003,
+      "value": 17.4660671678,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.6963434998,
+      "value_uci": 21.1239708213,
+      "category_id": 2,
+      "year": 2003,
+      "value": 20.9101571605,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.8585951397,
+      "value_uci": 21.0334939801,
+      "category_id": 2,
+      "year": 2003,
+      "value": 20.9460445599,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.8980070852,
+      "value_uci": 81.3789996518,
+      "category_id": 1,
+      "year": 2004,
+      "value": 81.1385033685,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.0328160881,
+      "value_uci": 81.2313768249,
+      "category_id": 1,
+      "year": 2004,
+      "value": 81.1320964565,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 78.5101466079,
+      "value_uci": 79.2201274338,
+      "category_id": 1,
+      "year": 2004,
+      "value": 78.8651370208,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 78.3369964763,
+      "value_uci": 78.6257330388,
+      "category_id": 1,
+      "year": 2004,
+      "value": 78.4813647576,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.4373711592,
+      "value_uci": 83.6987626839,
+      "category_id": 1,
+      "year": 2004,
+      "value": 83.5680669215,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.8736407866,
+      "value_uci": 83.5029164823,
+      "category_id": 1,
+      "year": 2004,
+      "value": 83.1882786344,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.7006461002,
+      "value_uci": 20.0342128961,
+      "category_id": 2,
+      "year": 2004,
+      "value": 19.8674294982,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.8158150823,
+      "value_uci": 19.9523921197,
+      "category_id": 2,
+      "year": 2004,
+      "value": 19.884103601,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.0889174753,
+      "value_uci": 18.5877083731,
+      "category_id": 2,
+      "year": 2004,
+      "value": 18.3383129242,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 17.8989946724,
+      "value_uci": 18.0981481173,
+      "category_id": 2,
+      "year": 2004,
+      "value": 17.9985713949,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.8207906952,
+      "value_uci": 21.2565955883,
+      "category_id": 2,
+      "year": 2004,
+      "value": 21.0386931418,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.2981734001,
+      "value_uci": 21.4773545539,
+      "category_id": 2,
+      "year": 2004,
+      "value": 21.387763977,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.8331728058,
+      "value_uci": 81.3218158018,
+      "category_id": 1,
+      "year": 2005,
+      "value": 81.0774943038,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.1898885058,
+      "value_uci": 81.3851249307,
+      "category_id": 1,
+      "year": 2005,
+      "value": 81.2875067183,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 78.1504008962,
+      "value_uci": 78.8644487353,
+      "category_id": 1,
+      "year": 2005,
+      "value": 78.5074248157,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 78.4634914145,
+      "value_uci": 78.7466205274,
+      "category_id": 1,
+      "year": 2005,
+      "value": 78.605055971,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.6347994746,
+      "value_uci": 83.8918027018,
+      "category_id": 1,
+      "year": 2005,
+      "value": 83.7633010882,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.0907610637,
+      "value_uci": 83.7302305474,
+      "category_id": 1,
+      "year": 2005,
+      "value": 83.4104958055,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.8121660292,
+      "value_uci": 20.1444193451,
+      "category_id": 2,
+      "year": 2005,
+      "value": 19.9782926872,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.8875252562,
+      "value_uci": 20.0221470809,
+      "category_id": 2,
+      "year": 2005,
+      "value": 19.9548361686,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 17.9363405664,
+      "value_uci": 18.4156052773,
+      "category_id": 2,
+      "year": 2005,
+      "value": 18.1759729219,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 17.8973136464,
+      "value_uci": 18.0918693367,
+      "category_id": 2,
+      "year": 2005,
+      "value": 17.9945914915,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.1626651804,
+      "value_uci": 21.6044943792,
+      "category_id": 2,
+      "year": 2005,
+      "value": 21.3835797798,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.4519430337,
+      "value_uci": 21.6291906389,
+      "category_id": 2,
+      "year": 2005,
+      "value": 21.5405668363,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.421734251,
+      "value_uci": 81.9111753581,
+      "category_id": 1,
+      "year": 2006,
+      "value": 81.6664548045,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.5163060268,
+      "value_uci": 81.7126006337,
+      "category_id": 1,
+      "year": 2006,
+      "value": 81.6144533303,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 78.8784225959,
+      "value_uci": 79.5761357427,
+      "category_id": 1,
+      "year": 2006,
+      "value": 79.2272791693,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 78.9186689137,
+      "value_uci": 79.2014496604,
+      "category_id": 1,
+      "year": 2006,
+      "value": 79.060059287,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.8096878339,
+      "value_uci": 84.071354507,
+      "category_id": 1,
+      "year": 2006,
+      "value": 83.9405211704,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.5040581972,
+      "value_uci": 84.1678559499,
+      "category_id": 1,
+      "year": 2006,
+      "value": 83.8359570736,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.2231392303,
+      "value_uci": 20.5578970746,
+      "category_id": 2,
+      "year": 2006,
+      "value": 20.3905181525,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.1721626169,
+      "value_uci": 20.3084533894,
+      "category_id": 2,
+      "year": 2006,
+      "value": 20.2403080031,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.2324568734,
+      "value_uci": 18.7143917464,
+      "category_id": 2,
+      "year": 2006,
+      "value": 18.4734243099,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.2240025043,
+      "value_uci": 18.4203624218,
+      "category_id": 2,
+      "year": 2006,
+      "value": 18.3221824631,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.685972973,
+      "value_uci": 22.1297271071,
+      "category_id": 2,
+      "year": 2006,
+      "value": 21.90785004,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.6906870895,
+      "value_uci": 21.8711061412,
+      "category_id": 2,
+      "year": 2006,
+      "value": 21.7808966153,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.5973950233,
+      "value_uci": 82.0722700781,
+      "category_id": 1,
+      "year": 2007,
+      "value": 81.8348325507,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.7011252852,
+      "value_uci": 81.8934238936,
+      "category_id": 1,
+      "year": 2007,
+      "value": 81.7972745894,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 79.3220855569,
+      "value_uci": 80.0060977134,
+      "category_id": 1,
+      "year": 2007,
+      "value": 79.6640916351,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 79.1714719093,
+      "value_uci": 79.447719897,
+      "category_id": 1,
+      "year": 2007,
+      "value": 79.3095959032,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.946512985,
+      "value_uci": 84.2042704345,
+      "category_id": 1,
+      "year": 2007,
+      "value": 84.0753917097,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.4376727414,
+      "value_uci": 84.0780098885,
+      "category_id": 1,
+      "year": 2007,
+      "value": 83.757841315,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.2346515862,
+      "value_uci": 20.5636145543,
+      "category_id": 2,
+      "year": 2007,
+      "value": 20.3991330703,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.2500041625,
+      "value_uci": 20.3851470795,
+      "category_id": 2,
+      "year": 2007,
+      "value": 20.317575621,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.488840398,
+      "value_uci": 18.9701140339,
+      "category_id": 2,
+      "year": 2007,
+      "value": 18.7294772159,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.3429020235,
+      "value_uci": 18.5385995746,
+      "category_id": 2,
+      "year": 2007,
+      "value": 18.440750799,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.4936067746,
+      "value_uci": 21.9277593704,
+      "category_id": 2,
+      "year": 2007,
+      "value": 21.7106830725,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.7523850076,
+      "value_uci": 21.9307898107,
+      "category_id": 2,
+      "year": 2007,
+      "value": 21.8415874091,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.8362728199,
+      "value_uci": 82.3011679027,
+      "category_id": 1,
+      "year": 2008,
+      "value": 82.0687203613,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.9666132709,
+      "value_uci": 82.1563261445,
+      "category_id": 1,
+      "year": 2008,
+      "value": 82.0614697077,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 79.6068939286,
+      "value_uci": 80.2727549932,
+      "category_id": 1,
+      "year": 2008,
+      "value": 79.9398244609,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 79.4931044332,
+      "value_uci": 79.767876714,
+      "category_id": 1,
+      "year": 2008,
+      "value": 79.6304905736,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.1621987813,
+      "value_uci": 84.4138794604,
+      "category_id": 1,
+      "year": 2008,
+      "value": 84.2880391209,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.6367121783,
+      "value_uci": 84.2669448015,
+      "category_id": 1,
+      "year": 2008,
+      "value": 83.9518284899,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.3740456803,
+      "value_uci": 20.6993292834,
+      "category_id": 2,
+      "year": 2008,
+      "value": 20.5366874818,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.4067365309,
+      "value_uci": 20.5406170531,
+      "category_id": 2,
+      "year": 2008,
+      "value": 20.473676792,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.7101973052,
+      "value_uci": 19.1809752407,
+      "category_id": 2,
+      "year": 2008,
+      "value": 18.945586273,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.5731692396,
+      "value_uci": 18.7671538475,
+      "category_id": 2,
+      "year": 2008,
+      "value": 18.6701615435,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.5547470411,
+      "value_uci": 21.9881493036,
+      "category_id": 2,
+      "year": 2008,
+      "value": 21.7714481723,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.8470535188,
+      "value_uci": 22.0240737484,
+      "category_id": 2,
+      "year": 2008,
+      "value": 21.9355636336,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.1264391718,
+      "value_uci": 82.5804445144,
+      "category_id": 1,
+      "year": 2009,
+      "value": 82.3534418431,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.9854041533,
+      "value_uci": 82.1746281845,
+      "category_id": 1,
+      "year": 2009,
+      "value": 82.0800161689,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 79.8366601371,
+      "value_uci": 80.5011413662,
+      "category_id": 1,
+      "year": 2009,
+      "value": 80.1689007516,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 79.5470719492,
+      "value_uci": 79.8220673506,
+      "category_id": 1,
+      "year": 2009,
+      "value": 79.6845696499,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.1700587589,
+      "value_uci": 84.4206864331,
+      "category_id": 1,
+      "year": 2009,
+      "value": 84.295372596,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.0398420812,
+      "value_uci": 84.6393080158,
+      "category_id": 1,
+      "year": 2009,
+      "value": 84.3395750485,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.506398908,
+      "value_uci": 20.8309145667,
+      "category_id": 2,
+      "year": 2009,
+      "value": 20.6686567373,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.4134210822,
+      "value_uci": 20.5461038567,
+      "category_id": 2,
+      "year": 2009,
+      "value": 20.4797624695,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.8851421503,
+      "value_uci": 19.3630655984,
+      "category_id": 2,
+      "year": 2009,
+      "value": 19.1241038743,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.6540096874,
+      "value_uci": 18.8469607256,
+      "category_id": 2,
+      "year": 2009,
+      "value": 18.7504852065,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.6793791203,
+      "value_uci": 22.1085312721,
+      "category_id": 2,
+      "year": 2009,
+      "value": 21.8939551962,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.8053291301,
+      "value_uci": 21.9810225191,
+      "category_id": 2,
+      "year": 2009,
+      "value": 21.8931758246,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.2571801098,
+      "value_uci": 82.7078027632,
+      "category_id": 1,
+      "year": 2010,
+      "value": 82.4824914365,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.3083497873,
+      "value_uci": 82.4923646046,
+      "category_id": 1,
+      "year": 2010,
+      "value": 82.4003571959,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.0035897959,
+      "value_uci": 80.6503083583,
+      "category_id": 1,
+      "year": 2010,
+      "value": 80.3269490771,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 79.970375286,
+      "value_uci": 80.2328288018,
+      "category_id": 1,
+      "year": 2010,
+      "value": 80.1016020439,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.3806018919,
+      "value_uci": 84.6299622054,
+      "category_id": 1,
+      "year": 2010,
+      "value": 84.5052820487,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.1058665789,
+      "value_uci": 84.7130806758,
+      "category_id": 1,
+      "year": 2010,
+      "value": 84.4094736274,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.5948913414,
+      "value_uci": 20.9185572146,
+      "category_id": 2,
+      "year": 2010,
+      "value": 20.756724278,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.5745695054,
+      "value_uci": 20.7064348287,
+      "category_id": 2,
+      "year": 2010,
+      "value": 20.6405021671,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.8413388437,
+      "value_uci": 19.3069474283,
+      "category_id": 2,
+      "year": 2010,
+      "value": 19.074143136,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.744733066,
+      "value_uci": 18.9346905858,
+      "category_id": 2,
+      "year": 2010,
+      "value": 18.8397118259,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.8893227278,
+      "value_uci": 22.3217786116,
+      "category_id": 2,
+      "year": 2010,
+      "value": 22.1055506697,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.0431360849,
+      "value_uci": 22.2181923307,
+      "category_id": 2,
+      "year": 2010,
+      "value": 22.1306642078,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.3962996717,
+      "value_uci": 82.83362442,
+      "category_id": 1,
+      "year": 2011,
+      "value": 82.6149620458,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.4237132482,
+      "value_uci": 82.605705215,
+      "category_id": 1,
+      "year": 2011,
+      "value": 82.5147092316,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.3214397457,
+      "value_uci": 80.9608975135,
+      "category_id": 1,
+      "year": 2011,
+      "value": 80.6411686296,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.0998537451,
+      "value_uci": 80.3624727238,
+      "category_id": 1,
+      "year": 2011,
+      "value": 80.2311632344,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.493102581,
+      "value_uci": 84.7361017899,
+      "category_id": 1,
+      "year": 2011,
+      "value": 84.6146021854,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.0871850683,
+      "value_uci": 84.6666425783,
+      "category_id": 1,
+      "year": 2011,
+      "value": 84.3769138233,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.5533610601,
+      "value_uci": 20.8657573605,
+      "category_id": 2,
+      "year": 2011,
+      "value": 20.7095592103,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.6118635354,
+      "value_uci": 20.7401030949,
+      "category_id": 2,
+      "year": 2011,
+      "value": 20.6759833151,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 18.9723826929,
+      "value_uci": 19.4301451799,
+      "category_id": 2,
+      "year": 2011,
+      "value": 19.2012639364,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.8499775886,
+      "value_uci": 19.0350211789,
+      "category_id": 2,
+      "year": 2011,
+      "value": 18.9424993838,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.7121387065,
+      "value_uci": 22.1258250902,
+      "category_id": 2,
+      "year": 2011,
+      "value": 21.9189818983,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.0232607505,
+      "value_uci": 22.19354435,
+      "category_id": 2,
+      "year": 2011,
+      "value": 22.1084025503,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.4673967829,
+      "value_uci": 82.8996251725,
+      "category_id": 1,
+      "year": 2012,
+      "value": 82.6835109777,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.4617877357,
+      "value_uci": 82.6390848467,
+      "category_id": 1,
+      "year": 2012,
+      "value": 82.5504362912,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.4195921651,
+      "value_uci": 81.0399181801,
+      "category_id": 1,
+      "year": 2012,
+      "value": 80.7297551726,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.273047485,
+      "value_uci": 80.5292671677,
+      "category_id": 1,
+      "year": 2012,
+      "value": 80.4011573264,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.4145355656,
+      "value_uci": 84.6516048258,
+      "category_id": 1,
+      "year": 2012,
+      "value": 84.5330701957,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.1542497562,
+      "value_uci": 84.7417087776,
+      "category_id": 1,
+      "year": 2012,
+      "value": 84.4479792669,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.5964830381,
+      "value_uci": 20.9038106238,
+      "category_id": 2,
+      "year": 2012,
+      "value": 20.750146831,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.5870459348,
+      "value_uci": 20.7117855303,
+      "category_id": 2,
+      "year": 2012,
+      "value": 20.6494157325,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.0832835492,
+      "value_uci": 19.5327635337,
+      "category_id": 2,
+      "year": 2012,
+      "value": 19.3080235414,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 18.9545092275,
+      "value_uci": 19.1354411762,
+      "category_id": 2,
+      "year": 2012,
+      "value": 19.0449752018,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.7062748913,
+      "value_uci": 22.1145794033,
+      "category_id": 2,
+      "year": 2012,
+      "value": 21.9104271473,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.8961645212,
+      "value_uci": 22.0616105187,
+      "category_id": 2,
+      "year": 2012,
+      "value": 21.9788875199,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.5649615307,
+      "value_uci": 82.9875804981,
+      "category_id": 1,
+      "year": 2013,
+      "value": 82.7762710144,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.5501383319,
+      "value_uci": 82.726895069,
+      "category_id": 1,
+      "year": 2013,
+      "value": 82.6385167004,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.6814526963,
+      "value_uci": 81.2958591767,
+      "category_id": 1,
+      "year": 2013,
+      "value": 80.9886559365,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.3300032726,
+      "value_uci": 80.586801494,
+      "category_id": 1,
+      "year": 2013,
+      "value": 80.4584023833,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.5510989751,
+      "value_uci": 84.7854568007,
+      "category_id": 1,
+      "year": 2013,
+      "value": 84.6682778879,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.121209223,
+      "value_uci": 84.6895583822,
+      "category_id": 1,
+      "year": 2013,
+      "value": 84.4053838026,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.6452994721,
+      "value_uci": 20.9441830747,
+      "category_id": 2,
+      "year": 2013,
+      "value": 20.7947412734,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.6558566244,
+      "value_uci": 20.7793691898,
+      "category_id": 2,
+      "year": 2013,
+      "value": 20.7176129071,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.3036787114,
+      "value_uci": 19.7470094204,
+      "category_id": 2,
+      "year": 2013,
+      "value": 19.5253440659,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.0308878599,
+      "value_uci": 19.2093720789,
+      "category_id": 2,
+      "year": 2013,
+      "value": 19.1201299694,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.6272573251,
+      "value_uci": 22.0218267392,
+      "category_id": 2,
+      "year": 2013,
+      "value": 21.8245420321,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.97058731,
+      "value_uci": 22.134939662,
+      "category_id": 2,
+      "year": 2013,
+      "value": 22.052763486,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.8516871984,
+      "value_uci": 83.2824137856,
+      "category_id": 1,
+      "year": 2014,
+      "value": 83.067050492,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.9280132518,
+      "value_uci": 83.1032591533,
+      "category_id": 1,
+      "year": 2014,
+      "value": 83.0156362026,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.8273455512,
+      "value_uci": 81.4562289403,
+      "category_id": 1,
+      "year": 2014,
+      "value": 81.1417872457,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.7347066863,
+      "value_uci": 80.9886811202,
+      "category_id": 1,
+      "year": 2014,
+      "value": 80.8616939033,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.901607675,
+      "value_uci": 85.134793579,
+      "category_id": 1,
+      "year": 2014,
+      "value": 85.018200627,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.5393384719,
+      "value_uci": 85.1122248561,
+      "category_id": 1,
+      "year": 2014,
+      "value": 84.825781664,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.9238592843,
+      "value_uci": 21.2279225429,
+      "category_id": 2,
+      "year": 2014,
+      "value": 21.0758909136,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.9029304416,
+      "value_uci": 21.0271266324,
+      "category_id": 2,
+      "year": 2014,
+      "value": 20.965028537,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.4569812396,
+      "value_uci": 19.9026755561,
+      "category_id": 2,
+      "year": 2014,
+      "value": 19.6798283979,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.2732198357,
+      "value_uci": 19.4525649885,
+      "category_id": 2,
+      "year": 2014,
+      "value": 19.3628924121,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.015930008,
+      "value_uci": 22.4194316271,
+      "category_id": 2,
+      "year": 2014,
+      "value": 22.2176808175,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.2267419686,
+      "value_uci": 22.3921270262,
+      "category_id": 2,
+      "year": 2014,
+      "value": 22.3094344974,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.755155652,
+      "value_uci": 83.1649835338,
+      "category_id": 1,
+      "year": 2015,
+      "value": 82.9600695929,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.6848402606,
+      "value_uci": 82.8580575756,
+      "category_id": 1,
+      "year": 2015,
+      "value": 82.7714489181,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 80.6148714397,
+      "value_uci": 81.2146032315,
+      "category_id": 1,
+      "year": 2015,
+      "value": 80.9147373356,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.4983323567,
+      "value_uci": 80.7505100623,
+      "category_id": 1,
+      "year": 2015,
+      "value": 80.6244212095,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.6843119464,
+      "value_uci": 84.9135504225,
+      "category_id": 1,
+      "year": 2015,
+      "value": 84.7989311844,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.5892454833,
+      "value_uci": 85.1284624723,
+      "category_id": 1,
+      "year": 2015,
+      "value": 84.8588539778,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.6693734187,
+      "value_uci": 20.9647236918,
+      "category_id": 2,
+      "year": 2015,
+      "value": 20.8170485552,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.6832632153,
+      "value_uci": 20.8039132699,
+      "category_id": 2,
+      "year": 2015,
+      "value": 20.7435882426,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.0831634987,
+      "value_uci": 19.5096929456,
+      "category_id": 2,
+      "year": 2015,
+      "value": 19.2964282222,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.0904249657,
+      "value_uci": 19.2645995734,
+      "category_id": 2,
+      "year": 2015,
+      "value": 19.1775122695,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.8975869656,
+      "value_uci": 22.2929767282,
+      "category_id": 2,
+      "year": 2015,
+      "value": 22.0952818469,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.0028042106,
+      "value_uci": 22.1636987288,
+      "category_id": 2,
+      "year": 2015,
+      "value": 22.0832514697,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.3629298416,
+      "value_uci": 83.7676742544,
+      "category_id": 1,
+      "year": 2016,
+      "value": 83.565302048,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.2810869264,
+      "value_uci": 83.4523673311,
+      "category_id": 1,
+      "year": 2016,
+      "value": 83.3667271288,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.3151136995,
+      "value_uci": 81.8975244777,
+      "category_id": 1,
+      "year": 2016,
+      "value": 81.6063190886,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.3218008946,
+      "value_uci": 81.56628626,
+      "category_id": 1,
+      "year": 2016,
+      "value": 81.4440435773,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.018550906,
+      "value_uci": 85.2521226998,
+      "category_id": 1,
+      "year": 2016,
+      "value": 85.1353368029,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 85.0854335167,
+      "value_uci": 85.6306791914,
+      "category_id": 1,
+      "year": 2016,
+      "value": 85.358056354,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.0828779192,
+      "value_uci": 21.3828014528,
+      "category_id": 2,
+      "year": 2016,
+      "value": 21.232839686,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.1325274444,
+      "value_uci": 21.255390741,
+      "category_id": 2,
+      "year": 2016,
+      "value": 21.1939590927,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.5450688224,
+      "value_uci": 19.9760240751,
+      "category_id": 2,
+      "year": 2016,
+      "value": 19.7605464488,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.6042743364,
+      "value_uci": 19.7813435293,
+      "category_id": 2,
+      "year": 2016,
+      "value": 19.6928089328,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.2477683448,
+      "value_uci": 22.6515744621,
+      "category_id": 2,
+      "year": 2016,
+      "value": 22.4496714035,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.374988823,
+      "value_uci": 22.5395872173,
+      "category_id": 2,
+      "year": 2016,
+      "value": 22.4572880201,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.2606111381,
+      "value_uci": 83.6694830544,
+      "category_id": 1,
+      "year": 2017,
+      "value": 83.4650470962,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.2657288649,
+      "value_uci": 83.4355429568,
+      "category_id": 1,
+      "year": 2017,
+      "value": 83.3506359108,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.1681124777,
+      "value_uci": 81.7702509609,
+      "category_id": 1,
+      "year": 2017,
+      "value": 81.4691817193,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.1756845295,
+      "value_uci": 81.4231177895,
+      "category_id": 1,
+      "year": 2017,
+      "value": 81.2994011595,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.1729570763,
+      "value_uci": 85.3977069798,
+      "category_id": 1,
+      "year": 2017,
+      "value": 85.285332028,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 85.065612,
+      "value_uci": 85.6001474247,
+      "category_id": 1,
+      "year": 2017,
+      "value": 85.3328797123,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.0963566035,
+      "value_uci": 21.3903684406,
+      "category_id": 2,
+      "year": 2017,
+      "value": 21.2433625221,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.0974372654,
+      "value_uci": 21.21810565,
+      "category_id": 2,
+      "year": 2017,
+      "value": 21.1577714577,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.6329424125,
+      "value_uci": 20.0627607947,
+      "category_id": 2,
+      "year": 2017,
+      "value": 19.8478516036,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.5943074497,
+      "value_uci": 19.7683657966,
+      "category_id": 2,
+      "year": 2017,
+      "value": 19.6813366231,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.2153468159,
+      "value_uci": 22.6057074398,
+      "category_id": 2,
+      "year": 2017,
+      "value": 22.4105271279,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.3365444024,
+      "value_uci": 22.498086875,
+      "category_id": 2,
+      "year": 2017,
+      "value": 22.4173156387,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.4490075507,
+      "value_uci": 83.8573220265,
+      "category_id": 1,
+      "year": 2018,
+      "value": 83.6531647886,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.4277432772,
+      "value_uci": 83.5977433822,
+      "category_id": 1,
+      "year": 2018,
+      "value": 83.5127433297,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.6372435155,
+      "value_uci": 82.2261456754,
+      "category_id": 1,
+      "year": 2018,
+      "value": 81.9316945954,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.4659761524,
+      "value_uci": 81.7112163854,
+      "category_id": 1,
+      "year": 2018,
+      "value": 81.5885962689,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.1966964259,
+      "value_uci": 85.4254419445,
+      "category_id": 1,
+      "year": 2018,
+      "value": 85.3110691852,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.9517188995,
+      "value_uci": 85.5057429845,
+      "category_id": 1,
+      "year": 2018,
+      "value": 85.228730942,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.1609259057,
+      "value_uci": 21.4581882545,
+      "category_id": 2,
+      "year": 2018,
+      "value": 21.3095570801,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.2591283512,
+      "value_uci": 21.3799980548,
+      "category_id": 2,
+      "year": 2018,
+      "value": 21.319563203,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.8245116117,
+      "value_uci": 20.2600125268,
+      "category_id": 2,
+      "year": 2018,
+      "value": 20.0422620692,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.7695719544,
+      "value_uci": 19.9438192077,
+      "category_id": 2,
+      "year": 2018,
+      "value": 19.856695581,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.1606459292,
+      "value_uci": 22.5569056909,
+      "category_id": 2,
+      "year": 2018,
+      "value": 22.35877581,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.4918139686,
+      "value_uci": 22.6538289906,
+      "category_id": 2,
+      "year": 2018,
+      "value": 22.5728214796,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.5015190316,
+      "value_uci": 83.9029496428,
+      "category_id": 1,
+      "year": 2019,
+      "value": 83.7022343372,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.6316769525,
+      "value_uci": 83.7987335346,
+      "category_id": 1,
+      "year": 2019,
+      "value": 83.7152052436,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.6476455418,
+      "value_uci": 82.2286544767,
+      "category_id": 1,
+      "year": 2019,
+      "value": 81.9381500092,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.6988661317,
+      "value_uci": 81.940753674,
+      "category_id": 1,
+      "year": 2019,
+      "value": 81.8198099029,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.3849751106,
+      "value_uci": 85.6088531686,
+      "category_id": 1,
+      "year": 2019,
+      "value": 85.4969141396,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 85.0630477316,
+      "value_uci": 85.6033155597,
+      "category_id": 1,
+      "year": 2019,
+      "value": 85.3331816456,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.2034272148,
+      "value_uci": 21.4967745654,
+      "category_id": 2,
+      "year": 2019,
+      "value": 21.3501008901,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.3063478537,
+      "value_uci": 21.4264560634,
+      "category_id": 2,
+      "year": 2019,
+      "value": 21.3664019585,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.7885445083,
+      "value_uci": 20.2162986267,
+      "category_id": 2,
+      "year": 2019,
+      "value": 20.0024215675,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.85040398,
+      "value_uci": 20.0236863306,
+      "category_id": 2,
+      "year": 2019,
+      "value": 19.9370451553,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.2921889242,
+      "value_uci": 22.6838803018,
+      "category_id": 2,
+      "year": 2019,
+      "value": 22.488034613,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.5201590801,
+      "value_uci": 22.6814097584,
+      "category_id": 2,
+      "year": 2019,
+      "value": 22.6007844192,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.1372554307,
+      "value_uci": 83.5369700309,
+      "category_id": 1,
+      "year": 2020,
+      "value": 83.3371127308,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.8856849817,
+      "value_uci": 83.0500708079,
+      "category_id": 1,
+      "year": 2020,
+      "value": 82.9678778948,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.2927765571,
+      "value_uci": 81.8707977673,
+      "category_id": 1,
+      "year": 2020,
+      "value": 81.5817871622,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 80.7774501324,
+      "value_uci": 81.0145361567,
+      "category_id": 1,
+      "year": 2020,
+      "value": 80.8959931446,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.8658176135,
+      "value_uci": 85.0859364208,
+      "category_id": 1,
+      "year": 2020,
+      "value": 84.9758770172,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.7080639858,
+      "value_uci": 85.2456375889,
+      "category_id": 1,
+      "year": 2020,
+      "value": 84.9768507874,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.863197388,
+      "value_uci": 21.1458619642,
+      "category_id": 2,
+      "year": 2020,
+      "value": 21.0045296761,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.627576397,
+      "value_uci": 20.7408136256,
+      "category_id": 2,
+      "year": 2020,
+      "value": 20.6841950113,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.5128313649,
+      "value_uci": 19.9212467395,
+      "category_id": 2,
+      "year": 2020,
+      "value": 19.7170390522,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.0422735362,
+      "value_uci": 19.2025916994,
+      "category_id": 2,
+      "year": 2020,
+      "value": 19.1224326178,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.9016893032,
+      "value_uci": 22.2825314216,
+      "category_id": 2,
+      "year": 2020,
+      "value": 22.0921103624,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.010899447,
+      "value_uci": 22.1645798372,
+      "category_id": 2,
+      "year": 2020,
+      "value": 22.0877396421,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.3265084816,
+      "value_uci": 83.7310547387,
+      "category_id": 1,
+      "year": 2021,
+      "value": 83.5287816101,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.4946211336,
+      "value_uci": 83.6602756135,
+      "category_id": 1,
+      "year": 2021,
+      "value": 83.5774483735,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.358792549,
+      "value_uci": 81.9580095014,
+      "category_id": 1,
+      "year": 2021,
+      "value": 81.6584010252,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.4286925452,
+      "value_uci": 81.6690162386,
+      "category_id": 1,
+      "year": 2021,
+      "value": 81.5488543919,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.4171560815,
+      "value_uci": 85.6377916844,
+      "category_id": 1,
+      "year": 2021,
+      "value": 85.5274738829,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 85.0458865428,
+      "value_uci": 85.5725459636,
+      "category_id": 1,
+      "year": 2021,
+      "value": 85.3092162532,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.1126556311,
+      "value_uci": 21.4030858256,
+      "category_id": 2,
+      "year": 2021,
+      "value": 21.2578707284,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.2365606463,
+      "value_uci": 21.3545418087,
+      "category_id": 2,
+      "year": 2021,
+      "value": 21.2955512275,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.7743497954,
+      "value_uci": 20.1991137283,
+      "category_id": 2,
+      "year": 2021,
+      "value": 19.9867317618,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.711280477,
+      "value_uci": 19.8805742844,
+      "category_id": 2,
+      "year": 2021,
+      "value": 19.7959273807,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.1494284196,
+      "value_uci": 22.5370584885,
+      "category_id": 2,
+      "year": 2021,
+      "value": 22.3432434541,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.5443193934,
+      "value_uci": 22.7030745975,
+      "category_id": 2,
+      "year": 2021,
+      "value": 22.6236969954,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.4216554307,
+      "value_uci": 83.8259709429,
+      "category_id": 1,
+      "year": 2022,
+      "value": 83.6238131868,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.3619529424,
+      "value_uci": 83.5268397926,
+      "category_id": 1,
+      "year": 2022,
+      "value": 83.4443963675,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 81.697307905,
+      "value_uci": 82.2829229943,
+      "category_id": 1,
+      "year": 2022,
+      "value": 81.9901154497,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 81.4121864,
+      "value_uci": 81.6508004165,
+      "category_id": 1,
+      "year": 2022,
+      "value": 81.5314934083,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.1713195696,
+      "value_uci": 85.392329083,
+      "category_id": 1,
+      "year": 2022,
+      "value": 85.2818243263,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 84.8721863868,
+      "value_uci": 85.4181156011,
+      "category_id": 1,
+      "year": 2022,
+      "value": 85.1451509939,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.1718646865,
+      "value_uci": 21.4567486841,
+      "category_id": 2,
+      "year": 2022,
+      "value": 21.3143066853,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.0974741314,
+      "value_uci": 21.2116988365,
+      "category_id": 2,
+      "year": 2022,
+      "value": 21.1545864839,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 19.8685385169,
+      "value_uci": 20.282091843,
+      "category_id": 2,
+      "year": 2022,
+      "value": 20.07531518,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 19.6694446741,
+      "value_uci": 19.8327656139,
+      "category_id": 2,
+      "year": 2022,
+      "value": 19.751105144,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.1819175487,
+      "value_uci": 22.5652931,
+      "category_id": 2,
+      "year": 2022,
+      "value": 22.3736053244,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.3213285371,
+      "value_uci": 22.475962241,
+      "category_id": 2,
+      "year": 2022,
+      "value": 22.3986453891,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 82.8914739358,
+      "value_uci": 84.0132403578,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.4523571468,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 83.1866214683,
+      "value_uci": 83.8705766923,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.5285990803,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.9482656408,
+      "value_uci": 84.3418564489,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.1450610448,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 84.5256416489,
+      "value_uci": 85.2171373814,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.8713895152,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 83.7100301663,
+      "value_uci": 84.4460267163,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.0780284413,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 83.1761017172,
+      "value_uci": 84.089943931,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.6330228241,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 83.6023901024,
+      "value_uci": 84.1706142229,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.8865021627,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 82.7447547415,
+      "value_uci": 83.6989541975,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.2218544695,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 83.3599872523,
+      "value_uci": 83.8363539072,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.5981705798,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 83.6241871046,
+      "value_uci": 84.6359934331,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.1300902688,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 83.2299824404,
+      "value_uci": 84.4305516101,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.8302670252,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 82.3258101853,
+      "value_uci": 84.5316727658,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.4287414755,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 83.3627413752,
+      "value_uci": 84.22066415,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.7917027626,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 82.5599353036,
+      "value_uci": 84.6185809923,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.5892581479,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 84.003681834,
+      "value_uci": 84.5682120892,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.2859469616,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 84.4018712105,
+      "value_uci": 85.1642464882,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.7830588493,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 83.0132985075,
+      "value_uci": 85.306108556,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.1597035318,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 82.3002853696,
+      "value_uci": 84.5209762508,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.4106308102,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 81.6497067816,
+      "value_uci": 83.5012942285,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.575500505,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 83.6163232386,
+      "value_uci": 86.771124425,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.1937238318,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 82.5666522613,
+      "value_uci": 83.6768894139,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.1217708376,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 83.6351561166,
+      "value_uci": 84.4334108553,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.034283486,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 84.2457797785,
+      "value_uci": 85.5886127217,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.9171962501,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 81.2959000308,
+      "value_uci": 83.2663231069,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.2811115689,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 83.8971920104,
+      "value_uci": 84.0613941409,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.9792930757,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 83.1796765646,
+      "value_uci": 85.6544857715,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.4170811681,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 84.2781738432,
+      "value_uci": 85.1259817538,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.7020777985,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 82.3296873093,
+      "value_uci": 84.2281851424,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.2789362258,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 80.497094768,
+      "value_uci": 84.1456114849,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.3213531265,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 81.9012652366,
+      "value_uci": 83.3637523595,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.6325087981,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 80.8539305123,
+      "value_uci": 81.8734802877,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.3637054,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 80.4555923999,
+      "value_uci": 83.6352440849,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.0454182424,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 82.4410943131,
+      "value_uci": 86.6938704554,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.5674823842,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 81.9439700577,
+      "value_uci": 82.7730315684,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.358500813,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 81.767795872,
+      "value_uci": 82.8952789513,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.3315374117,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 79.5619106537,
+      "value_uci": 82.5627221528,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.0623164032,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 80.1082151152,
+      "value_uci": 83.3839113247,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.74606322,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 81.7837673083,
+      "value_uci": 82.829326249,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.3065467786,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 81.0751916324,
+      "value_uci": 82.3900173304,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.7326044814,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 78.5643554685,
+      "value_uci": 81.4049254764,
+      "category_id": 1,
+      "year": 2023,
+      "value": 79.9846404724,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.0926669067,
+      "value_uci": 82.6656083801,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.3791376434,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 80.8443288378,
+      "value_uci": 82.421739533,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.6330341854,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 82.2357533774,
+      "value_uci": 83.5141111276,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.8749322525,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 80.6849015186,
+      "value_uci": 83.8845013902,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.2847014544,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 78.5872888484,
+      "value_uci": 81.3848332406,
+      "category_id": 1,
+      "year": 2023,
+      "value": 79.9860610445,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 80.3966262677,
+      "value_uci": 81.9095744441,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.1531003559,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 82.0825050359,
+      "value_uci": 83.1377154321,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.610110234,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 80.8552605917,
+      "value_uci": 82.2793981879,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.5673293898,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 81.0634324087,
+      "value_uci": 82.7098336123,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.8866330105,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 82.0372613533,
+      "value_uci": 82.8490838917,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.4431726225,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 81.3210521057,
+      "value_uci": 82.0057839214,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.6634180136,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.0143869738,
+      "value_uci": 82.2527777788,
+      "category_id": 1,
+      "year": 2023,
+      "value": 82.1335823763,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 82.5543672546,
+      "value_uci": 83.6781428259,
+      "category_id": 1,
+      "year": 2023,
+      "value": 83.1162550402,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 81.1873640115,
+      "value_uci": 82.4208458574,
+      "category_id": 1,
+      "year": 2023,
+      "value": 81.8041049345,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 84.9146735198,
+      "value_uci": 86.1444424898,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.5295580048,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 85.0372915453,
+      "value_uci": 88.2361470661,
+      "category_id": 1,
+      "year": 2023,
+      "value": 86.6367193057,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 85.5643566082,
+      "value_uci": 87.411508778,
+      "category_id": 1,
+      "year": 2023,
+      "value": 86.4879326931,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 85.0018813091,
+      "value_uci": 85.7607871508,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.38133423,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 84.901025849,
+      "value_uci": 86.2688865109,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.5849561799,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 83.2143152338,
+      "value_uci": 86.2824416591,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.7483784465,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 85.2666660911,
+      "value_uci": 86.1351277767,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.7008969339,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.6294390597,
+      "value_uci": 85.8490121953,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.7392256275,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 83.5007871878,
+      "value_uci": 88.1146647439,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.8077259658,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 85.2854957459,
+      "value_uci": 86.2980852089,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.7917904774,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 85.5519529867,
+      "value_uci": 86.0777418437,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.8148474152,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 83.8822323064,
+      "value_uci": 86.6697895893,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.2760109479,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 84.9766067329,
+      "value_uci": 87.627362775,
+      "category_id": 1,
+      "year": 2023,
+      "value": 86.301984754,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 84.0635354188,
+      "value_uci": 86.2823083365,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.1729218777,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 84.5667365116,
+      "value_uci": 87.7738030637,
+      "category_id": 1,
+      "year": 2023,
+      "value": 86.1702697877,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 85.9082924434,
+      "value_uci": 86.977967449,
+      "category_id": 1,
+      "year": 2023,
+      "value": 86.4431299462,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 83.1653614864,
+      "value_uci": 85.8677107361,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.5165361113,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 84.0861603116,
+      "value_uci": 85.6887176867,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.8874389991,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 86.4653138588,
+      "value_uci": 87.3241377693,
+      "category_id": 1,
+      "year": 2023,
+      "value": 86.8947258141,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 84.332181399,
+      "value_uci": 85.9004346591,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.116308029,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 85.1104009673,
+      "value_uci": 86.7993135827,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.954857275,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 85.123501897,
+      "value_uci": 85.7711352009,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.447318549,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 84.2175946028,
+      "value_uci": 85.4436404526,
+      "category_id": 1,
+      "year": 2023,
+      "value": 84.8306175277,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 85.1042255041,
+      "value_uci": 86.214359653,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.6592925785,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 85.5315965043,
+      "value_uci": 86.2983477797,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.914972142,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 85.1632919431,
+      "value_uci": 86.3162856344,
+      "category_id": 1,
+      "year": 2023,
+      "value": 85.7397887887,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 85.7551029032,
+      "value_uci": 86.76071984,
+      "category_id": 1,
+      "year": 2023,
+      "value": 86.2579113716,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 21.1668552269,
+      "value_uci": 21.7943270928,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.4805911599,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 20.9496481846,
+      "value_uci": 21.5641610221,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.2569046034,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 21.6586031452,
+      "value_uci": 22.2291510811,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.9438771132,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 20.9982492837,
+      "value_uci": 21.6420744156,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.3201618497,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 21.2174422583,
+      "value_uci": 21.7477096344,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.4825759464,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 21.7942498177,
+      "value_uci": 22.3254153715,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.0598325946,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 20.5129795399,
+      "value_uci": 22.011816473,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.2623980064,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 20.3248049113,
+      "value_uci": 22.029066907,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.1769359092,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 20.51639983,
+      "value_uci": 21.8859171051,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.2011584676,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 20.7406986994,
+      "value_uci": 21.5758517519,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.1582752256,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 20.448616891,
+      "value_uci": 21.6577599115,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.0531884013,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 21.1922753569,
+      "value_uci": 21.4997869537,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.3460311553,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.4532850824,
+      "value_uci": 21.7376585513,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.5954718168,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.4928018432,
+      "value_uci": 21.6078316723,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.5503167577,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 20.4443072176,
+      "value_uci": 21.5627622965,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.0035347571,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 22.0637527221,
+      "value_uci": 22.5944610354,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.3291068788,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 21.1750275046,
+      "value_uci": 21.5791160576,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.3770717811,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 20.7777594074,
+      "value_uci": 23.2739381918,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.0258487996,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 21.4289555237,
+      "value_uci": 21.9836312213,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.7062933725,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 21.0092491541,
+      "value_uci": 21.4840471683,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.2466481612,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 21.5016893313,
+      "value_uci": 22.4575673655,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.9796283484,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 20.562833639,
+      "value_uci": 21.3435477588,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.9531906989,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 20.5347599428,
+      "value_uci": 21.3562055942,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.9454827685,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 21.2545261265,
+      "value_uci": 21.9361213284,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.5953237274,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 20.7084481804,
+      "value_uci": 22.3176909188,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.5130695496,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 20.1124065635,
+      "value_uci": 21.6574989938,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.8849527786,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 21.7277805375,
+      "value_uci": 22.1359036796,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.9318421085,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 18.5538411466,
+      "value_uci": 20.1397340117,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.3467875792,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 18.6600634183,
+      "value_uci": 19.7930071704,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.2265352943,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 19.7384283091,
+      "value_uci": 20.6029342213,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.1706812652,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 19.4343981923,
+      "value_uci": 20.3357816961,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.8850899442,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 20.2505878307,
+      "value_uci": 21.0180519992,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.634319915,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 19.9372763839,
+      "value_uci": 21.2620308499,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.5996536169,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 19.2013586524,
+      "value_uci": 21.4099622707,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.3056604615,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 19.1199077961,
+      "value_uci": 21.2090815812,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.1644946886,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 18.8110960153,
+      "value_uci": 21.1069614857,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.9590287505,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 20.2810514998,
+      "value_uci": 21.1108046146,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.6959280572,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 18.9578794802,
+      "value_uci": 20.1088910491,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.5333852647,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 19.0412073123,
+      "value_uci": 21.1677967293,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.1045020208,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 19.7081651873,
+      "value_uci": 20.4691467326,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.0886559599,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 19.7135804395,
+      "value_uci": 20.1598885459,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.9367344927,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.0783434747,
+      "value_uci": 20.4929694529,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.2856564638,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.1121592785,
+      "value_uci": 20.2774655354,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.1948124069,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 18.5724905776,
+      "value_uci": 20.2553293905,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.4139099841,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 20.3993538906,
+      "value_uci": 21.181905439,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.7906296648,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 18.9893662858,
+      "value_uci": 20.1905153587,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.5899408222,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 20.0390300104,
+      "value_uci": 20.8387506245,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.4388903175,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 20.1402180029,
+      "value_uci": 20.7316512641,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.4359346335,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 19.5414738655,
+      "value_uci": 20.4200335133,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.9807536894,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 20.046418742,
+      "value_uci": 20.6254065435,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.3359126427,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 20.1757742962,
+      "value_uci": 21.1537337051,
+      "category_id": 2,
+      "year": 2023,
+      "value": 20.6647540006,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 19.4922469,
+      "value_uci": 20.165185896,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.828716398,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 20.3152871172,
+      "value_uci": 23.7646930536,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.0399900854,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 18.4581811779,
+      "value_uci": 20.3515715553,
+      "category_id": 2,
+      "year": 2023,
+      "value": 19.4048763666,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 21.7476794271,
+      "value_uci": 23.2661098959,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.5068946615,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 22.6520328539,
+      "value_uci": 23.4170418032,
+      "category_id": 2,
+      "year": 2023,
+      "value": 23.0345373286,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 21.8955740369,
+      "value_uci": 22.9289701691,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.412272103,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 21.7917012707,
+      "value_uci": 22.6433402274,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.2175207491,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 22.1909238686,
+      "value_uci": 23.0756397333,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.6332818009,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 22.567976813,
+      "value_uci": 23.8968592212,
+      "category_id": 2,
+      "year": 2023,
+      "value": 23.2324180171,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 20.2828664029,
+      "value_uci": 22.4426299088,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.3627481558,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 21.3449688585,
+      "value_uci": 23.4458829117,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.3954258851,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 21.2021775892,
+      "value_uci": 23.6582344209,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.4302060051,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 22.2726631957,
+      "value_uci": 23.4282380891,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.8504506424,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 21.7653758006,
+      "value_uci": 24.1074307225,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.9364032615,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 22.3982140627,
+      "value_uci": 23.1133099299,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.7557619963,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 22.3937316354,
+      "value_uci": 22.8033346583,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.5985331469,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.5404612251,
+      "value_uci": 22.9205707611,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.7305159931,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.6663562914,
+      "value_uci": 22.8216571955,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.7440067434,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 21.7028985235,
+      "value_uci": 23.3666061289,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.5347523262,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 23.2030944793,
+      "value_uci": 23.9040617518,
+      "category_id": 2,
+      "year": 2023,
+      "value": 23.5535781155,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 21.5173179572,
+      "value_uci": 22.6132888132,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.0653033852,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 22.4550720888,
+      "value_uci": 23.2035854051,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.8293287469,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 22.8877548207,
+      "value_uci": 23.433670317,
+      "category_id": 2,
+      "year": 2023,
+      "value": 23.1607125688,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 22.8991822084,
+      "value_uci": 23.6111143684,
+      "category_id": 2,
+      "year": 2023,
+      "value": 23.2551482884,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 22.4717050707,
+      "value_uci": 23.3332068571,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.9024559639,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 22.0409846682,
+      "value_uci": 22.5935783102,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.3172814892,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 21.941502806,
+      "value_uci": 22.8738678511,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.4076853286,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 22.2200145032,
+      "value_uci": 22.8683886436,
+      "category_id": 2,
+      "year": 2023,
+      "value": 22.5442015734,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 20.1600355242,
+      "value_uci": 23.7432536958,
+      "category_id": 2,
+      "year": 2023,
+      "value": 21.95164461,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 22.0893611282,
+      "value_uci": 23.9610200013,
+      "category_id": 2,
+      "year": 2023,
+      "value": 23.0251905648,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 82.9547143463,
+      "value_uci": 84.1361920729,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.5454532096,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 83.3107529513,
+      "value_uci": 83.9755535008,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.643153226,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 83.9409914288,
+      "value_uci": 84.3496587082,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.1453250685,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 84.8408944353,
+      "value_uci": 85.5277001371,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.1842972862,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 84.1855210936,
+      "value_uci": 84.9106052471,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.5480631704,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 83.6234198772,
+      "value_uci": 84.5221687852,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.0727943312,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 83.9636525354,
+      "value_uci": 84.5323956599,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.2480240977,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 82.6934034742,
+      "value_uci": 83.6111698632,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.1522866687,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 83.6100203397,
+      "value_uci": 84.0838787347,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.8469495372,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 83.6411884273,
+      "value_uci": 84.6644725323,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.1528304798,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 83.158492538,
+      "value_uci": 84.3547022471,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.7565973925,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 84.243063662,
+      "value_uci": 86.3933180519,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.3181908569,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 83.5719407548,
+      "value_uci": 84.409725939,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.9908333469,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 81.9176465967,
+      "value_uci": 83.9527936144,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.9352201056,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 84.122851085,
+      "value_uci": 84.6726488828,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.3977499839,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 84.7262156556,
+      "value_uci": 85.4906243529,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.1084200042,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 84.2082161933,
+      "value_uci": 86.4999090859,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.3540626396,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 82.0734584742,
+      "value_uci": 84.3821465762,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.2278025252,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 83.3147409302,
+      "value_uci": 84.8597353041,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.0872381172,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 81.1614945669,
+      "value_uci": 85.9335876231,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.547541095,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 82.0630531066,
+      "value_uci": 83.152212368,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.6076327373,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 83.4255665606,
+      "value_uci": 84.2971196949,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.8613431277,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 84.1664192211,
+      "value_uci": 85.4452091621,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.8058141916,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 82.912959974,
+      "value_uci": 84.5977600237,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.7553599989,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 84.0579778944,
+      "value_uci": 84.2225109244,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.1402444094,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 83.7235014921,
+      "value_uci": 85.9532811658,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.838391329,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 84.0087946571,
+      "value_uci": 84.9261630324,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.4674788447,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 82.2129989184,
+      "value_uci": 84.1952044299,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.2041016741,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 80.7066385395,
+      "value_uci": 84.2434589183,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.4750487289,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 81.4093041437,
+      "value_uci": 82.8952707911,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.1522874674,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 81.5757985328,
+      "value_uci": 82.5030805717,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.0394395523,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 80.8495850808,
+      "value_uci": 83.7381821603,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.2938836205,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 81.3377508695,
+      "value_uci": 87.50595381,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.4218523398,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 82.1861655365,
+      "value_uci": 83.0154443204,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.6008049284,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 81.3709559659,
+      "value_uci": 82.6124112743,
+      "category_id": 1,
+      "year": 2024,
+      "value": 81.9916836201,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 80.509435049,
+      "value_uci": 83.1787504011,
+      "category_id": 1,
+      "year": 2024,
+      "value": 81.8440927251,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 82.0579862863,
+      "value_uci": 85.4463781404,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.7521822134,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 82.0378383058,
+      "value_uci": 83.0963551266,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.5670967162,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 81.9087962549,
+      "value_uci": 83.2284627026,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.5686294788,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 81.0076583612,
+      "value_uci": 83.2900625303,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.1488604458,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 82.1374839793,
+      "value_uci": 82.7325681872,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.4350260832,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 80.6930472403,
+      "value_uci": 82.3717879519,
+      "category_id": 1,
+      "year": 2024,
+      "value": 81.5324175961,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 82.2913120967,
+      "value_uci": 83.6546881168,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.9730001068,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 81.6926121468,
+      "value_uci": 85.066795054,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.3797036004,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 80.2031643439,
+      "value_uci": 82.7221140948,
+      "category_id": 1,
+      "year": 2024,
+      "value": 81.4626392193,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 79.7817598719,
+      "value_uci": 81.3751840865,
+      "category_id": 1,
+      "year": 2024,
+      "value": 80.5784719792,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 82.9709779889,
+      "value_uci": 83.9356321077,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.4533050483,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 80.9191536124,
+      "value_uci": 82.2066006426,
+      "category_id": 1,
+      "year": 2024,
+      "value": 81.5628771275,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 81.182640831,
+      "value_uci": 82.8726512017,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.0276460163,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 82.0247201228,
+      "value_uci": 82.8279414736,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.4263307982,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 81.5824311799,
+      "value_uci": 82.2671776631,
+      "category_id": 1,
+      "year": 2024,
+      "value": 81.9248044215,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 82.234787107,
+      "value_uci": 82.4725802616,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.3536836843,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 82.6655632658,
+      "value_uci": 83.8204647477,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.2430140068,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 81.3741105351,
+      "value_uci": 82.5815320245,
+      "category_id": 1,
+      "year": 2024,
+      "value": 81.9778212798,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 84.930433253,
+      "value_uci": 86.1176122714,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.5240227622,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 86.1535601565,
+      "value_uci": 88.5808751433,
+      "category_id": 1,
+      "year": 2024,
+      "value": 87.3672176499,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 85.6484457741,
+      "value_uci": 87.1969658531,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.4227058136,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 85.4874506918,
+      "value_uci": 86.2436435647,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.8655471283,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 85.4930692173,
+      "value_uci": 86.8505934688,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.1718313431,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 82.1580408139,
+      "value_uci": 85.7887391811,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.9733899975,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 84.717514394,
+      "value_uci": 85.6545172629,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.1860158284,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 85.7276010936,
+      "value_uci": 85.9494121304,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.838506612,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 78.8299954546,
+      "value_uci": 86.1274414632,
+      "category_id": 1,
+      "year": 2024,
+      "value": 82.4787184589,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 85.9923184368,
+      "value_uci": 86.9470738145,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.4696961257,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 85.4886581401,
+      "value_uci": 86.0362929886,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.7624755643,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 85.6784770743,
+      "value_uci": 88.176669765,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.9275734197,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 82.4146542101,
+      "value_uci": 85.4799985171,
+      "category_id": 1,
+      "year": 2024,
+      "value": 83.9473263636,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 84.9428957027,
+      "value_uci": 86.9558848586,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.9493902807,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 86.074497865,
+      "value_uci": 89.016222396,
+      "category_id": 1,
+      "year": 2024,
+      "value": 87.5453601305,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 85.2639948652,
+      "value_uci": 86.4574966569,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.8607457611,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 84.9895253447,
+      "value_uci": 87.0916574413,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.040591393,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 83.756593445,
+      "value_uci": 85.2017669738,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.4791802094,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 86.1490790578,
+      "value_uci": 87.1145043204,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.6317916891,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 84.5886498153,
+      "value_uci": 86.2126419149,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.4006458651,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 84.7529312479,
+      "value_uci": 86.4034039061,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.578167577,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 85.3523278236,
+      "value_uci": 85.991769138,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.6720484808,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 84.0580160075,
+      "value_uci": 85.3464684728,
+      "category_id": 1,
+      "year": 2024,
+      "value": 84.7022422401,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 85.0971792751,
+      "value_uci": 86.2965569206,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.6968680978,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 85.8315478041,
+      "value_uci": 86.5632192661,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.1973835351,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 85.421495657,
+      "value_uci": 86.5462095901,
+      "category_id": 1,
+      "year": 2024,
+      "value": 85.9838526235,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 86.3193152329,
+      "value_uci": 87.2906115733,
+      "category_id": 1,
+      "year": 2024,
+      "value": 86.8049634031,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 21.3029243409,
+      "value_uci": 21.9269036972,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.6149140191,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 20.878145072,
+      "value_uci": 21.4830063341,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.1805757031,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 21.8621297231,
+      "value_uci": 22.4481574908,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.1551436069,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 20.9684987031,
+      "value_uci": 21.6068539945,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.2876763488,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 21.632994276,
+      "value_uci": 22.163342488,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.898168382,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 22.0353892229,
+      "value_uci": 22.5612933174,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.2983412701,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 21.8971376782,
+      "value_uci": 23.3665916847,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.6318646814,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 21.9606894812,
+      "value_uci": 23.7217189359,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.8412042086,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 20.2990368577,
+      "value_uci": 21.6076834048,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.9533601312,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 21.0567050819,
+      "value_uci": 21.8582173968,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.4574612393,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 20.7650576082,
+      "value_uci": 21.9516824147,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.3583700114,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 21.3630374219,
+      "value_uci": 21.6750926652,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.5190650435,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 21.5995879933,
+      "value_uci": 21.8872902701,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.7434391317,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 21.6545910636,
+      "value_uci": 21.7701079742,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.7123495189,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 21.0674355516,
+      "value_uci": 22.1735796,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.6205075758,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 22.2153497398,
+      "value_uci": 22.7508813624,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.4831155511,
+      "q": 5,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 21.5015626755,
+      "value_uci": 21.9142111196,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.7078868976,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 20.7139908015,
+      "value_uci": 23.3696728161,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.0418318088,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 21.5342125327,
+      "value_uci": 22.0901379135,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.8121752231,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 21.1268978518,
+      "value_uci": 21.5942463994,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.3605721256,
+      "q": 2,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 21.5202769446,
+      "value_uci": 22.4602929522,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.9902849484,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 20.2565760271,
+      "value_uci": 21.0256772275,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.6411266273,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 20.8464414271,
+      "value_uci": 21.6709354664,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.2586884468,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 21.4227440297,
+      "value_uci": 22.1205526422,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.771648336,
+      "q": 3,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 21.2988940301,
+      "value_uci": 22.8275569536,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.0632254919,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 20.1937519603,
+      "value_uci": 21.8096103872,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.0016811737,
+      "q": 1,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 21.6391191328,
+      "value_uci": 22.0510175966,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.8450683647,
+      "q": 4,
+      "sex_id": 0
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 19.3304350307,
+      "value_uci": 20.9480388434,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.139236937,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 18.6705348806,
+      "value_uci": 19.7872664897,
+      "category_id": 2,
+      "year": 2024,
+      "value": 19.2289006852,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 19.6057985862,
+      "value_uci": 20.46432047,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.0350595281,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 19.2414785084,
+      "value_uci": 20.1407946999,
+      "category_id": 2,
+      "year": 2024,
+      "value": 19.6911366041,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 20.465107007,
+      "value_uci": 21.2253065819,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.8452067945,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 20.40525464,
+      "value_uci": 21.794342053,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.0997983465,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 18.8851174651,
+      "value_uci": 21.0447686155,
+      "category_id": 2,
+      "year": 2024,
+      "value": 19.9649430403,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 20.8867101289,
+      "value_uci": 22.9613730005,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.9240415647,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 20.1993272519,
+      "value_uci": 22.7063674289,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.4528473404,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 20.6699984786,
+      "value_uci": 21.525698409,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.0978484438,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 19.6565312495,
+      "value_uci": 20.7560523571,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.2062918033,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 19.8719117877,
+      "value_uci": 21.9085123072,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.8902120475,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 20.0496426879,
+      "value_uci": 20.8017706718,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.4257066798,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 19.8252819764,
+      "value_uci": 20.2738435829,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.0495627796,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 20.2721543734,
+      "value_uci": 20.6941624452,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.4831584093,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 20.291550914,
+      "value_uci": 20.4578846877,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.3747178009,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 18.8104439687,
+      "value_uci": 20.492198802,
+      "category_id": 2,
+      "year": 2024,
+      "value": 19.6513213853,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 20.6236034255,
+      "value_uci": 21.4027409636,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.0131721946,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 18.9600735315,
+      "value_uci": 20.1543588718,
+      "category_id": 2,
+      "year": 2024,
+      "value": 19.5572162017,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 20.0886713405,
+      "value_uci": 20.8949337575,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.491802549,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 20.0571368004,
+      "value_uci": 20.6648001286,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.3609684645,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 20.1140683499,
+      "value_uci": 21.0012422338,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.5576552918,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 20.2285841117,
+      "value_uci": 20.8139972733,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.5212906925,
+      "q": 4,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 19.898897178,
+      "value_uci": 20.8800062713,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.3894517246,
+      "q": 3,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 19.8057531476,
+      "value_uci": 20.4715378363,
+      "category_id": 2,
+      "year": 2024,
+      "value": 20.1386454919,
+      "q": 2,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 20.1805599649,
+      "value_uci": 23.8817738444,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.0311669047,
+      "q": 5,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 18.9086031913,
+      "value_uci": 20.7442371442,
+      "category_id": 2,
+      "year": 2024,
+      "value": 19.8264201678,
+      "q": 1,
+      "sex_id": 1
+    },
+    {
+      "kanton_nr": 14,
+      "value_lci": 22.2216959755,
+      "value_uci": 23.6843271877,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.9530115816,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 13,
+      "value_lci": 22.6644685199,
+      "value_uci": 23.4527812979,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.0586249089,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 12,
+      "value_lci": 21.2957575644,
+      "value_uci": 22.3256508783,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.8107042213,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 11,
+      "value_lci": 21.8034755069,
+      "value_uci": 22.6321739344,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.2178247207,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 10,
+      "value_lci": 22.3655485596,
+      "value_uci": 23.2349550948,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.8002518272,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 9,
+      "value_lci": 22.1752438322,
+      "value_uci": 23.4259938608,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.8006188465,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 8,
+      "value_lci": 20.6889039473,
+      "value_uci": 23.0211083331,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.8550061402,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 7,
+      "value_lci": 22.2538370477,
+      "value_uci": 24.3066543755,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.2802457116,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 6,
+      "value_lci": 23.1143272785,
+      "value_uci": 25.5098002441,
+      "category_id": 2,
+      "year": 2024,
+      "value": 24.3120637613,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 5,
+      "value_lci": 22.1364581563,
+      "value_uci": 23.2674201983,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.7019391773,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 4,
+      "value_lci": 22.1021344206,
+      "value_uci": 24.3063526083,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.2042435144,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 3,
+      "value_lci": 22.8724592759,
+      "value_uci": 23.5924219674,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.2324406217,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 2,
+      "value_lci": 22.620401188,
+      "value_uci": 23.0402138765,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.8303075322,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 1,
+      "value_lci": 22.642880167,
+      "value_uci": 23.0263776551,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.8346289111,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 0,
+      "value_lci": 22.8146786255,
+      "value_uci": 22.9706106034,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.8926446144,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 26,
+      "value_lci": 22.1655245051,
+      "value_uci": 23.7675405493,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.9665325272,
+      "q": 3,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 25,
+      "value_lci": 23.2799687371,
+      "value_uci": 23.9976442015,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.6388064693,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 24,
+      "value_lci": 22.1827135005,
+      "value_uci": 23.2800938546,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.7314036776,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 23,
+      "value_lci": 22.6373969664,
+      "value_uci": 23.3846665476,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.011031757,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 22,
+      "value_lci": 22.8157181688,
+      "value_uci": 23.3591657159,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.0874419423,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 21,
+      "value_lci": 23.1833131368,
+      "value_uci": 23.8892050111,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.536259074,
+      "q": 5,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 20,
+      "value_lci": 22.1304834844,
+      "value_uci": 22.9867711881,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.5586273363,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 19,
+      "value_lci": 22.5076300593,
+      "value_uci": 23.0750103516,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.7913202054,
+      "q": 2,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 18,
+      "value_lci": 22.5899209363,
+      "value_uci": 23.5499374026,
+      "category_id": 2,
+      "year": 2024,
+      "value": 23.0699291695,
+      "q": 4,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 17,
+      "value_lci": 22.1339722935,
+      "value_uci": 22.7726881012,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.4533301974,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 16,
+      "value_lci": 20.0281936211,
+      "value_uci": 23.7773674297,
+      "category_id": 2,
+      "year": 2024,
+      "value": 21.9027805254,
+      "q": 1,
+      "sex_id": 2
+    },
+    {
+      "kanton_nr": 15,
+      "value_lci": 21.0978272868,
+      "value_uci": 22.9085868877,
+      "category_id": 2,
+      "year": 2024,
+      "value": 22.0032070873,
+      "q": 1,
+      "sex_id": 2
+    }
+  ]
+}

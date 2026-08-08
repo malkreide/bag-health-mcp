@@ -7,6 +7,94 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Behoben — der Obsan-Client fragte nach zwei von sieben Schnitten
+
+Der letzte Eintrag hielt fest, dass der Katalog mehr Indikatoren anbietet, als
+das Serien-Tool ausliefern kann: von 12 Stichproben hatten nur 3 eine Reihe, 9
+gaben auf `/g/json` **und** `/gum/json` je 404. Das war die Messung. Der Schluss
+daraus war meiner, und er war falsch.
+
+**Sie haben keine Reihe, die der Client fragt.** Eine Obsan-Indikatorseite
+deklariert in `props.pageProps.jsonLDs.links.od3.<id>`, welche API-Varianten es
+zu ihr gibt — samt vollstaendiger `apiUrl` je Variante. Der Client hat diese
+Liste nie gelesen. Er hat zwei feste Endungen geraten.
+
+Am 2026-08-08 ueber 60 sprachneutrale Indikatoren gemessen
+(`tests/fixtures/obsan_variant_census.json`):
+
+| Schnitt | Bedeutung | vorhanden bei |
+|---|---|---|
+| `kg` | nach Kantonen | **50** von 60 |
+| `ag` | nach Altersklasse | 49 |
+| `sd` | nach sozialer Lage | 24 |
+| `gum` | Verteilung nach Segmenten | 9 |
+| `agum` | Verteilung nach Altersklasse | 5 |
+| `g` | national | **3** |
+| `bg` | weiterer Schnitt | 1 |
+
+**49 von 60** haben weder `g` noch `gum` — die beiden einzigen, die der Client
+fragte. Gar keine Variante haben **8**. Die Differenz sind **41 Indikatoren mit
+Daten, die der Server fuer nicht vorhanden erklaerte.** Der haeufigste Schnitt
+ist der kantonale; der einzige, den der Client verlaesslich fragte, ist der
+seltenste.
+
+`obsan/lebenserwartung` stand im letzten Eintrag als Beispiel fuer «keine
+Serie». Er hat 4374 Datenpunkte, kantonal, seit 1998 — hinter einer Adresse, die
+nie jemand abgefragt hat.
+
+**Was jetzt geschieht:**
+
+- Die Seite wird gelesen. `_obsan_resolve` liefert `(interne id, deklarierte
+  Varianten)`; die Reihenfolge `g → kg → ag → sd → gum → agum → bg` waehlt aus
+  dem, was es gibt, statt zu raten. Wird eine Region angefragt, geht `kg` voran.
+- **Kantonale Obsan-Reihen sind damit erreichbar.** `region='ZH'` liefert den
+  Kanton, ohne Region den nationalen Wert (BFS-Nummer 0, den `kg` mitfuehrt).
+  Die Tool-Beschreibungen behaupteten bisher das Gegenteil («obsan indicators
+  are national»); fuer 50 von 60 stimmte das nicht.
+- **Der gelieferte Schnitt wird benannt** (`variant`, `variants_available`).
+  Vorher rutschte `gum` still als Ersatz fuer `g` durch — `g` ist bei `_010`
+  eine standardisierte Rate, `gum` eine Verteilung in %. Zwei Groessen, ein
+  Feld, kein Hinweis. Sie sind keine schlechteren Kopien voneinander.
+- **Die Legende kommt aus dem Payload.** Obsan liefert zu jeder Dimension eine
+  uebersetzte `codes`-Tabelle. Vorher stand hier ein fester Satz («category
+  breakdown (see source remarks)») — derselbe fuer einen Indikator, der nach
+  Suizid vs. Suizidhilfe geteilt ist, wie fuer einen nach Lebenserwartung bei
+  Geburt vs. bei 65. Dazu die `remarks` der Quelle als `note`.
+- **Kantonsnummern werden geprueft, nicht geglaubt.** Die BFS-Zuordnung steht im
+  Code und wird bei jedem Aufruf gegen die `kanton_nr.codes` des Payloads
+  gehalten. Weicht sie ab, bricht der Aufruf ab. Ein falsch zugeordneter Kanton
+  ist die unangenehmste Form von falsch: vollstaendig, plausibel, und ueber
+  woanders.
+- **Gepoolte Jahresspannen brechen nichts mehr.** `"1998-02"` ist 1998–2002, ein
+  5-Jahresmittel. Diese Form kommt nur in Schnitten vor, die der Client nie
+  holte; in ein `int`-Feld gelegt wirft sie einen Validierungsfehler mitten im
+  Werkzeugaufruf. Sie behaelt jetzt ihr Etikett in `period`, ihr erstes Jahr
+  steht in `year`, und der Jahresfilter rechnet damit. Ebenso `n` als
+  Gleitkommazahl (durchschnittliche Faelle pro Jahr).
+- **Wo es wirklich keine Reihe gibt — 8 von 60 —, sagt der Aufruf das.** Ein
+  leeres Ergebnis liest sich wie eine Aussage ueber die Welt und waere eine ueber
+  den Client.
+- Die Suche behauptet nicht mehr «mostly national». Die Sitemap traegt URLs und
+  sonst nichts; welche Schnitte es gibt, weiss erst der Serien-Aufruf.
+
+**Aufgezeichnet dazu:** `obsan_api_kg.json` (gepoolte Spannen),
+`obsan_api_kg_only.json` (der Indikator ohne `g`/`gum`),
+`obsan_api_kg_sparse.json` (nicht fuer alle Kantone publiziert),
+`obsan_page_cantonal_only.html`, `obsan_page_no_variants.html` und die Erhebung
+`obsan_variant_census.json`. Die Zahl oben ist damit kein Satz in einer
+Commit-Nachricht, sondern eine datierte Messung, die man wiederholen kann.
+
+**Gegenprobe gefuehrt:** Mit dem alten Verhalten — Varianten-Liste ignoriert,
+`g`/`gum` geraten — fallen sechs der neuen Tests. Zwei `@pytest.mark.live`-Tests
+halten die Annahme ausserdem gegen den echten Host.
+
+**Und eine Korrektur an einer eigenen Notiz:** Der letzte Eintrag behauptete,
+`pytest -m live` sammle hier null Tests ein. Das stimmt nicht. `test_server.py`
+ruft auf Modulebene `importorskip("opentelemetry.sdk.trace")` auf — ohne die
+OTel-Extras faellt die ganze Datei weg, Live-Tests inklusive. CI installiert sie
+und sammelt sechs. Gemessen wurde eine lokale Umgebung, berichtet wurde ueber
+das Repository.
+
 ### Hinzugefuegt — die Fixtures sind aufgezeichnet, nicht mehr ausgedacht
 
 Jeder Payload dieser Suite war ein Literal im Testmodul, keiner je von der

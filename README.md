@@ -39,11 +39,12 @@ MCP server for Swiss public health data. Its core is the Swiss Federal Office of
 > **🎯 Anchor demo query** — *«Wie hat sich der Alkoholkonsum bei 15-Jährigen im
 > Kanton Zürich seit 2010 entwickelt, und wie steht der Kanton im Schweizer
 > Vergleich da?»* The HBSC youth series (via Obsan) answers the **Switzerland-wide**
-> trend since 2010 with 95% confidence intervals; it is **national only**, so the
-> response includes a `region_note` explaining that a canton-vs-Switzerland
-> comparison is not available from this survey (HBSC is not cantonally
-> representative). These are **aggregated population statistics — not individual
-> advice.** See [`docs/tool-design-health-indicators.md`](docs/tool-design-health-indicators.md).
+> trend since 2010 with 95% confidence intervals. This particular indicator is
+> **national only**, so the response includes a `region_note` saying so
+> (HBSC is not cantonally representative). Most other Obsan indicators *are*
+> published by canton — see the note on cuts below. These are **aggregated
+> population statistics — not individual advice.**
+> See [`docs/tool-design-health-indicators.md`](docs/tool-design-health-indicators.md).
 
 ---
 
@@ -67,17 +68,27 @@ Health indicators — Obsan, Versorgungsatlas & Sucht Schweiz (multi-source):
 | Tool | Description |
 |------|-------------|
 | `bag_health_mcp__search_health_indicators` | Search indicators by `source` (`obsan` / `versorgungsatlas` / `suchtschweiz`), topic, region, year range |
-| `bag_health_mcp__get_indicator_series` | Fetch one indicator's time series (national with 95% CIs; Versorgungsatlas also **cantonal**, with a canton-vs-Switzerland comparison) |
+| `bag_health_mcp__get_indicator_series` | Fetch one indicator's time series, naming which **cut** it is (`variant`: national / by canton / by age class / by social position / distribution) and which others exist. Pass `region='ZH'` for the cantonal cut; 95% CIs throughout |
 
 > ⚠️ **Aggregated population statistics only.** The indicator tools serve
 > population-level aggregates (prevalences/metrics by age/sex/region) — **not
 > individual advice, diagnosis or case assessment, and no personal data.** This is
 > stated in both tool descriptions and every response (`aggregate_statistics_notice`),
 > and matters especially for `suchtschweiz` (HBSC), which touches prevention topics
-> in a school context. Sources: Obsan `ind.obsan.admin.ch` (clean JSON API, national);
+> in a school context. Sources: Obsan `ind.obsan.admin.ch` (clean JSON API);
 > Sucht Schweiz HBSC via the Obsan mirror (national); **Versorgungsatlas** returns a
 > **cantonal** year/value series (26 cantons + a `CH` national total, with 95% CIs and
 > a canton-vs-CH ratio) from the Tarifpool. See the per-source [probe notes](docs/).
+
+> **Obsan publishes an indicator in several cuts, not one series.** Measured over
+> 60 catalogue entries on 2026-08-08: 50 have a cantonal cut (`kg`), 49 one by age
+> class (`ag`), 24 one by social position (`sd`) — and only 3 the plain national
+> one (`g`). They are different measurements with different units, so
+> `get_indicator_series` names the cut it returned in `variant` and lists the rest
+> in `variants_available`, rather than presenting one as a stand-in for another.
+> Eight of the 60 publish no series at all; that case fails with its reason
+> instead of returning an empty result. The census is recorded and dated in
+> [`tests/fixtures/obsan_variant_census.json`](tests/fixtures/obsan_variant_census.json).
 
 ### Tool annotations
 

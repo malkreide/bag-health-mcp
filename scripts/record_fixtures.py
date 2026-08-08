@@ -9,9 +9,11 @@ the same hour, the same reading of the docs. Where both are wrong, both are
 wrong together, and the suite stays green forever.
 
 This repository had no protection against that at all: every payload was a
-literal in the test module, none of them recorded, and the one ``@pytest.mark.live``
-test is skipped -- ``pytest -m live`` collects zero tests here. So nothing in
-this repo has ever compared its assumptions against the real hosts.
+literal in the test module, none of them recorded. (A note from 2026-08-07 said
+``pytest -m live`` collects zero tests here. That was wrong, and worth saying so:
+``test_server.py`` calls ``importorskip("opentelemetry.sdk.trace")`` at module
+level, so a machine without the OTel extras skips the whole file, live tests
+included. CI installs them and collects six.)
 
 The written fixtures are **excerpts**, never full dumps: the Obsan sitemap is
 148 KB and the Versorgungsatlas catalogue 710 KB. Each selection rule is small,
@@ -38,15 +40,35 @@ FIXTURES = Path(__file__).resolve().parent.parent / "tests" / "fixtures"
 # The indicator the tests exercise. Its internal id is resolved from the live
 # page rather than hard-coded: the page carries it in __NEXT_DATA__, and that
 # is exactly the lookup the server performs.
-# Sprachneutral (== Deutsch) UND mit Datenserie. Beides ist noetig und
-# keineswegs selbstverstaendlich: In einer Stichprobe von 12 neutralen
-# Indikatoren am 2026-08-07 hatten nur 3 ueberhaupt eine Serie -- 9 gaben auf
-# `/g/json` UND `/gum/json` 404. Der Katalog listet also weit mehr, als das
-# Serien-Tool ausliefern kann. `NO_SERIES_INDICATOR` haelt genau diesen
-# Mehrheitsfall als Fixture fest; vorher testete ihn nichts.
+#
+# Drei Indikatoren, drei Faelle -- und die Faelle sind der eigentliche Fund:
+#
+#   INDICATOR             hat `g`, den nationalen Schnitt (3 von 60 haben ihn)
+#   CANTONAL_INDICATOR    hat NUR `kg`, den kantonalen. Am 2026-08-07 stand er
+#                         hier als NO_SERIES_INDICATOR -- weil `/g` und `/gum`
+#                         404 gaben und der Client nur diese beiden fragte.
+#                         Er hat 4374 Datenpunkte. Die Aussage «9 von 12
+#                         Indikatoren haben keine Serie» war meine eigene, und
+#                         sie war falsch: sie haben keine, die der Client fragt.
+#   NO_VARIANT_INDICATOR  hat wirklich keine Variante. Diesen Fall gibt es --
+#                         8 von 60 -- und er ist der einzige, in dem «keine
+#                         Serie» stimmt.
 INDICATOR = "obsan/suizid-und-suizidhilfe"
-NO_SERIES_INDICATOR = "obsan/lebenserwartung"
+CANTONAL_INDICATOR = "obsan/lebenserwartung"
+NO_VARIANT_INDICATOR = "obsan/osteoporose"
+# Ein zweiter kantonaler Schnitt, und zwar ein LUECKENHAFTER: nicht jeder
+# Indikator wird fuer jeden Kanton publiziert. Ohne diese Fixture liesse sich
+# der Zweig «dieser Kanton kommt hier nicht vor» nur gegen einen erfundenen
+# Payload pruefen -- also gegen dieselbe Annahme, die er absichern soll.
+SPARSE_CANTONAL_INDICATOR = "obsan/starke-koerperliche-beschwerden"
 VA_ITEM = ("_003", "b")
+
+# Umfang der Variantenerhebung (siehe `_census`). Die ersten N sprachneutralen
+# Eintraege in Sitemap-Reihenfolge -- ein Zuschnitt, dem man sonst zu Recht
+# misstraut. Hier traegt er, weil die Sitemap nach Themenpfad sortiert ist und
+# nicht danach, welche Schnitte ein Indikator veroeffentlicht; und weil die
+# Erhebung abbricht, wenn ihr genau die auffaelligen Faelle fehlen.
+CENSUS_SAMPLE = 60
 
 # Kept from the sitemap -- and this list is a finding in itself.
 #
@@ -60,8 +82,9 @@ VA_ITEM = ("_003", "b")
 # exercised the one it always produces: every German result rides on the
 # `lang == ""` branch of `_obsan_catalogue`, which no unit test touched.
 SITEMAP_KEEP = (
-    "/indicator/obsan/suizid-und-suizidhilfe",  # neutral == Deutsch, mit Serie
-    "/indicator/obsan/lebenserwartung",  # neutral, OHNE Serie
+    "/indicator/obsan/suizid-und-suizidhilfe",  # neutral == Deutsch, mit `g`
+    "/indicator/obsan/lebenserwartung",  # neutral, nur `kg` (kantonal)
+    "/indicator/obsan/osteoporose",  # neutral, gar keine Variante
     # Ein `monam`-Eintrag ist Pflicht und kein Beiwerk: Der Test zur
     # Sucht-Schweiz-Eingrenzung assertiert `all(id.startswith("monam/") …)`.
     # Ueber einer leeren Liste ist das wahr — ohne diesen Eintrag bestuende er
@@ -70,6 +93,104 @@ SITEMAP_KEEP = (
     "/indicator/monam/episodisch-risikoreicher-alkoholkonsum-alter-15",
     "/fr/indicator/obsan/esperance-de-vie",  # dieselbe Sache auf fr
 )
+
+
+_NEXT_DATA_RE = re.compile(r"__NEXT_DATA__[^>]*>(.*?)</script>", re.S)
+_NEUTRAL_IND_RE = re.compile(r"https?://[^/]+/indicator/([a-z0-9_]+)/([a-z0-9-]+)$", re.I)
+
+
+def _page_props(client: httpx.Client, path: str) -> tuple[str, dict, str]:
+    """``(internal_id, declared_variants, next_data_json)`` for an indicator page."""
+    url = f"{OBSAN}/de/indicator/{path}"
+    r = client.get(url)
+    r.raise_for_status()
+    m = _NEXT_DATA_RE.search(r.text)
+    if not m:
+        raise SystemExit(f"{url}: no __NEXT_DATA__ block -- page rebuilt?")
+    props = json.loads(m.group(1))["props"]["pageProps"]
+    internal = props["id"]
+    od3 = ((props.get("jsonLDs") or {}).get("links") or {}).get("od3") or {}
+    return internal, (od3.get(internal) or {}), m.group(1)
+
+
+def _census(client: httpx.Client, xml: str) -> dict:
+    """Count which API variants the catalogue's indicators actually publish.
+
+    This exists because the number it produces is the whole finding, and a
+    number in a commit message ages into an assertion nobody can check. Here it
+    is a recording like any other: dated, re-runnable, with its selection rule
+    written down. Re-run it and the claim either survives or it does not.
+
+    The client used to ask for `/g/json` and, on 404, `/gum/json` -- and for
+    most indicators the source publishes neither, while publishing plenty else.
+    """
+    neutral: list[tuple[str, str]] = []
+    for loc in re.findall(r"<loc>\s*([^<]+?)\s*</loc>", xml):
+        m = _NEUTRAL_IND_RE.match(loc.strip())
+        if m:
+            neutral.append((m.group(1), m.group(2)))
+
+    counts: dict[str, int] = {}
+    without_g_or_gum = 0
+    without_any = 0
+    with_kg = 0
+    sample = neutral[:CENSUS_SAMPLE]
+    for topic, slug in sample:
+        _internal, variants, _raw = _page_props(client, f"{topic}/{slug}")
+        for suffix in variants:
+            counts[suffix] = counts.get(suffix, 0) + 1
+        if not variants:
+            without_any += 1
+        if not ({"g", "gum"} & set(variants)):
+            without_g_or_gum += 1
+        if "kg" in variants:
+            with_kg += 1
+        print(f"    {topic}/{slug:<52} {sorted(variants)}")
+
+    # Eine Erhebung, in der die auffaelligen Faelle fehlen, belegt nichts: sie
+    # koennte auch aus einer Welt stammen, in der es sie nicht gibt. Dann lieber
+    # abbrechen als eine Zahl schreiben, die niemanden mehr stutzig macht.
+    if not without_any:
+        raise SystemExit(
+            "Erhebung ohne einen einzigen variantenlosen Indikator -- entweder "
+            "hat die Quelle nachgeliefert oder der Zuschnitt trifft ihn nicht "
+            "mehr. CENSUS_SAMPLE pruefen."
+        )
+    if not without_g_or_gum:
+        raise SystemExit(
+            "Erhebung, in der jeder Indikator `g` oder `gum` hat -- dann waere "
+            "die alte Abfrage richtig gewesen. Zuschnitt und Quelle pruefen."
+        )
+    return {
+        "sitemap_language_neutral_indicators": len(neutral),
+        "sampled": len(sample),
+        "sample_rule": (
+            f"die ersten {CENSUS_SAMPLE} sprachneutralen Indikator-URLs in Sitemap-Reihenfolge"
+        ),
+        "variant_counts": dict(sorted(counts.items(), key=lambda kv: -kv[1])),
+        "without_g_or_gum": without_g_or_gum,
+        "without_any_variant": without_any,
+        "with_cantonal_cut": with_kg,
+    }
+
+
+def _excerpt_cantonal(rows: list[dict]) -> tuple[list[dict], str]:
+    """Shorten a ``kg`` payload without losing what makes it a ``kg`` payload.
+
+    Two things have to survive, and «die ersten N Zeilen» keeps neither: the
+    full time series for at least one canton next to the national total (a
+    canton-vs-Switzerland comparison needs both, over the same years), and the
+    complete canton list (so «this canton is not published here» stays a
+    question the fixture can answer). Hence: everything for BFS 0 and 1, plus
+    the two most recent years for every canton.
+    """
+    years = sorted({row.get("year") for row in rows if row.get("year") is not None})
+    recent = set(years[-2:])
+    kept = [row for row in rows if row.get("kanton_nr") in (0, 1) or row.get("year") in recent]
+    return kept, (
+        f"alle Jahrgaenge fuer Schweiz (0) und Zuerich (1) plus die zwei "
+        f"juengsten Jahrgaenge ({sorted(recent)}) fuer jeden Kanton"
+    )
 
 
 def _excerpt_sitemap(xml: str) -> tuple[str, str]:
@@ -114,66 +235,162 @@ def record() -> int:
         # 1) Obsan catalogue.
         r = c.get(f"{OBSAN}/sitemap.xml")
         r.raise_for_status()
-        text, rule = _excerpt_sitemap(r.text)
+        r_sitemap_text = r.text
+        text, rule = _excerpt_sitemap(r_sitemap_text)
         write("obsan_sitemap.xml", text, f"{OBSAN}/sitemap.xml", rule)
 
-        # 2) The indicator page, and the internal id the server reads from it.
-        page_url = f"{OBSAN}/de/indicator/{INDICATOR}"
-        r = c.get(page_url)
-        r.raise_for_status()
-        match = re.search(r"__NEXT_DATA__[^>]*>(.*?)</script>", r.text, re.S)
-        if not match:
-            raise SystemExit(f"{page_url}: no __NEXT_DATA__ block -- page rebuilt?")
-        internal = json.loads(match.group(1))["props"]["pageProps"]["id"]
-        # Only the script block is kept: the surrounding 31 KB of markup is
-        # noise the server never reads, and it would churn the diff on every
-        # unrelated redesign.
+        # 1b) Which cuts the catalogue actually publishes. The whole finding.
+        print("  Variantenerhebung ...")
+        census = _census(c, r_sitemap_text)
         write(
-            "obsan_page.html",
-            '<html><body><script id="__NEXT_DATA__" type="application/json">'
-            + match.group(1)
-            + "</script></body></html>\n",
-            page_url,
-            "nur der __NEXT_DATA__-Block; das umgebende Markup liest der Server nie",
+            "obsan_variant_census.json",
+            json.dumps(census, ensure_ascii=False, indent=2) + "\n",
+            f"{OBSAN}/de/indicator/<topic>/<slug> ({census['sampled']} Seiten)",
+            census["sample_rule"] + "; gezaehlt werden die in `jsonLDs.links.od3` "
+            "deklarierten API-Varianten je Indikator",
         )
 
-        # 3) The two data endpoints -- /g is the primary, /gum the fallback.
+        def page(path: str, name: str, note: str) -> tuple[str, dict]:
+            """Record an indicator page and return ``(internal_id, variants)``."""
+            internal, variants, raw = _page_props(c, path)
+            # Only the script block is kept: the surrounding 31 KB of markup is
+            # noise the server never reads, and it would churn the diff on every
+            # unrelated redesign.
+            write(
+                name,
+                '<html><body><script id="__NEXT_DATA__" type="application/json">'
+                + raw
+                + "</script></body></html>\n",
+                f"{OBSAN}/de/indicator/{path}",
+                f"nur der __NEXT_DATA__-Block; {note} (intern {internal}, "
+                f"Varianten {sorted(variants) or 'keine'})",
+            )
+            return internal, variants
+
+        # 2) An indicator that does have the national `g` cut -- 3 of 60 do.
+        internal, variants = page(INDICATOR, "obsan_page.html", "nationaler Schnitt vorhanden")
+        if "g" not in variants:
+            raise SystemExit(
+                f"{INDICATOR}: kein `g` mehr deklariert (nur {sorted(variants)}). "
+                "Dann testet die Fixture den nationalen Zweig nicht mehr -- "
+                "INDICATOR auf einen Indikator mit `g` umstellen."
+            )
+
+        # 3) Its data endpoints. Recorded from the URLs the PAGE declares, not
+        #    from a suffix guessed here -- that guess was the bug.
         for suffix in ("g", "gum"):
-            url = f"{OBSAN}/api/{internal}/{suffix}/json"
+            url = variants[suffix]["apiUrl"]
             r = c.get(url)
             r.raise_for_status()
             write(
                 f"obsan_api_{suffix}.json",
                 json.dumps(r.json(), ensure_ascii=False, indent=2) + "\n",
                 url,
-                f"vollstaendig, Indikator {INDICATOR} (intern {internal})",
+                f"vollstaendig, Indikator {INDICATOR} (intern {internal}), "
+                f"Variante `{suffix}` wie von der Seite deklariert",
             )
 
-        # 3b) The majority case: an indicator whose series does not exist.
-        page_url = f"{OBSAN}/de/indicator/{NO_SERIES_INDICATOR}"
-        r = c.get(page_url)
+        # 3a) Und sein kantonaler Schnitt -- derselbe Indikator, andere Zahlen.
+        #     Er traegt ausserdem die gepoolten Jahresspannen ("1998-02" ist
+        #     1998-2002, kein Februar): eine Form, die kein Fixture je enthielt,
+        #     weil sie in `g` und `gum` nicht vorkommt. In ein int-Feld gelegt
+        #     wirft sie einen Validierungsfehler, den niemand kommen sieht.
+        url = variants["kg"]["apiUrl"]
+        r = c.get(url)
         r.raise_for_status()
-        m2 = re.search(r"__NEXT_DATA__[^>]*>(.*?)</script>", r.text, re.S)
-        if not m2:
-            raise SystemExit(f"{page_url}: no __NEXT_DATA__ block")
-        internal_none = json.loads(m2.group(1))["props"]["pageProps"]["id"]
+        payload_pooled = r.json()
+        total_pooled = len(payload_pooled.get("data", []))
+        pooled = [row for row in payload_pooled["data"] if isinstance(row.get("year"), str)]
+        if not pooled:
+            raise SystemExit(
+                f"{INDICATOR}: keine gepoolte Jahresspanne mehr in `kg` — dann "
+                "prueft die Fixture den `period`-Zweig nicht mehr."
+            )
+        payload_pooled["data"], pooled_rule = _excerpt_cantonal(payload_pooled["data"])
         write(
-            "obsan_page_no_series.html",
-            '<html><body><script id="__NEXT_DATA__" type="application/json">'
-            + m2.group(1)
-            + "</script></body></html>\n",
-            page_url,
-            f"nur der __NEXT_DATA__-Block; Indikator ohne Serie (intern "
-            f"{internal_none}, /g und /gum je 404)",
+            "obsan_api_kg.json",
+            json.dumps(payload_pooled, ensure_ascii=False, indent=2) + "\n",
+            url,
+            f"Indikator {INDICATOR} (intern {internal}) — {pooled_rule}, "
+            f"{len(payload_pooled['data'])} von {total_pooled} Zeilen; die "
+            "Jahresangaben sind gepoolte Spannen ('1998-02' = 1998-2002)",
         )
+
+        # 3b) Der Mehrheitsfall: kein `g`, kein `gum` -- und trotzdem Daten.
+        internal_kg, variants_kg = page(
+            CANTONAL_INDICATOR,
+            "obsan_page_cantonal_only.html",
+            "weder `g` noch `gum`, dafuer der kantonale Schnitt",
+        )
+        if set(variants_kg) != {"kg"}:
+            raise SystemExit(
+                f"{CANTONAL_INDICATOR}: Varianten sind {sorted(variants_kg)}, "
+                "erwartet genau {'kg'}. Genau darum geht diese Fixture -- ein "
+                "Indikator, den die alte Abfrage fuer leer hielt. Neuen suchen."
+            )
         for suffix in ("g", "gum"):
-            probe = c.get(f"{OBSAN}/api/{internal_none}/{suffix}/json")
+            probe = c.get(f"{OBSAN}/api/{internal_kg}/{suffix}/json")
             if probe.status_code != 404:
                 raise SystemExit(
-                    f"{NO_SERIES_INDICATOR}: /{suffix}/json antwortet "
-                    f"{probe.status_code}, nicht 404 — die Quelle hat "
-                    "nachgeliefert, Fixture-Auswahl pruefen"
+                    f"{CANTONAL_INDICATOR}: /{suffix}/json antwortet "
+                    f"{probe.status_code}, nicht 404 — dann belegt die Fixture "
+                    "den Fund nicht mehr, Auswahl pruefen"
                 )
+        url = variants_kg["kg"]["apiUrl"]
+        r = c.get(url)
+        r.raise_for_status()
+        payload_kg = r.json()
+        total_kg = len(payload_kg.get("data", []))
+        payload_kg["data"], kg_rule = _excerpt_cantonal(payload_kg["data"])
+        write(
+            "obsan_api_kg_only.json",
+            json.dumps(payload_kg, ensure_ascii=False, indent=2) + "\n",
+            url,
+            f"Indikator {CANTONAL_INDICATOR} (intern {internal_kg}) — {kg_rule}, "
+            f"{len(payload_kg['data'])} von {total_kg} Zeilen. Diese {total_kg} "
+            "Punkte lagen hinter einer Adresse, die der Client nie abgefragt hat",
+        )
+
+        # 3b') Derselbe Schnitt, aber luekenhaft besetzt.
+        internal_sparse, variants_sparse, _ = _page_props(c, SPARSE_CANTONAL_INDICATOR)
+        url = variants_sparse["kg"]["apiUrl"]
+        r = c.get(url)
+        r.raise_for_status()
+        payload_sparse = r.json()
+        present = {row.get("kanton_nr") for row in payload_sparse.get("data", [])}
+        missing = sorted(set(range(1, 27)) - present)
+        if not missing:
+            raise SystemExit(
+                f"{SPARSE_CANTONAL_INDICATOR}: inzwischen fuer alle 26 Kantone "
+                "publiziert. Dann belegt die Fixture den Luecken-Fall nicht mehr "
+                "— einen anderen luekenhaften Indikator waehlen."
+            )
+        total_sparse = len(payload_sparse.get("data", []))
+        newest = max(row["year"] for row in payload_sparse["data"] if row.get("year"))
+        payload_sparse["data"] = [r_ for r_ in payload_sparse["data"] if r_.get("year") == newest]
+        write(
+            "obsan_api_kg_sparse.json",
+            json.dumps(payload_sparse, ensure_ascii=False, indent=2) + "\n",
+            url,
+            f"Indikator {SPARSE_CANTONAL_INDICATOR} (intern {internal_sparse}) — "
+            f"der juengste Jahrgang ({newest}) fuer jeden publizierten Kanton, "
+            f"{len(payload_sparse['data'])} von {total_sparse} Zeilen. Der "
+            "Indikator wird nicht fuer alle Kantone publiziert; es fehlen die "
+            f"BFS-Nummern {missing}, und genau das haelt diese Fixture fest",
+        )
+
+        # 3c) Und der Fall, in dem «keine Serie» wirklich stimmt: 8 von 60.
+        _internal_none, variants_none = page(
+            NO_VARIANT_INDICATOR,
+            "obsan_page_no_variants.html",
+            "gar keine Variante deklariert",
+        )
+        if variants_none:
+            raise SystemExit(
+                f"{NO_VARIANT_INDICATOR}: deklariert jetzt {sorted(variants_none)}. "
+                "Die Quelle hat nachgeliefert -- einen anderen variantenlosen "
+                "Indikator aus obsan_variant_census.json waehlen."
+            )
 
         # 4) Versorgungsatlas catalogue -- 285 entries upstream, excerpt here.
         url = f"{VA}/search/search_de.json"

@@ -1,0 +1,17 @@
+{
+  "sitemap_language_neutral_indicators": 285,
+  "sampled": 60,
+  "sample_rule": "die ersten 60 sprachneutralen Indikator-URLs in Sitemap-Reihenfolge",
+  "variant_counts": {
+    "kg": 50,
+    "ag": 49,
+    "sd": 24,
+    "gum": 9,
+    "agum": 5,
+    "g": 3,
+    "bg": 1
+  },
+  "without_g_or_gum": 49,
+  "without_any_variant": 8,
+  "with_cantonal_cut": 50
+}

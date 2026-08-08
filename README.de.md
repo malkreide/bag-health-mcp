@@ -28,11 +28,13 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 ```
 
 > **Hinweis zur Ankerquery:** Die HBSC-Jugendreihe (über Obsan) beantwortet den
-> **gesamtschweizerischen** Verlauf seit 2010 (mit 95%-Konfidenzintervallen). Sie
-> ist **national, nicht kantonal** — die Antwort enthält daher eine `region_note`,
-> die erklärt, dass ein «Kanton ZH vs. Schweiz»-Vergleich auf dieser Befragung
-> nicht möglich ist (HBSC ist nicht kantonal repräsentativ). Es handelt sich um
-> **aggregierte Bevölkerungsstatistik — keine individuelle Beratung.**
+> **gesamtschweizerischen** Verlauf seit 2010 (mit 95%-Konfidenzintervallen).
+> Dieser Indikator ist **national, nicht kantonal** — die Antwort enthält daher
+> eine `region_note`, die erklärt, dass ein «Kanton ZH vs. Schweiz»-Vergleich auf
+> dieser Befragung nicht möglich ist (HBSC ist nicht kantonal repräsentativ). Die
+> meisten übrigen Obsan-Indikatoren erscheinen sehr wohl kantonal — siehe den
+> Hinweis zu den Schnitten weiter unten. Es handelt sich um **aggregierte
+> Bevölkerungsstatistik — keine individuelle Beratung.**
 
 ---
 
@@ -71,17 +73,28 @@ MCP-Server für öffentliche Schweizer Gesundheitsdaten. Kern ist das **Infektio
 | Tool | Beschreibung |
 |------|-------------|
 | `bag_health_mcp__search_health_indicators` | Indikatoren suchen nach `source` (`obsan` / `versorgungsatlas` / `suchtschweiz`), Thema, Region, Jahresbereich |
-| `bag_health_mcp__get_indicator_series` | Zeitreihe eines Indikators (national mit 95%-CI; Versorgungsatlas auch **kantonal**, mit Kanton-vs-Schweiz-Vergleich) |
+| `bag_health_mcp__get_indicator_series` | Zeitreihe eines Indikators — mit Angabe, welcher **Schnitt** geliefert wurde (`variant`: national / nach Kantonen / nach Altersklasse / nach sozialer Lage / Verteilung) und welche es sonst gibt. `region='ZH'` liefert den kantonalen Schnitt; durchgehend mit 95%-CI |
 
 > ⚠️ **Nur aggregierte Bevölkerungsstatistik** (Prävalenzen/Kennzahlen nach
 > Alter/Geschlecht/Region) — **keine individuelle Beratung, Diagnose oder
 > Fallbeurteilung, kein Personenbezug.** Dies steht in beiden Tool-Beschreibungen
 > und in jeder Antwort (`aggregate_statistics_notice`) und ist besonders für
 > `suchtschweiz` (HBSC) relevant, da diese Daten Präventionsthemen im Schulkontext
-> berühren. Quellen: Obsan (`ind.obsan.admin.ch`, JSON-API, national); Sucht Schweiz
+> berühren. Quellen: Obsan (`ind.obsan.admin.ch`, JSON-API); Sucht Schweiz
 > HBSC über den Obsan-Spiegel (national); **Versorgungsatlas** liefert eine
 > **kantonale** Zeitreihe (26 Kantone + CH-Total, mit 95%-CI und Kanton-vs-CH-Verhältnis)
 > aus dem Tarifpool. Siehe `docs/tool-design-health-indicators.md`.
+
+> **Obsan veröffentlicht einen Indikator in mehreren Schnitten, nicht als eine
+> Reihe.** Über 60 Katalogeinträge gemessen am 2026-08-08: 50 haben einen
+> kantonalen Schnitt (`kg`), 49 einen nach Altersklasse (`ag`), 24 einen nach
+> sozialer Lage (`sd`) — und nur 3 den einfachen nationalen (`g`). Es sind
+> verschiedene Messgrössen mit verschiedenen Einheiten; `get_indicator_series`
+> nennt darum in `variant`, welchen Schnitt es geliefert hat, und in
+> `variants_available` die übrigen, statt einen für einen anderen einstehen zu
+> lassen. Acht der 60 veröffentlichen gar keine Reihe; dieser Fall scheitert mit
+> Begründung, statt ein leeres Ergebnis zu liefern. Die Erhebung liegt datiert in
+> [`tests/fixtures/obsan_variant_census.json`](tests/fixtures/obsan_variant_census.json).
 
 ---
 
