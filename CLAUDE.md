@@ -47,13 +47,13 @@ Ein Codex-Review auf einem PR wird beantwortet oder behoben, nie ignoriert.
 
 ### ruff-Version
 
-CI pinnt `ruff==0.16.1` (`.github/workflows/ci.yml`). Eine
-`.pre-commit-config.yaml` existiert **nicht**.
+`ruff==0.16.1`, an zwei Stellen exakt gleich gepinnt:
+`.github/workflows/ci.yml` und `pyproject.toml` `[dev]`. `pip install -e
+".[dev]"` liefert damit dieselbe Version, die die CI fährt. Beide Pins nur
+zusammen hochziehen.
 
-**Befund:** `pyproject.toml` `[dev]` deklariert `ruff>=0.4.0` ohne Obergrenze.
-`pip install -e ".[dev]"` installiert damit die jeweils neuste ruff, nicht
-0.16.1 — lokal und CI linten auseinander. Bis das gefixt ist, nach dem
-dev-Install immer explizit `pip install ruff==0.16.1` nachziehen.
+Eine `.pre-commit-config.yaml` existiert in diesem Repo **nicht** — es gibt
+keine Hooks, die Gates laufen von Hand oder in der CI.
 
 ### Gate-Befehle (wörtlich aus ci.yml, Python 3.11/3.12/3.13)
 
