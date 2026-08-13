@@ -228,6 +228,28 @@ async def test_bag_list_export_files():
 
 @pytest.mark.live
 @pytest.mark.asyncio
+async def test_live_resolver_is_not_stubbed():
+    """Gegenprobe zur autouse-Fixture in conftest.
+
+    Ohne diese Zusicherung koennen alle folgenden Live-Tests gruen sein, ohne die
+    Quelle je erreicht zu haben: der gestubbte Resolver liefert conftest.PUBLIC_IP,
+    das Pinning waehlt sie, und hinter einem nach Hostnamen routenden Proxy faellt
+    das nicht auf. Genau so ist es passiert.
+    """
+    from conftest import PUBLIC_IP
+
+    from bag_health_mcp import server as srv
+
+    resolved = await srv._resolve_host("api.idd.bag.admin.ch")
+    assert PUBLIC_IP not in resolved, (
+        "Live-Tests laufen mit gestubbtem DNS — sie pruefen die Quelle nicht. "
+        "Die autouse-Fixture stub_dns muss live-markierte Tests auslassen."
+    )
+    assert resolved, "der Host loeste auf keine Adresse auf"
+
+
+@pytest.mark.live
+@pytest.mark.asyncio
 async def test_live_list_diseases():
     result = await bag_list_diseases(ListDiseasesInput())
     assert result.total_topics >= 40
