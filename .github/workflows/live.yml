@@ -1,0 +1,91 @@
+name: Live API tests
+
+# Die Unit-Tests laufen gegen aufgezeichnete Fixtures. Eine Fixture belegt die
+# Form einer Antwort zu ihrem Aufnahmedatum — nicht, dass die Quelle heute noch
+# so antwortet. Wechselt BAG oder Obsan eine Schreibweise, bleibt die gesamte
+# CI gruen und der Server ist produktiv kaputt. Dieser Lauf ist die einzige
+# Stelle, an der das auffaellt, bevor es jemand meldet (Audit-Katalog:
+# DRIFT-005).
+
+on:
+  schedule:
+    # Taeglich 06:17 UTC. Die Quelldaten sind wochenweise, taeglich reicht also
+    # weit; die schiefe Minute haelt den Lauf aus der vollen Stunde heraus, in
+    # der GitHub Scheduled Jobs verzoegert.
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+# GitHub deaktiviert Scheduled Workflows nach 60 Tagen ohne Repo-Aktivitaet.
+# Bleibt das Repo laenger still, muss der Workflow von Hand reaktiviert werden.
+
+concurrency:
+  group: live-tests
+  cancel-in-progress: false
+
+jobs:
+  live:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Eine Version genuegt: geprueft wird die Quelle, nicht der Interpreter —
+      # und eine Matrix vervielfachte die Last auf einer oeffentlichen API.
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      # Kein Retry: ein Retry verdeckt genau den Fall, fuer den dieser Lauf da
+      # ist. Eine einzelne Netzstoerung oeffnet ein Issue, das der naechste
+      # gruene Lauf selbst wieder schliesst.
+      - name: Run live tests
+        run: PYTHONPATH=src pytest tests/ -m live --timeout=30
+
+      - name: Open or update the failure issue
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          gh label create live-failure --force \
+            --color B60205 --description "Live-Tests gegen die Quelle sind rot"
+          EXISTING=$(gh issue list --state open --label live-failure \
+            --limit 1 --json number --jq '.[0].number // empty')
+          if [ -n "$EXISTING" ]; then
+            gh issue comment "$EXISTING" --body "Weiterhin rot: $RUN_URL"
+          else
+            {
+              printf 'Der geplante Live-Lauf ist fehlgeschlagen: %s\n\n' "$RUN_URL"
+              printf 'Erst die Quelle abfragen, dann einordnen — nicht aus der\n'
+              printf 'Fehlermeldung schliessen. "Nicht gefunden" hiess hier schon\n'
+              printf 'einmal nicht, dass der Datensatz weg war, sondern dass die\n'
+              printf 'Quelle die Schreibweise ihrer Kopfzeile gewechselt hatte.\n\n'
+              printf 'Haelt die Aenderung, gehoeren die Fixtures neu aufgezeichnet\n'
+              printf '(scripts/record_fixtures.py).\n\n'
+              printf 'Dieses Issue schliesst sich beim naechsten gruenen Lauf selbst.\n'
+            } > /tmp/live-failure-body.md
+            gh issue create --label live-failure \
+              --title "Live-Tests gegen die Quelle sind rot" \
+              --body-file /tmp/live-failure-body.md
+          fi
+
+      # Ein Issue, das nach der Reparatur offen bleibt, wird zum Rauschen und
+      # damit ignoriert — dann ist der Workflow so wirkungslos wie keiner.
+      - name: Close the failure issue once green again
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          for N in $(gh issue list --state open --label live-failure \
+            --json number --jq '.[].number'); do
+            gh issue close "$N" --comment "Live-Tests wieder gruen: $RUN_URL"
+          done

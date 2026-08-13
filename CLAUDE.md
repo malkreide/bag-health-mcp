@@ -72,8 +72,12 @@ Separater Job `secret-scan`: gitleaks 8.21.2, `detect --source . --redact
 
 ### Live-Tests
 
-**Befund (DRIFT-005):** Es gibt keinen geplanten Live-Test-Workflow. Kein
-Workflow hat einen `schedule`/cron-Trigger; Live-Tests sind ausschliesslich
-per `-m "not live"` aus der CI ausgeschlossen und laufen damit nie
-automatisch. Ein Schema-Wechsel der Quelle bleibt unbemerkt, bis jemand von
-Hand `pytest -m live` fährt.
+`.github/workflows/live.yml` fährt sie täglich (cron `17 6 * * *`, dazu
+`workflow_dispatch`): `PYTHONPATH=src pytest tests/ -m live --timeout=30`.
+Rot öffnet ein Issue mit Label `live-failure`, der nächste grüne Lauf
+schliesst es wieder. Kein Retry — er verdeckte genau den Fall, für den der
+Lauf da ist.
+
+Zwei Dinge, die stillschweigend zurück nach DRIFT-005 führen: GitHub
+deaktiviert Scheduled Workflows nach 60 Tagen ohne Repo-Aktivität, und ein
+`live`-Test, der ohne Quelle grün werden kann, zählt nicht.
