@@ -63,6 +63,11 @@ dev = [
     "pytest>=8.0.0",
     "pytest-asyncio>=0.23.0",
     "pytest-cov>=5.0.0",
+    # Per-Test-Timeout fuer die Live-Tests (.github/workflows/live.yml). Ohne
+    # das Plugin bricht der dokumentierte Befehl `pytest -m live --timeout=30`
+    # mit "unrecognized arguments" ab, und ein haengender Endpunkt blockiert
+    # den Lauf bis zum Job-Limit.
+    "pytest-timeout>=2.3.0",
     "respx>=0.21.0",
     # Exact pin, mirroring the pinned install in .github/workflows/ci.yml. An
     # open range would lint local work with a different rule set than CI, which
