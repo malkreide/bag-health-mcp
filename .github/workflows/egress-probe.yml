@@ -1,11 +1,14 @@
 name: TEMP egress probe
 
-# Wegwerf-Diagnose, nicht zum Mergen gedacht.
+# Wegwerf-Diagnose, nicht zum Mergen gedacht — wird nach der Auswertung entfernt.
 #
-# Der erste live.yml-Lauf ist mit sechs von sechs Tests auf Verbindungsebene
-# gescheitert (Issue #61), waehrend dieselben Tests ausserhalb der Runner gruen
-# liefen und beide Hosts antworteten. Diese Datei misst runner-seitig, wo genau
-# es klemmt. Sie wird nach der Auswertung wieder entfernt.
+# Runde 1 hat gezeigt: der Runner erreicht beide Quellen einwandfrei
+# (TCP-Connect 0.16s/0.31s, curl http=404/200). Das Netz ist also nicht die
+# Ursache der sechs roten Live-Tests aus Issue #61.
+#
+# Runde 2 fuehrt deshalb den Egress-Pfad des Servers selbst aus — denselben
+# httpx-Client mit _PinningBackend, den die Tools benutzen — und zeigt den
+# vollen Traceback, statt aus der Fehlermeldung zu schliessen.
 
 on:
   pull_request:
@@ -15,51 +18,61 @@ on:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 12
     steps:
-      - name: Wer sind wir nach aussen
-        run: |
-          curl -sS --max-time 20 https://api.ipify.org || echo "(ipify nicht erreichbar)"
-          echo
+      - uses: actions/checkout@v7
 
-      - name: DNS-Aufloesung der beiden Quellen
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Der Client des Servers, direkt
         run: |
-          python3 - <<'PY'
-          import socket
-          for h in ("api.idd.bag.admin.ch", "ind.obsan.admin.ch"):
-              try:
-                  infos = socket.getaddrinfo(h, None, proto=socket.IPPROTO_TCP)
-                  for fam, *_ , sa in infos:
-                      print(f"{h}: {'v6' if fam==socket.AF_INET6 else 'v4'}  {sa[0]}")
-              except OSError as exc:
-                  print(f"{h}: DNS FEHLER {exc!r}")
+          PYTHONPATH=src python - <<'PY'
+          import asyncio, traceback
+          from bag_health_mcp import server as srv
+
+          async def main():
+              print("IDD_BASE :", srv.IDD_BASE)
+              print("TIMEOUT  :", srv.TIMEOUT)
+              print("USER_AGENT:", srv.USER_AGENT)
+              client = srv._new_client()
+              for path in ("/", "/api/v1/topics"):
+                  try:
+                      r = await asyncio.wait_for(client.get(path), timeout=25)
+                      print(f"GET {path!r} -> {r.status_code}, {len(r.content)} bytes")
+                  except Exception:
+                      print(f"GET {path!r} -> FEHLER:")
+                      traceback.print_exc()
+              await client.aclose()
+
+          asyncio.run(main())
           PY
 
-      - name: Nackter TCP-Connect auf :443
+      - name: Aufloesung wie der Pinning-Backend sie sieht
         run: |
-          python3 - <<'PY'
-          import socket, time
-          for h in ("api.idd.bag.admin.ch", "ind.obsan.admin.ch"):
-              t0 = time.time()
-              try:
-                  s = socket.create_connection((h, 443), timeout=15)
-                  s.close()
-                  print(f"{h}:443  CONNECT OK  {time.time()-t0:.2f}s")
-              except Exception as exc:
-                  print(f"{h}:443  CONNECT FEHLER nach {time.time()-t0:.2f}s: {exc!r}")
+          PYTHONPATH=src python - <<'PY'
+          import asyncio, traceback
+          from bag_health_mcp import server as srv
+          async def main():
+              for h in ("api.idd.bag.admin.ch", "ind.obsan.admin.ch"):
+                  try:
+                      print(h, "->", await srv._resolve_host(h))
+                  except Exception:
+                      traceback.print_exc()
+          asyncio.run(main())
           PY
 
-      - name: curl mit Timing
+      - name: Ein Live-Test mit vollem Traceback
         run: |
-          for U in https://api.idd.bag.admin.ch https://ind.obsan.admin.ch; do
-            echo "--- $U"
-            curl -sS -o /dev/null --max-time 25 \
-              -w "http=%{http_code} dns=%{time_namelookup}s connect=%{time_connect}s tls=%{time_appconnect}s total=%{time_total}s\n" \
-              "$U" || echo "curl exit=$?"
-          done
+          PYTHONPATH=src pytest tests/test_server.py::test_live_data_version \
+            -m live --timeout=60 --tb=long -q || true
 
-      - name: Gegenprobe an einem unbeteiligten Host
+      - name: Netz-Gegenprobe (Runde 1 wiederholt)
         run: |
           curl -sS -o /dev/null --max-time 20 \
-            -w "example.com http=%{http_code} total=%{time_total}s\n" https://example.com \
-            || echo "curl exit=$?"
+            -w "idd http=%{http_code} total=%{time_total}s\n" \
+            https://api.idd.bag.admin.ch || echo "curl exit=$?"
