@@ -26,6 +26,14 @@ Bitte gib an:
 5. Mit [Conventional Commits](https://www.conventionalcommits.org/) committen: `feat: add new tool`
 6. Pushen und einen Pull Request gegen `main` öffnen
 
+Die Live-Tests gehen gegen die echten BAG- und Obsan-Endpunkte und sind vom Befehl in Schritt 4 ausgeschlossen. So werden sie gefahren:
+
+```bash
+PYTHONPATH=src pytest tests/ -m live --timeout=30
+```
+
+`--timeout` stammt aus `pytest-timeout` und wird mit dem `dev`-Extra installiert (`pip install -e ".[dev]"`). Ohne das Plugin bricht pytest mit `unrecognized arguments` ab, und ein hängender Endpunkt blockiert den Lauf. Ein geplanter Workflow (`.github/workflows/live.yml`) fährt sie täglich — denn eine aufgezeichnete Fixture belegt die Form einer Antwort zu ihrem Aufnahmedatum, nicht dass die Quelle heute noch so antwortet.
+
 ---
 
 ## Code-Stil
