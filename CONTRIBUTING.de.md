@@ -59,6 +59,21 @@ Beim Hinzufügen neuer Tools dem bestehenden Muster folgen: Pydantic-Eingabemode
 
 ---
 
+## Die Live-Suite: wann sie läuft, und wer ein rotes Ergebnis sieht
+
+**Kadenz:** täglich um 06:17 UTC, dazu jederzeit von Hand über *Actions → Live API tests → Run
+workflow*. Siehe [`.github/workflows/live.yml`](.github/workflows/live.yml).
+
+**Wer es sieht:** Ein roter Lauf öffnet ein Issue mit dem Label `live-failure` (Titel: «Live-Tests gegen die Quelle sind rot»). Ein zweiter roter Lauf erkennt das offene Issue **am Label**, nicht am Titel, und hängt sich an denselben Thread. Wer das Label von Hand entfernt, bekommt beim nächsten roten Lauf ein zweites Issue. Wird die Suite wieder grün, schliesst sich das Issue selbst.
+
+**Ein roter Live-Lauf heisst nicht zwingend «unser Fehler».** Er heisst: Der
+Vertrag mit der Quelle hat sich geändert, oder die Quelle ist gerade aus. Beides
+gehört gesehen, nur das Erste gehört gefixt. Bitte den Lauf lesen, bevor der Job
+deaktiviert wird — so stirbt dieser Check, und er ist der einzige im Repo, der
+einer falschen Grundannahme über api.idd.bag.admin.ch widersprechen kann. Jeder andere Test
+prüft gegen eine Fixture, und die Fixture ist aus derselben Annahme geschrieben
+wie der Code.
+
 ## Lizenz
 
 Mit deinem Beitrag erklärst du dich damit einverstanden, dass deine Beiträge unter der [MIT-Lizenz](LICENSE) lizenziert werden.
