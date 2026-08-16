@@ -79,8 +79,15 @@ python scripts/tool_hashes.py --check      # SEC-022 rug-pull guard
 python scripts/check_version_sync.py       # pyproject ↔ server.json / README / src
 ```
 
+Alle sechs laufen in einem Job auf allen drei Versionen — keine
+`if:`-Ausnahme, kein zweiter lint-Job. Ein grünes 3.13 heisst hier also
+wirklich, dass alles auf 3.13 lief; im Portfolio ist das nicht durchgehend so.
+Ein `fail-fast: false` steht **nicht** da: Eine rote 3.11 bricht 3.12 und 3.13
+ab, bevor sie etwas sagen.
+
 Separater Job `secret-scan`: gitleaks 8.21.2, `detect --source . --redact
---verbose --exit-code 1`, mit `fetch-depth: 0`.
+--verbose --exit-code 1`, mit `fetch-depth: 0`. Lokal stellt ihn keiner der
+Befehle oben nach — ein roter PR bei grünen Tests ist meistens er.
 
 ### Live-Tests
 
