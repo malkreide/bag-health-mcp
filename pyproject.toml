@@ -72,7 +72,7 @@ dev = [
     # Exact pin, mirroring the pinned install in .github/workflows/ci.yml. An
     # open range would lint local work with a different rule set than CI, which
     # reports diffs nobody caused. Roll both forward together.
-    "ruff==0.16.1",
+    "ruff==0.16.3",
     # so the tracing-active path can be exercised offline in tests
     "opentelemetry-sdk>=1.20",
     "opentelemetry-exporter-otlp-proto-http>=1.20",
