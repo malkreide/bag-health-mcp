@@ -45,22 +45,20 @@ Ein Codex-Review auf einem PR wird beantwortet oder behoben, nie ignoriert.
 
 ## Teil 2 — Dieses Repo
 
-### ruff-Version
+**ruff: eine Quelle.** Der Pin `0.16.1` steht in `pyproject.toml` — und
+**nicht** mehr als eigener Install-Schritt in der CI.
 
-`ruff==0.16.1`, an zwei Stellen exakt gleich gepinnt:
-`.github/workflows/ci.yml` und `pyproject.toml` `[dev]`. `pip install -e
-".[dev]"` liefert damit dieselbe Version, die die CI fährt. Beide Pins nur
-zusammen hochziehen.
-
-Eine `.pre-commit-config.yaml` existiert in diesem Repo **nicht** — es gibt
-keine Hooks, die Gates laufen von Hand oder in der CI.
+Der CI-Schritt lief nach dem Install der Abhängigkeiten und überschrieb sie.
+Eine Abweichung im Pin konnte deshalb in der CI gar nicht auffallen, sondern
+nur lokal — wo niemand sie erwartet. Ein manuelles Nachinstallieren von ruff
+vor den Gates ist damit nicht mehr nötig und wäre schädlich: Es würde eine
+spätere Anhebung hier stillschweigend überstimmen.
 
 ### Gate-Befehle (wörtlich aus ci.yml, Python 3.11/3.12/3.13)
 
 ```bash
 pip install -e ".[dev]"
 PYTHONPATH=src pytest tests/ -m "not live"
-pip install ruff==0.16.1
 python -m ruff check src/ tests/ scripts/
 python -m ruff format --check src/ tests/ scripts/
 python scripts/tool_hashes.py --check      # SEC-022 rug-pull guard
