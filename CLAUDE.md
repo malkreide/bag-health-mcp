@@ -68,6 +68,9 @@ nur lokal — wo niemand sie erwartet. Ein manuelles Nachinstallieren von ruff
 vor den Gates ist damit nicht mehr nötig und wäre schädlich: Es würde eine
 spätere Anhebung hier stillschweigend überstimmen.
 
+Vor dem Lauf `ruff --version` prüfen: ein älteres ruff früher im `PATH`
+schlägt den Pin, ohne dass der Install etwas meldet.
+
 ### Gate-Befehle (wörtlich aus ci.yml, Python 3.11/3.12/3.13)
 
 ```bash
