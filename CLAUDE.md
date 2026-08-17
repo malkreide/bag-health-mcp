@@ -76,6 +76,7 @@ schlägt den Pin, ohne dass der Install etwas meldet.
 ```bash
 pip install -e ".[dev]"
 PYTHONPATH=src pytest tests/ -m "not live"
+python scripts/check_ruff_pin.py
 python -m ruff check src/ tests/ scripts/
 python -m ruff format --check src/ tests/ scripts/
 python scripts/tool_hashes.py --check      # SEC-022 rug-pull guard
