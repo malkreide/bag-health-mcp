@@ -2,6 +2,10 @@
 # SessionStart-Hook: meldet, wie viele Commits der ausgecheckte Stand hinter
 # origin/<default-branch> liegt. Siehe .claude/hooks/README.md fuer den Grund.
 #
+# Geltungsbereich: nur Claude Code on the web (CLAUDE_CODE_REMOTE). Lokal
+# passiert nichts — dort greift die Klon-Pruefung aus CLAUDE.md, Abschnitt
+# «Vor der Arbeit».
+#
 # Oberste Regel: Dieser Hook blockiert die Session NIEMALS. Kein Netz, kein
 # Remote, detached HEAD, flatterndes DNS, fehlendes `timeout` — jeder dieser
 # Faelle endet still mit Exit 0. Deshalb bewusst KEIN `set -e`: ein einzelner
@@ -18,6 +22,15 @@ FETCH_TIMEOUT="${CLAUDE_FRESHNESS_TIMEOUT:-5}"
 log() { printf '%s\n' "$*"; }
 
 main() {
+  # Web-only. Lokal (Variable ungesetzt, leer, "false", "0") passiert nichts.
+  # Beide Richtungen explizit: ein unerwarteter Wert soll den Hook nicht
+  # stillschweigend fuer immer abschalten — Schweigen ist hier auch der
+  # Normalzustand und faellt darum niemandem auf.
+  case "${CLAUDE_CODE_REMOTE:-}" in
+    true | 1) ;;
+    *) return 0 ;;
+  esac
+
   command -v git >/dev/null 2>&1 || return 0
 
   # `timeout` ist Pflicht — ohne harte Zeitschranke koennte das fetch den

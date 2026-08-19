@@ -4,6 +4,19 @@
 ausgecheckte Stand hinter `origin/<default-branch>` liegt. Registriert in
 `.claude/settings.json` unter `hooks.SessionStart`.
 
+## Geltungsbereich: nur Claude Code on the web
+
+Der Hook läuft ausschliesslich, wenn `CLAUDE_CODE_REMOTE` auf `true` oder `1`
+steht. Lokal — Variable ungesetzt, leer, `false` oder `0` — passiert nichts.
+
+Beide Richtungen sind explizit ausgeschrieben, statt nur auf `!= "true"` zu
+prüfen. Grund: Schweigen ist bei diesem Hook auch der Normalzustand. Ein
+unerwarteter Wert würde ihn dauerhaft abschalten, ohne dass es jemandem
+auffällt — der Hook sähe aus wie immer.
+
+Damit deckt der Hook den lokalen Fall **nicht** ab. Dort gilt weiterhin die
+Klon-Prüfung aus `CLAUDE.md`, Abschnitt «Vor der Arbeit», von Hand.
+
 ## Grund
 
 Ein veralteter Klon hat am 3.8.2026 **zweimal** eine rote CI erzeugt, deren
@@ -18,6 +31,7 @@ Dateien.
 
 | Fall | Ausgabe |
 | --- | --- |
+| lokale Session (kein `CLAUDE_CODE_REMOTE`) | nichts |
 | 0 Commits hinter | nichts — der Hook schweigt |
 | n > 0 Commits hinter | Anzahl, Default-Branch und Angleich-Befehl |
 | kein Netz, kein Remote, kein Git, DNS flattert | nichts |
@@ -58,17 +72,24 @@ Unsinn, beides ist schlechter als Schweigen.
 
 ## Lokal testen
 
+Ohne die Variable tut das Skript nichts — beim Testen also setzen:
+
 ```bash
-./.claude/hooks/check-clone-freshness.sh; echo "exit=$?"
+CLAUDE_CODE_REMOTE=true ./.claude/hooks/check-clone-freshness.sh; echo "exit=$?"
 ```
 
 Gegenprobe — künstlich hinter den Stand zurückfallen, ohne den Branch zu
 verändern:
 
 ```bash
-git switch --detach HEAD~3 && ./.claude/hooks/check-clone-freshness.sh
+git switch --detach HEAD~3
+CLAUDE_CODE_REMOTE=true ./.claude/hooks/check-clone-freshness.sh
 git switch -                     # zurück
 ```
+
+Ein stiller Lauf beweist für sich genommen nichts — der Hook schweigt auch bei
+aktuellem Stand. Wer das Gate prüfen will, braucht einen Stand, der sicher
+meldet, und schaltet dann nur `CLAUDE_CODE_REMOTE` um.
 
 (Auf detached HEAD schweigt der Hook absichtlich; für eine echte Gegenprobe
 einen Wegwerf-Branch drei Commits vor dem Stand anlegen.)
