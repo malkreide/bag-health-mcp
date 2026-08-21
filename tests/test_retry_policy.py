@@ -26,6 +26,22 @@ import bag_health_mcp.server as srv
 
 URL = "https://example.test/data.json"
 
+# Wall-clock numbers for the deadline test below, spread far enough apart that
+# scheduler jitter cannot move the outcome. Measured on 3.11 over 15 runs of
+# that test's own body, through pytest so every fixture is in place:
+# 0.126-0.175s against a 0.05s budget. Setup — building the `httpx.AsyncClient`
+# and the first call through it — accounted for about 0.085s of that, more than
+# the budget itself, so most of what the test used to measure was not the
+# deadline. The old bound of 0.25s left 0.115s of absolute headroom and one run
+# in fifteen already came within 0.075s of it. CI jitter is absolute, not
+# proportional: in swiss-efv-mcp a loaded runner turned 0.105s into 0.55s on
+# 2026-08-21 and tore the same assertion there, with more room to spare than
+# this one had. Raising the budget does not shrink that stall, it makes the
+# stall small *relative to* what is measured.
+_BUDGET = 0.5
+_CUT_BY = 2.5
+_SLOW_RESPONSE = 8.0
+
 
 @pytest.fixture(autouse=True)
 def _no_backoff(monkeypatch):
@@ -185,19 +201,41 @@ async def test_a_slow_response_is_cut_by_the_wall_clock_deadline(monkeypatch):
     about *real* time: the code that ignores the wall clock never sleeps, so no
     time passes and the broken version stays green. This test sleeps for real —
     deliberately, and it is the only one here that does.
+
+    The margins are wide on purpose — see `_BUDGET` above for the measurement
+    that set them. Building the client and the first call through it happen
+    before the clock starts, so the measured window holds the deadline and
+    nothing else.
     """
-    monkeypatch.setattr(srv, "RETRY_TOTAL_BUDGET", 0.05)
+    # Warm-up on the untouched default budget, before it is narrowed below:
+    # pays whatever a fresh client and the first call through it cost, outside
+    # the window measured further down.
+    route = respx.get(URL).mock(return_value=httpx.Response(200, json={}))
+    async with httpx.AsyncClient() as warm:
+        await srv._get_with_retry(warm, URL, context="warm-up")
+
+    monkeypatch.setattr(srv, "RETRY_TOTAL_BUDGET", _BUDGET)
 
     async def _slow(request):
-        await asyncio.sleep(0.30)
+        await asyncio.sleep(_SLOW_RESPONSE)
         return httpx.Response(200)
 
-    respx.get(URL).mock(side_effect=_slow)
-    started = time.monotonic()
+    route.mock(side_effect=_slow)
     async with httpx.AsyncClient() as client:
+        # The clock starts *inside* the context manager: constructing and
+        # closing the client cost more than the old 0.05s budget did, and that
+        # is setup, not deadline.
+        started = time.monotonic()
         with pytest.raises(ToolError):
             await srv._get_with_retry(client, URL, context="testing")
-    assert time.monotonic() - started < 0.25, "the per-operation TIMEOUT is not a budget"
+        elapsed = time.monotonic() - started
+
+    # Two-sided on purpose. The upper bound is the guarantee: a response that
+    # would have taken _SLOW_RESPONSE was cut. The lower bound says the cut came
+    # from the budget rather than from something failing straight away — a
+    # deadline computed wrong sails through an upper bound alone.
+    assert elapsed >= _BUDGET / 2, f"cut too early to be the budget: {elapsed:.3f}s"
+    assert elapsed < _CUT_BY, f"the per-operation TIMEOUT is not a budget: {elapsed:.2f}s"
 
 
 @respx.mock
