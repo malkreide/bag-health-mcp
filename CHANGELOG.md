@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Behoben — Browser-Clients kamen am Preflight nicht vorbei
+
+Spec `2026-07-28` routet eine Streamable-HTTP-Anfrage über `Mcp-Method`,
+`Mcp-Name` und `Mcp-Protocol-Version`. Die CORS-Freigabeliste nannte keinen
+davon, dafür mit `Mcp-Session-Id` den Header genau der Session-Mechanik, die
+dieselbe Revision abgeschafft hat. Ein Browser darf einen nicht safelisteten
+Header nicht senden, wenn der Server ihn nicht nennt: die Anfrage starb vor dem
+ersten MCP-Byte, während stdio und Python, für die kein Preflight gilt,
+weiterliefen. Deshalb war nichts rot.
+
+### Hinzugefügt — Frischehinweise auf den auflistenden Methoden
+
+SEP-2549, Spec `2026-07-28`: `tools/list`, `resources/list`,
+`resources/templates/list`, `prompts/list` und `server/discover` antworten mit
+`ttlMs` 300000 und `cacheScope` `public`. Das SDK setzt sonst «sofort veraltet,
+nie geteilt» und lässt damit jeden Client bei jeder Verbindung neu auflisten —
+für Verzeichnisse, die per Dekorator beim Import feststehen.
+
+`resources/read` und `prompts/get` bleiben ohne Hinweis: das wäre eine
+Zusicherung über den Inhalt statt über das Verzeichnis.
+
+
 ### Behoben — der Obsan-Client fragte nach zwei von sieben Schnitten
 
 Der letzte Eintrag hielt fest, dass der Katalog mehr Indikatoren anbietet, als
