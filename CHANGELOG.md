@@ -213,6 +213,23 @@ unter Regel 5 und im Katalog-Check `OPS-009`.
   lose them quietly. Counter-checks were run against all six properties; see
   the pull request.
 
+- **Protokoll-Gate: beide Spec-Aeren gepinnt und geprueft**
+  (`tests/test_protocol_version.py`). `mcp` 2.x bedient zwei Aeren ueber
+  denselben Server — den `initialize`-Handshake, der bei `2025-11-25`
+  deckelt, und den Pro-Request-Envelope, der `2026-07-28` erreicht.
+  `LATEST_PROTOCOL_VERSION` ist ein Alias auf die **moderne** Aera; wer nur
+  dagegen pinnt, laesst genau die Aera frei wandern, die heutige Clients
+  aushandeln. Beide sind jetzt einzeln gepinnt, ein Dependabot-Bump von
+  `mcp` kann keine davon still verschieben.
+
+  Nachgemessen statt aus Konstantennamen geschlossen: ein echter `initialize`
+  durch den zusammengebauten ASGI-Stack. Ein Client, der ueber den Handshake
+  nach `2026-07-28` fragt, bekommt `2025-11-25` zurueck.
+
+  Beide READMEs beschreiben die Aeren; ein Test haelt jede Sprache einzeln
+  dagegen — im Portfolio sind EN und DE desselben Repos schon dreimal
+  auseinandergelaufen, weil nur eine Fassung nachgezogen wurde.
+
 ### Added
 
 - **Host/Origin allow-list for the HTTP transport (`MCP_ALLOWED_HOSTS`,
