@@ -1699,6 +1699,50 @@ async def test_tool_hashes_match_snapshot():
     assert current == expected
 
 
+def test_tool_hash_is_independent_of_docstring_indentation():
+    """The snapshot must not depend on the Python version the check runs under.
+
+    Python 3.13 dedents docstrings at compile time; older versions do not. The
+    same source therefore yields a description whose continuation lines carry
+    four spaces of indent on 3.11 and none on 3.13.
+
+    Nothing here is affected today — every tool passes an explicit
+    `description=`, and a hand-written string is not a docstring. But the SDK
+    falls back to the function's docstring whenever that argument is omitted,
+    which is the natural thing to write, and the CI matrix runs 3.11, 3.12 and
+    3.13 with `--check` on every field. The failure would read "tool
+    definitions changed" and point at an indent.
+
+    That is not hypothetical: in `openlex-mcp` all eight hashes differed
+    between the two interpreters while input and output schemas were identical
+    byte for byte. This test is what would have caught it there.
+
+    The second half is the counter-control: only the indent is normalised, a
+    real rewording still changes the hash.
+    """
+    import importlib.util
+    import pathlib as _pathlib
+
+    script = _pathlib.Path(__file__).resolve().parent.parent / "scripts" / "tool_hashes.py"
+    spec = importlib.util.spec_from_file_location("tool_hashes_indent", script)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+
+    class _FakeTool:
+        def __init__(self, description):
+            self.name = "x"
+            self.description = description
+            self.input_schema = {"type": "object"}
+            self.output_schema = None
+
+    as_311 = "First line.\n\n    Second line, indented.\n    Third line."
+    as_313 = "First line.\n\nSecond line, indented.\nThird line."
+    assert mod._tool_hash(_FakeTool(as_311)) == mod._tool_hash(_FakeTool(as_313))
+
+    reworded = "First line.\n\nSecond line, indented.\nFourth line."
+    assert mod._tool_hash(_FakeTool(as_313)) != mod._tool_hash(_FakeTool(reworded))
+
+
 # ---------------------------------------------------------------------------
 # SEC-009 / SDK-004: HTTP bearer auth + CORS
 # ---------------------------------------------------------------------------
