@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Der Tool-Hash normalisiert die Beschreibung mit `inspect.cleandoc`.** Python
+  3.13 dedentiert Docstrings beim Kompilieren, ältere Versionen nicht: derselbe
+  Quelltext liefert dort eine Beschreibung, deren Folgezeilen vier Leerzeichen
+  Einzug tragen, und auf 3.11 eine ohne. Die CI-Matrix fährt 3.11, 3.12 und 3.13
+  und ruft `--check` auf jedem Feld.
+
+  **Heute ändert das keinen einzigen Hash** — gemessen: 10 von 10 identisch mit
+  und ohne Normalisierung, der Schnappschuss bleibt unangetastet. Jedes Werkzeug
+  hier übergibt ein ausdrückliches `description=`, und eine handgeschriebene
+  Zeichenkette ist kein Docstring. Das SDK greift aber auf den Docstring zurück,
+  sobald dieses Argument fehlt — die naheliegendste Schreibweise überhaupt. Ab
+  dann wäre der Lauf auf einem Matrix-Feld rot und meldete «tool definitions
+  changed» über einen Einzug.
+
+  Kein Gedankenspiel: In `openlex-mcp` unterschieden sich genau so alle acht
+  Hashes zwischen den beiden Interpretern, während Eingabe- und Ausgabeschema
+  Zeichen für Zeichen identisch waren. Normalisiert wird ausschliesslich der
+  Einzug; eine echte Umformulierung ändert den Hash weiterhin.
+
+### Added
+
+- **`test_tool_hash_is_independent_of_docstring_indentation`.** Ohne ihn wäre
+  die Normalisierung beim nächsten Umbau still wieder herausgefallen: da kein
+  Werkzeug heute einen Docstring benutzt, hätte kein bestehender Test etwas
+  gemerkt.
+
 ### Behoben — Browser-Clients kamen am Preflight nicht vorbei
 
 Spec `2026-07-28` routet eine Streamable-HTTP-Anfrage über `Mcp-Method`,

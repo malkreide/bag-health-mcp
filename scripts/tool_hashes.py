@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import asyncio
 import hashlib
+import inspect
 import json
 import sys
 from pathlib import Path
@@ -38,10 +39,27 @@ def _tool_hash(tool) -> str:
     snake_case: the snapshot commits to what clients observe over the protocol,
     not to the SDK's local spelling. Hashes therefore survive the 1.x -> 2.x
     migration unchanged, and a drift still means a real contract change.
+
+    ``inspect.cleandoc`` rather than the raw string for the same reason, one
+    layer down. Python 3.13 dedents docstrings at compile time and older
+    versions do not, so the *same source* yields a description whose
+    continuation lines carry four spaces of indent on 3.11 and none on 3.13.
+    Every tool here passes an explicit ``description=``, so nothing is affected
+    today — but the SDK falls back to the function's docstring whenever that
+    argument is omitted, which is the natural thing to write. The check would
+    then be red on the 3.13 matrix field and green on 3.11, reporting "tool
+    definitions changed" about an indent.
+
+    That is not hypothetical: it is exactly what happened in ``openlex-mcp``,
+    where all eight hashes differed between the two interpreters while the
+    input and output schemas were identical byte for byte.
+
+    Only the indent the interpreter adds or removes is normalised. A real
+    rewording still changes the hash — which is the point.
     """
     payload = {
         "name": tool.name,
-        "description": tool.description or "",
+        "description": inspect.cleandoc(tool.description or ""),
         "inputSchema": tool.input_schema,
         "outputSchema": getattr(tool, "output_schema", None),
     }
