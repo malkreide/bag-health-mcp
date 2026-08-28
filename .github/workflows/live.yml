@@ -46,11 +46,38 @@ jobs:
       # Kein Retry: ein Retry verdeckt genau den Fall, fuer den dieser Lauf da
       # ist. Eine einzelne Netzstoerung oeffnet ein Issue, das der naechste
       # gruene Lauf selbst wieder schliesst.
+      #
+      # `continue-on-error`, damit die Einordnung in jedem Fall laeuft. Rot
+      # wird der Job weiter unten, aus dem eingeordneten Ergebnis.
       - name: Run live tests
-        run: PYTHONPATH=src pytest tests/ -m live --timeout=30
+        id: suite
+        continue-on-error: true
+        run: |
+          set +e
+          PYTHONPATH=src pytest tests/ -m live --timeout=30 \
+            --junitxml=live-report.xml 2>&1 | tee live-output.txt
+          echo "pytest_exit=${PIPESTATUS[0]}" >> "$GITHUB_OUTPUT"
+
+      # `if: failure()` kennt rot und nicht rot. Ein Live-Lauf hat drei
+      # Antworten, und die dritte zaehlt: Ein gescheitertes `pip install`, ein
+      # Timeout oder eine umbenannte Marke sind NICHT dasselbe wie ein
+      # gebrochener Vertrag mit BAG oder Obsan. Und ein Lauf, in dem jeder Test
+      # uebersprungen wurde, sieht unter jedem Exit-Code-Check aus wie Erfolg —
+      # der Schritt weiter unten haette ein offenes Issue geschlossen, ohne
+      # dass irgendetwas verglichen worden waere.
+      - name: Ergebnis einordnen
+        id: verdict
+        env:
+          PYTEST_EXIT: ${{ steps.suite.outputs.pytest_exit }}
+        run: |
+          args=(live-report.xml)
+          if [ -n "$PYTEST_EXIT" ]; then
+            args+=(--pytest-exit "$PYTEST_EXIT")
+          fi
+          python scripts/classify_live_run.py "${args[@]}"
 
       - name: Open or update the failure issue
-        if: failure()
+        if: steps.verdict.outputs.state == 'finding'
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -79,8 +106,11 @@ jobs:
 
       # Ein Issue, das nach der Reparatur offen bleibt, wird zum Rauschen und
       # damit ignoriert — dann ist der Workflow so wirkungslos wie keiner.
+      # Nur bei `clear`. `unknown` laesst den Thread in Ruhe: Ein Lauf, der
+      # nichts gemessen hat, darf kein Issue schliessen — der Vergleich, auf
+      # den sich das Schliessen beruft, hat nicht stattgefunden.
       - name: Close the failure issue once green again
-        if: success()
+        if: steps.verdict.outputs.state == 'clear'
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
@@ -89,3 +119,20 @@ jobs:
             --json number --jq '.[].number'); do
             gh issue close "$N" --comment "Live-Tests wieder gruen: $RUN_URL"
           done
+
+      # Erst hier wird der Job rot. `clear` ist gruen; `finding` und `unknown`
+      # sind beide rot, aber nur `finding` hat oben ein Issue erzeugt — der
+      # Unterschied steht im Log, nicht im Exit-Code.
+      #
+      # Ueber `env`, nicht ueber `${{ }}` im Skript: Der Grund kann eine
+      # Parser-Meldung ueber eine fremde Datei enthalten, und `${{ }}` setzt sie
+      # vor dem Start woertlich in die Shell ein.
+      - name: Ergebnis durchreichen
+        if: steps.verdict.outputs.state != 'clear'
+        env:
+          LIVE_STATE: ${{ steps.verdict.outputs.state }}
+          LIVE_REASON: ${{ steps.verdict.outputs.reason }}
+        run: |
+          echo "Live-Suite: $LIVE_STATE"
+          echo "$LIVE_REASON"
+          exit 1
