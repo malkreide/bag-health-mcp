@@ -284,8 +284,9 @@ wie der Code: Nichts ist rot, weil nichts geprüft wird, worauf es ankommt.
 
 ## Teil 2 — Dieses Repo
 
-**ruff: eine Quelle.** Der Pin `0.16.3` steht in `pyproject.toml` — und
-**nicht** mehr als eigener Install-Schritt in der CI.
+**ruff: eine Quelle.** Der Pin steht in `pyproject.toml`, dort exakt — und
+**nicht** mehr als eigener Install-Schritt in der CI. Die Version steht
+bewusst nicht hier; `tests/test_ruff_pin_doku.py` hält sie draussen.
 
 Der CI-Schritt lief nach dem Install der Abhängigkeiten und überschrieb sie.
 Eine Abweichung im Pin konnte deshalb in der CI gar nicht auffallen, sondern
