@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Behoben — der dokumentierte Startbefehl brach beim Start ab
+
+`python -m bag_health_mcp.server`, so genannt in README und
+`claude_desktop_config.json`, endete mit `partially initialized module
+'bag_health_mcp._tools' has no attribute 'READ_ONLY'`. Unter `-m` läuft
+`server.py` als `__main__`; die Tool-Module importieren aber
+`bag_health_mcp.server` und erzeugten damit eine zweite Kopie, die auf das halb
+initialisierte `_tools` traf. Nur der Konsolenbefehl `bag-health-mcp` lief.
+Alle Tests waren grün, weil keiner das Modul als Programm startete.
+
+- `server.py` übergibt unter `__main__` sofort an das kanonische Modul.
+- Neu `bag_health_mcp/__main__.py`: `python -m bag_health_mcp` geht ebenfalls.
+- `tests/test_entry_points.py` startet beide Formen als Unterprozess über stdio
+  bis zu `tools/list` und prüft, dass die Desktop-Konfiguration eine davon nennt.
+  Gegenprobe: ohne die Übergabe fällt genau der Fall `-m bag_health_mcp.server`.
+
 ### Geändert — nativ auf Spec `2026-07-28`
 
 Bisher erreichte der Server `2026-07-28`, weil das SDK es konnte: Frischehinweise
