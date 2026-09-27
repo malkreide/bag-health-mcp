@@ -8,6 +8,19 @@ No authentication required. All data is public.
 
 from __future__ import annotations
 
+# `python -m bag_health_mcp.server` fuehrt diese Datei als `__main__` aus, nicht
+# als `bag_health_mcp.server`. Die Tool-Module unten importieren aber
+# `bag_health_mcp.server` — das waere eine zweite Kopie dieses Moduls, die ihrerseits
+# das halb initialisierte `_tools` importiert und mit einem zirkulaeren Import
+# abbricht. Deshalb hier sofort an das kanonische Modul uebergeben, bevor diese
+# Kopie irgendetwas registriert. README und claude_desktop_config.json nennen
+# genau diesen Aufruf.
+if __name__ == "__main__":
+    from bag_health_mcp.server import main as _main
+
+    _main()
+    raise SystemExit(0)
+
 import asyncio
 import difflib
 import ipaddress
@@ -1346,7 +1359,3 @@ from bag_health_mcp import _health_indicators  # noqa: E402
 
 bag_search_health_indicators = _health_indicators.bag_search_health_indicators
 bag_get_indicator_series = _health_indicators.bag_get_indicator_series
-
-
-if __name__ == "__main__":
-    main()
