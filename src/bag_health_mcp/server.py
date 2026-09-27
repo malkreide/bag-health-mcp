@@ -700,6 +700,9 @@ CACHE_HINTS = {
 
 mcp = MCPServer(
     name="bag-health-mcp",
+    # Ohne `version=` meldet jede Antwort `serverInfo.version` als leeren Text —
+    # der SDK-Default. Dieselbe Quelle wie der User-Agent: die Paket-Metadaten.
+    version=__version__,
     cache_hints=CACHE_HINTS,
     instructions=(
         "Access Swiss Federal Office of Public Health (BAG) infectious disease "
@@ -712,6 +715,22 @@ mcp = MCPServer(
     ),
     lifespan=lifespan,
 )
+
+# Spec 2026-07-28 leitet `listChanged` (tools, resources, prompts) und
+# `resources.subscribe` allein daraus ab, ob `subscriptions/listen` bedient wird
+# (`mcp/server/lowlevel/server.py::get_capabilities`). `MCPServer` registriert
+# den Handler immer — ein moderner Client bekaeme also «Aenderungen werden
+# gemeldet» zugesagt und einen Stream, auf dem nie etwas ankommt: die Listen
+# stehen beim Import fest, der Server veroeffentlicht kein Ereignis. Die
+# Handshake-Aera meldete schon vorher `false`.
+#
+# Einen oeffentlichen Schalter hat das SDK nicht; der Eingriff geht ueber ein
+# privates Attribut. Bewusst `del` statt `pop(..., None)`: verschwindet das
+# Attribut oder der Eintrag bei einem SDK-Bump, bricht der Import laut, statt
+# still wieder `true` zu melden. `tests/test_spec_2026_07_28.py` haelt den
+# Zustand samt Negativkontrolle fest. Sobald ein Tool eine Liste zur Laufzeit
+# aendert, muss diese Zeile im selben Commit weg.
+del mcp._lowlevel_server._request_handlers["subscriptions/listen"]
 
 
 # ---------------------------------------------------------------------------
