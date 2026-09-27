@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-09-27
+
+Minor- statt Patch-Release: seit 0.3.0 kamen neue Konfiguration, neue
+Ausgabefelder und geändertes Betriebsverhalten dazu, nicht nur Fixes. Was
+Betreibende und Nutzende vor dem Update wissen sollten, steht hier; die
+Einzelheiten folgen darunter.
+
+### Upgrade-Hinweise
+
+- **HTTP ist sessionlos, in beiden Protokoll-Ären.** Keine Antwort trägt mehr
+  `Mcp-Session-Id`. Session-Affinität am Load Balancer ist nicht mehr nötig;
+  `deploy/deployment.yaml` hat sie verloren. Wer sie selbst konfiguriert hat,
+  kann sie entfernen — schädlich ist sie nicht, sie verzerrt nur die Last.
+- **Neu: Host-Allowlist `MCP_ALLOWED_HOSTS`** (Schutz gegen DNS-Rebinding).
+  Gesetzt, beantwortet der Server Anfragen unter jedem anderen `Host` mit 421.
+  Ungesetzt auf einem Nicht-Loopback-Bind bleibt die Prüfung aus, und der Start
+  warnt im Log — wer den Server ohne Gateway exponiert, sollte sie setzen.
+- **Keine MCP-Log-Meldungen mehr an den Client** (Spec `2026-07-28`, SEP-2577).
+  Fortschritt kommt weiterhin an; Betriebslogs stehen auf stderr.
+- **Das Indikator-Tool liefert zusätzliche Felder** (`variant`,
+  `variants_available`) und kantonale Obsan-Reihen. Die Tool-Hashes in
+  `tool-hashes.json` haben sich entsprechend geändert.
+- **`python -m bag_health_mcp.server` startet wieder**, neu auch
+  `python -m bag_health_mcp`.
+
 ### Behoben — der dokumentierte Startbefehl brach beim Start ab
 
 `python -m bag_health_mcp.server`, so genannt in README und
