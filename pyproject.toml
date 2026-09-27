@@ -97,6 +97,12 @@ addopts      = "-v --tb=short"
 markers      = [
     "live: live API tests (skipped in CI by default)",
 ]
+# Spec 2026-07-28 / SEP-2577: Protokoll-Logging, Sampling und Roots sind
+# abgekuendigt. Als Fehler statt als Warnung, damit ein zurueckgekehrter
+# `ctx.info` einen Test rot macht (tests/test_spec_2026_07_28.py).
+filterwarnings = [
+    "error::mcp.MCPDeprecationWarning",
+]
 
 [tool.ruff]
 line-length = 100

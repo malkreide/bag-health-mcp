@@ -340,6 +340,8 @@ def test_main_http_passes_host_and_port_to_run(monkeypatch):
         "transport": "streamable-http",
         "host": "127.0.0.1",  # safe default, no MCP_HOST
         "port": 9001,
+        # Spec 2026-07-28: sessionless on the legacy leg too (STATELESS_HTTP).
+        "stateless_http": True,
         # SEC-005: the allow-list travels the same way, so this path is
         # protected identically to the auth/CORS one. A loopback bind gets the
         # loopback list; see build_transport_security.
@@ -1298,23 +1300,20 @@ def test_disease_categories_taxonomy_is_source_of_truth():
 
 
 # ---------------------------------------------------------------------------
-# SDK-003: Context injection (progress + structured logging)
+# SDK-003: Context injection (progress)
 # ---------------------------------------------------------------------------
 
 
 class _RecordingCtx:
-    """Minimal stand-in for MCPServer Context capturing log/progress calls."""
+    """Minimal stand-in for MCPServer Context capturing progress calls.
+
+    Deliberately without ``info``/``warning``: protocol logging is deprecated in
+    Spec 2026-07-28 (SEP-2577), and a tool that calls it again fails here with
+    AttributeError instead of being recorded as intended behaviour.
+    """
 
     def __init__(self):
-        self.infos: list[str] = []
-        self.warnings: list[str] = []
         self.progress: list[tuple[float, float | None]] = []
-
-    async def info(self, message, **extra):
-        self.infos.append(message)
-
-    async def warning(self, message, **extra):
-        self.warnings.append(message)
 
     async def report_progress(self, progress, total=None, message=None):
         self.progress.append((progress, total))
@@ -1341,8 +1340,8 @@ def test_context_param_not_in_input_schema():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_disease_data_reports_progress_and_logs():
-    """bag_get_disease_data emits info logs and 0→1→2 progress via Context."""
+async def test_disease_data_reports_progress():
+    """bag_get_disease_data reports 0→1→2 progress via Context."""
     respx.get(f"{IDD_BASE}/api/v1/data/influenza/cases/incValue/iso_week/details").mock(
         return_value=httpx.Response(200, json=MOCK_DETAILS)
     )
@@ -1356,7 +1355,6 @@ async def test_disease_data_reports_progress_and_logs():
         ctx=ctx,
     )
     assert result.topic == "influenza"
-    assert len(ctx.infos) >= 2
     assert ctx.progress[0] == (0, 2)
     assert ctx.progress[-1] == (2, 2)
 
@@ -1381,9 +1379,10 @@ async def test_canton_situation_reports_progress_per_series():
 
 @pytest.mark.asyncio
 @respx.mock
-async def test_canton_situation_warns_client_on_degraded_series():
-    """A blocked/failed series is reported to the client via ctx.warning, and
-    still degrades closed without leaking (SDK-003 + OBS-002)."""
+async def test_canton_situation_reports_degraded_series_in_the_result():
+    """A blocked/failed series reaches the model through the result
+    (status="unavailable"), not over the deprecated protocol-logging channel,
+    and still degrades closed without leaking (SDK-003 + OBS-002)."""
     respx.get(url__regex=r".*/details$").mock(
         return_value=httpx.Response(302, headers={"location": "http://169.254.169.254/x"})
     )
@@ -1393,13 +1392,12 @@ async def test_canton_situation_warns_client_on_degraded_series():
 
     ctx = _RecordingCtx()
     result = await bag_get_canton_situation(canton="ZH", ctx=ctx)
-    assert len(ctx.warnings) == len(result.diseases)
     assert all(
         isinstance(v, CantonDiseaseStatus) and v.status == "unavailable"
         for v in result.diseases.values()
     )
     assert "LEAK-MUST-NOT-APPEAR" not in repr(result)
-    assert all("LEAK-MUST-NOT-APPEAR" not in w for w in ctx.warnings)
+    assert ctx.progress[-1] == (len(result.diseases), len(result.diseases))
 
 
 @pytest.mark.asyncio
@@ -1798,10 +1796,11 @@ def test_build_http_app_wraps_auth_when_token_set():
 
 
 @pytest.mark.asyncio
-async def test_cors_exposes_session_id_header():
-    """CORS (when origins configured) echoes an allowed origin and exposes the
-    Mcp-Session-Id header browser clients need (SDK-004); a disallowed origin is
-    not echoed."""
+async def test_cors_allows_session_header_through_preflight():
+    """CORS (when origins configured) echoes an allowed origin and lets the
+    Mcp-Session-Id header through the preflight (SDK-004); a disallowed origin is
+    not echoed. Nothing is exposed any more: the server is sessionless and
+    issues no session id (STATELESS_HTTP)."""
     import httpx
 
     from bag_health_mcp.server import Settings, build_http_app
@@ -2044,6 +2043,8 @@ def test_the_sdk_served_path_gets_the_allowlist_too(monkeypatch):
     assert not served_by_uvicorn, "took the uvicorn branch — this test asserts the other one"
     assert captured["host"] == "0.0.0.0"
     assert "bag.example.ch:8000" in captured["transport_security"].allowed_hosts
+    # Same session model as build_http_app (Spec 2026-07-28, no stickiness).
+    assert captured["stateless_http"] is True
 
 
 def test_the_uvicorn_served_path_gets_the_allowlist_too(monkeypatch):

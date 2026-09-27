@@ -68,8 +68,8 @@ default), and this document updated.
     compared in constant time. Unset = no auth (stdio/local). This is a
     shared-secret gate, not a per-user identity system.
   - **CORS (SDK-004):** `MCP_CORS_ORIGINS` is an explicit origin allow-list
-    (never a wildcard) for browser MCP clients; the `Mcp-Session-Id` header is
-    exposed so stateful sessions work.
+    (never a wildcard) for browser MCP clients. No session header is exposed:
+    the server is sessionless over HTTP in both protocol eras.
   - For real per-user identity/authorisation, front the server with an edge
     gateway (see the [deployment & scaling guide](deployment-scaling.md)).
 - **Host/Origin allow-list against DNS rebinding (SEC-005):**

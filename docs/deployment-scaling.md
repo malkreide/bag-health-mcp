@@ -7,8 +7,8 @@ orchestrator — adapt them to your platform. Covers audit findings
 **SCALE-001, -002, -003, -005, -006**.
 
 > These are **reference templates**, not a turnkey production configuration.
-> Review image pinning, replica count, resource sizing, ingress class, and your
-> LB's session-routing capabilities before use.
+> Review image pinning, replica count, resource sizing and ingress class before
+> use.
 
 ---
 
@@ -30,59 +30,41 @@ local/Claude-Desktop use.
 
 ---
 
-## 2. Session affinity (SCALE-002, SCALE-003)
+## 2. No session affinity needed (SCALE-002, SCALE-003)
 
-Streamable HTTP / SSE sessions are held **in pod memory** (the SDK has no shared
-session backend). With more than one replica, a client's requests must keep
-reaching the **same pod** for the life of its session, or the session breaks on
-a pod switch. Two options, simplest first:
+The server is **sessionless over HTTP in both protocol eras**, so any replica can
+answer any request and a plain round-robin load balancer is enough:
 
-**(a) Service-level client-IP affinity** — in `deploy/deployment.yaml`:
+| Client speaks | Session | What the LB must do |
+|---|---|---|
+| `2026-07-28` (per-request envelope) | none — the revision has no session | nothing |
+| `2025-11-25` and earlier (`initialize` handshake) | none — `STATELESS_HTTP = True` in `server.py` | nothing |
 
-```yaml
-spec:
-  sessionAffinity: ClientIP
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 3600   # ≥ your longest session
-```
+The first row is the spec itself: a `2026-07-28` request is one self-contained
+POST, no `initialize` before it, no `Mcp-Session-Id` after it. The second row is
+a choice this server makes (`stateless_http=True`): the SDK then builds a
+throwaway per-request session for handshake-era clients instead of holding one
+in pod memory.
 
-Works without any LB cookie/header support. Caveat: clients behind a shared NAT
-egress IP land on the same pod (coarse balancing).
+That choice costs the legacy leg its server-to-client channels outside a
+response — server-initiated requests (sampling, roots, push elicitation) and
+standalone notifications. This server uses none of them: no tool asks the client
+anything, the tool/resource/prompt lists are fixed at import, and protocol
+logging is gone (deprecated in `2026-07-28`, SEP-2577). **Progress still
+arrives** — it travels on the response stream of the tool call itself. All of
+this is measured in `tests/test_spec_2026_07_28.py`, including the case that
+matters here: a handshake on one app instance, the tool call on a second one.
 
-**(b) `Mcp-Session-Id` header routing at an edge LB** — more precise; routes by
-the MCP session id the protocol already sends. Sketches:
-
-*HAProxy stick-table:*
-```haproxy
-backend mcp
-  balance roundrobin
-  stick-table type string len 64 size 100k expire 60m
-  stick on req.hdr(Mcp-Session-Id)
-  server s1 10.0.0.1:8000 check
-  server s2 10.0.0.2:8000 check
-```
-
-*NGINX Ingress (consistent hash on the header):*
-```yaml
-metadata:
-  annotations:
-    nginx.ingress.kubernetes.io/upstream-hash-by: "$http_mcp_session_id"
-```
-
-Pick (a) for small/internal deployments; (b) when you run a dedicated edge LB or
-need failover semantics. Either way, set a session **TTL** (≥ expected session
-length) so stale entries expire.
-
-> A fully stateless horizontal scale-out would require a shared session store
-> (e.g. Redis) behind the SDK, which it does not provide out of the box —
-> out of scope here; affinity is the pragmatic answer for this workload.
+> Earlier versions of this guide required client-IP affinity or
+> `Mcp-Session-Id` header routing (HAProxy stick-table, NGINX
+> `upstream-hash-by`). Both are unnecessary now and have been removed from
+> `deploy/deployment.yaml`; leaving them in place is harmless but skews load.
 >
-> `mcp` 2.x narrows this slightly but does not close it: `MCPServer` accepts a
-> `subscriptions=` bus (fan out resource/tool change events across replicas) and
-> `streamable_http_app(event_store=...)` (resumable SSE streams). The session
-> table itself is still a per-process dict in `StreamableHTTPSessionManager`, so
-> affinity remains required.
+> Revisit this section the day a tool needs to ask the client something
+> (`Resolve(...)` / `InputRequiredResult`) or to push list changes: that is the
+> point where `STATELESS_HTTP` has to be decided again, and where
+> `request_state_security=` (shared keys across replicas) and a shared
+> `subscriptions=` bus come in.
 
 ---
 
@@ -134,7 +116,7 @@ auditing live in a controlled gateway layer (anti-"shadow MCP").
 ```bash
 kubectl apply -f deploy/networkpolicy.yaml   # egress control (SEC-021)
 kubectl apply -f deploy/deployment.yaml      # Deployment + Service (this guide)
-# then an Ingress/LB of your choice for Mcp-Session-Id routing (§2b), if used
+# then an Ingress/LB of your choice — no session routing needed (§2)
 ```
 
 See also: [`docs/isds-klassifikation.md`](isds-klassifikation.md) (ISDS) and

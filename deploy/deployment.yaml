@@ -84,10 +84,6 @@ spec:
     - name: http
       port: 80
       targetPort: 8000
-  # SCALE-002: pin a client to one pod for the life of its MCP session. This is
-  # client-IP affinity (works without LB cookie support); for Mcp-Session-Id
-  # header routing use an edge LB / Ingress instead (see docs/deployment-scaling.md).
-  sessionAffinity: ClientIP
-  sessionAffinityConfig:
-    clientIP:
-      timeoutSeconds: 3600
+  # SCALE-002: no session affinity. The server is sessionless over HTTP in both
+  # protocol eras (Spec 2026-07-28 + STATELESS_HTTP for handshake clients), so
+  # any pod can answer any request (see docs/deployment-scaling.md §2).

@@ -1179,13 +1179,33 @@ def build_transport_security(settings: Settings) -> Any:
 CORS_ROUTING_HEADERS = ["Mcp-Method", "Mcp-Name", "Mcp-Protocol-Version"]
 
 
+# Spec 2026-07-28 kennt keine Session: eine moderne Anfrage ist ein
+# eigenstaendiger POST ohne `Mcp-Session-Id`, jeder Worker kann sie beantworten.
+# Das SDK routet sie am `Mcp-Protocol-Version`-Header vorbei, bevor
+# `stateless_http` ueberhaupt gelesen wird — der Schalter wirkt nur auf die
+# Handshake-Aera.
+#
+# Dort kostet er die beiden Server->Client-Kanaele: Rueckfragen (Sampling,
+# Roots, Push-Elicitation) und Benachrichtigungen ausserhalb einer Antwort.
+# Dieser Server nutzt keinen davon — keine Rueckfragen, statische Listen, kein
+# Protokoll-Logging mehr (SEP-2577). Fortschritt bleibt: er laeuft im Stream der
+# Antwort auf den POST, gemessen fuer beide Aeren in
+# `tests/test_spec_2026_07_28.py`. Damit braucht auch ein Legacy-Client keine
+# Session-Affinitaet mehr, und beide Aeren skalieren gleich.
+#
+# Sobald ein Tool eine Rueckfrage oder eine Listenaenderung pushen soll, ist
+# dieser Schalter im selben Commit neu zu entscheiden.
+STATELESS_HTTP = True
+
+
 def build_http_app(settings: Settings) -> Any:
     """Build the Streamable-HTTP ASGI app with optional auth + CORS.
 
     - Bearer-token auth is applied when ``settings.auth_token`` is set (SEC-009).
-    - CORS is applied when ``settings.cors_origins`` is non-empty, exposing the
-      ``Mcp-Session-Id`` header browser clients need for stateful sessions
-      (SDK-004). Origins are an explicit allow-list — never a wildcard.
+    - CORS is applied when ``settings.cors_origins`` is non-empty (SDK-004).
+      Origins are an explicit allow-list — never a wildcard.
+    - Both protocol eras are served sessionless (:data:`STATELESS_HTTP`), so no
+      request needs to reach the worker that saw the previous one.
 
     ``host`` is handed to the SDK rather than left at its default because the
     SDK derives its DNS-rebinding protection from it; leaving it out would mean
@@ -1195,6 +1215,7 @@ def build_http_app(settings: Settings) -> Any:
     """
     app = mcp.streamable_http_app(
         host=settings.host,
+        stateless_http=STATELESS_HTTP,
         transport_security=build_transport_security(settings),
     )
     if settings.auth_token:
@@ -1208,13 +1229,15 @@ def build_http_app(settings: Settings) -> Any:
             app,
             allow_origins=origins,
             allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+            # `Mcp-Session-Id` stays allowed so a legacy browser client that
+            # sends one is not stopped at the preflight; the server issues none
+            # (STATELESS_HTTP), so there is nothing to expose.
             allow_headers=[
                 "Mcp-Session-Id",
                 "Authorization",
                 "Content-Type",
                 *CORS_ROUTING_HEADERS,
             ],
-            expose_headers=["Mcp-Session-Id"],
         )
         logger.info("CORS enabled for origins: %s", ", ".join(origins))
     return app
@@ -1281,13 +1304,15 @@ def main() -> None:
             # 2.x the bind address is a run() kwarg — MCPServer.settings no
             # longer carries host/port, so passing them here is the only way
             # to bind anywhere other than the SDK default of 127.0.0.1:8000.
-            # transport_security travels the same way; run() forwards it to the
-            # same app builder, so both HTTP paths get the identical allow-list
-            # rather than only the auth/CORS one.
+            # transport_security and stateless_http travel the same way; run()
+            # forwards them to the same app builder, so both HTTP paths get the
+            # identical allow-list and session model rather than only the
+            # auth/CORS one.
             mcp.run(
                 transport="streamable-http",
                 host=settings.host,
                 port=settings.port,
+                stateless_http=STATELESS_HTTP,
                 transport_security=build_transport_security(settings),
             )
     else:

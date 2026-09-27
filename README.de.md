@@ -173,25 +173,47 @@ einer künftigen Schreib-Phase gelten dokumentierte Voraussetzungen
 
 ## MCP-Protokollversion
 
-Dieser Server bedient **zwei Protokoll-Aeren** ueber denselben Endpunkt. Die
-erste Anfrage einer Verbindung entscheidet, welche gilt; ein spaeterer Anspruch
-aus der jeweils anderen Aera wird abgewiesen.
+Dieser Server spricht MCP **`2026-07-28` nativ** und bedient ueber denselben
+Endpunkt weiterhin jeden aelteren Client. Die erste Anfrage einer Verbindung
+entscheidet ueber die Aera; ein spaeterer Anspruch aus der jeweils anderen Aera
+wird abgewiesen.
 
 | Aera | Revision | Wer sie erreicht |
 |---|---|---|
-| `initialize`-Handshake | `2024-11-05` … **`2025-11-25`** | Was heutige Clients sprechen. Der Server antwortet mit der angefragten Revision — oder mit der Obergrenze `2025-11-25`, wenn die Anfrage etwas Neueres verlangt. |
-| Pro-Request-Envelope | **`2026-07-28`** | Eine Anfrage mit dem `2026-07-28`-`_meta`-Envelope oeffnet eine moderne Verbindung. |
+| Pro-Request-Envelope | **`2026-07-28`** | Eine Anfrage mit dem `2026-07-28`-`_meta`-Envelope. Kein `initialize`, keine Session — der `Client` des SDK landet standardmaessig hier. |
+| `initialize`-Handshake | `2024-11-05` … **`2025-11-25`** | Clients, die `2026-07-28` noch nicht sprechen. Der Server antwortet mit der angefragten Revision — oder mit der Obergrenze `2025-11-25`, wenn die Anfrage etwas Neueres verlangt. |
+
+Was «nativ» hier heisst, jeder Punkt geprueft in
+[`tests/test_spec_2026_07_28.py`](tests/test_spec_2026_07_28.py):
+
+- **Keine Session, in keiner Aera.** Keine Antwort traegt `Mcp-Session-Id`;
+  jede Replika kann jede Anfrage beantworten, ein einfacher
+  Round-Robin-Balancer genuegt (siehe
+  [Deployment & Skalierung](docs/deployment-scaling.md)). Fuer
+  Handshake-Clients ist das ein bewusstes `stateless_http=True`.
+- **Keine abgekuendigten Faehigkeiten.** Protokoll-Logging
+  (`ctx.info`/`ctx.warning`), Sampling und Roots sind in `2026-07-28`
+  abgekuendigt (SEP-2577). Der Server nutzt keine davon; Betriebslogs gehen nach
+  stderr. Die Testsuite macht aus `MCPDeprecationWarning` einen Fehler, ein
+  zurueckgekehrter Aufruf faellt also in der CI auf.
+- **Keine Rueckfragen an den Client.** Kein Tool fragt beim Client nach, nichts
+  haengt an einem Rueckkanal, den `2026-07-28` nicht mehr hat.
+- **Fortschritt** (Server an Client, weiterhin in der Spec) kommt in beiden
+  Aeren an, im Antwort-Stream des Tool-Aufrufs.
+- **Frischehinweise** (`ttlMs`/`cacheScope`, SEP-2549) auf den auflistenden
+  Methoden, und **CORS** fuer die Routing-Header `Mcp-Method`, `Mcp-Name`,
+  `Mcp-Protocol-Version`.
 
 Beide Revisionen sind in
 [`tests/test_protocol_version.py`](tests/test_protocol_version.py) gepinnt und
 werden gegen das installierte SDK geprueft; ein Dependabot-Bump von `mcp` kann
-also keine der beiden still verschieben. Die Handshake-Obergrenze wird an einem echten `initialize` durch den
-zusammengebauten ASGI-Stack gemessen, nicht aus einem Konstantennamen
-abgelesen.
+also keine der beiden still verschieben. Die Handshake-Obergrenze wird an einem
+echten `initialize` durch den zusammengebauten ASGI-Stack gemessen, nicht aus
+einem Konstantennamen abgelesen.
 
 Zu beachten: `LATEST_PROTOCOL_VERSION` im SDK ist ein Alias auf die **moderne**
-Aera, nicht auf die Handshake-Aera — wer nur dagegen pinnt, laesst genau die
-Aera frei wandern, die heutige Clients tatsaechlich aushandeln.
+Aera, nicht auf die Handshake-Aera — wer nur dagegen pinnt, laesst die
+Handshake-Aera frei wandern.
 
 **Update-Politik.** Faellt das Gate, die Konstante nicht blind nachziehen: erst
 das Spec-Changelog zwischen den beiden Revisionen lesen, pruefen, ob sich der

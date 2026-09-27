@@ -14,18 +14,13 @@ waehrend jeder Browser-Client ausgesperrt war.
 Geprueft mit echten Anfragen gegen die zusammengebaute App. Ein Blick in
 `CORS_ROUTING_HEADERS` waere kein Test: die Liste kann vollstaendig sein und
 trotzdem nie an der Middleware ankommen.
-`Mcp-Session-Id` gehoert dabei weiterhin auf die Liste. Eine fruehere Fassung
-dieses Docstrings nannte ihn den Header einer Mechanik, die `2026-07-28`
-abgeschafft habe — das stimmt nicht, und der Code hier hat es nie behauptet:
-derselbe Server gibt den Header in `expose_headers` frei, damit ein
-Browser-Client ihn lesen kann.
-
-Nachgemessen statt aus Spec-Text geschlossen: `MCP_SESSION_ID_HEADER` steht
-unveraendert in `mcp/server/streamable_http.py`, und ein echter `initialize`
-durch den zusammengebauten ASGI-Stack bekommt eine Session-ID im
-Antwort-Header zurueck. `mcp` 2.x bedient beide Protokoll-Aeren; die Session
-gehoert zur Handshake-Aera, und die ist es, in der heutige Clients sprechen.
-Die Freigabeliste war also nicht falsch besetzt, sondern unvollstaendig.
+`Mcp-Session-Id` gehoert dabei weiterhin auf die Liste. Das SDK kennt den
+Header unveraendert (`mcp/server/streamable_http.py`); er gehoert zur
+Handshake-Aera. Seit der Server auch dort sessionlos laeuft
+(`STATELESS_HTTP`, siehe `tests/test_spec_2026_07_28.py`), vergibt er keinen
+mehr und gibt ihn deshalb auch nicht mehr in `expose_headers` frei. Erlaubt
+bleibt er trotzdem: ein Legacy-Browser-Client, der ihn mitschickt, soll nicht am
+Preflight sterben, bevor der Server ihn ignorieren kann.
 """
 
 from __future__ import annotations

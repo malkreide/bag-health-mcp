@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Geändert — nativ auf Spec `2026-07-28`
+
+Bisher erreichte der Server `2026-07-28`, weil das SDK es konnte: Frischehinweise
+und CORS-Header waren nachgezogen, das Verhalten dahinter stammte aus der
+Handshake-Ära. Jetzt spricht er die Revision so, wie sie gemeint ist, und bedient
+ältere Clients weiter über denselben Endpunkt.
+
+- **Kein Protokoll-Logging mehr.** `ctx.info`/`ctx.warning` in
+  `get_disease_data`, `get_canton_situation` und `get_indicator_series` sind
+  entfernt; SEP-2577 kündigt die Fähigkeit ab und ersetzt sie nicht. Die Schritte
+  landen im Server-Log auf stderr. Die frühere Warnung pro ausgefallener Serie im
+  Kantonsüberblick war doppelt: das Resultat trägt `status="unavailable"` ohnehin,
+  und nur das liest das Modell. Fortschritt bleibt — er ist in `2026-07-28`
+  weiterhin Server→Client.
+- **Sessionlos über HTTP, in beiden Ären.** `2026-07-28` hat keine Session; für
+  Handshake-Clients setzt der Server jetzt `stateless_http=True`
+  (`STATELESS_HTTP` in `server.py`, auf beiden HTTP-Pfaden). Keine Antwort trägt
+  mehr `Mcp-Session-Id`, jede Replika beantwortet jede Anfrage.
+  `deploy/deployment.yaml` verliert die Client-IP-Affinität, die
+  Skalierungsdoku die Anleitung für Stick-Tables. Gemessen, was das kostet:
+  nichts, was dieser Server nutzt — Fortschritt kommt auf der Legacy-Strecke
+  weiterhin an (3 von 3 Meldungen), Rückfragen an den Client gibt es keine.
+- **CORS gibt `Mcp-Session-Id` nicht mehr in `expose_headers` frei**, weil keiner
+  mehr vergeben wird. Als erlaubter Anfrage-Header bleibt er stehen.
+
+### Hinzugefügt
+
+- **`tests/test_spec_2026_07_28.py`.** Ein Tool läuft durch einen echten
+  modernen Client, ohne `initialize`, mit Fortschritt; über HTTP ohne Session;
+  und auf der Legacy-Strecke mit Handshake auf einer App-Instanz und Aufruf auf
+  einer zweiten. Gegenprobe: mit `STATELESS_HTTP = False` antwortet die zweite
+  mit 404 «Session not found».
+- **`filterwarnings = ["error::mcp.MCPDeprecationWarning"]`** in
+  `pyproject.toml`. Ein zurückgekehrter `ctx.info` macht den Tool-Aufruf zu
+  `is_error` statt zu einer Warnung, die niemand liest. Gegenprobe: 7 Tests
+  fallen mit einem eingefügten `ctx.info`, 3 davon auch ohne den Filter.
+
 ### Changed
 
 - **Der Tool-Hash normalisiert die Beschreibung mit `inspect.cleandoc`.** Python
