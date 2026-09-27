@@ -228,8 +228,10 @@ no auth (fine for stdio/local). This gates *who may invoke* the server; for real
 user identity, front it with a gateway.
 
 **CORS (browser clients):** set `MCP_CORS_ORIGINS` to a comma-separated origin
-allow-list to enable cross-origin browser access; the `Mcp-Session-Id` header is
-exposed so stateful sessions work. Empty = no cross-origin (never a wildcard).
+allow-list to enable cross-origin browser access. The `2026-07-28` routing
+headers (`Mcp-Method`, `Mcp-Name`, `Mcp-Protocol-Version`) pass the preflight;
+no session header is exposed, because the server issues none. Empty = no
+cross-origin (never a wildcard).
 
 **Host allow-list (DNS rebinding):** set `MCP_ALLOWED_HOSTS` to a comma-separated
 list of the names this server is reachable under, including the port, e.g.
@@ -245,7 +247,7 @@ This is independent of `MCP_AUTH_TOKEN`. The token says *who* is asking; this
 says *under which name* the server is addressed. A rebinding attack runs in a
 browser that already holds the token.
 
-For running at scale (session affinity, resource limits, MCP gateway), see the
+For running at scale (no session affinity needed, resource limits, MCP gateway), see the
 [deployment & scaling guide](docs/deployment-scaling.md) and the reference
 manifests in [`deploy/`](deploy/).
 
@@ -292,14 +294,33 @@ class — never tool arguments, cantons or surveillance data.
 
 ## MCP Protocol Version
 
-This server speaks **two protocol eras** over the same endpoint. The client's
-first request on a connection decides which one applies; a later claim from the
-other era is refused.
+This server speaks MCP **`2026-07-28` natively**, and still serves every older
+client over the same endpoint. The client's first request on a connection
+decides the era; a later claim from the other era is refused.
 
 | Era | Revision | Who reaches it |
 |---|---|---|
-| `initialize` handshake | `2024-11-05` … **`2025-11-25`** | What today's clients speak. The server answers with the revision asked for, or with the `2025-11-25` ceiling when the request asks for something newer. |
-| Per-request envelope | **`2026-07-28`** | A request carrying the `2026-07-28` `_meta` envelope opens a modern connection. |
+| Per-request envelope | **`2026-07-28`** | A request carrying the `2026-07-28` `_meta` envelope. No `initialize`, no session — the SDK's own `Client` lands here by default. |
+| `initialize` handshake | `2024-11-05` … **`2025-11-25`** | Clients that do not speak `2026-07-28` yet. The server answers with the revision asked for, or with the `2025-11-25` ceiling when the request asks for something newer. |
+
+What "natively" means here, each point asserted in
+[`tests/test_spec_2026_07_28.py`](tests/test_spec_2026_07_28.py):
+
+- **No session, in either era.** No response carries `Mcp-Session-Id`; any
+  replica can answer any request, so a plain round-robin load balancer is enough
+  (see [deployment & scaling](docs/deployment-scaling.md)). For handshake
+  clients this is a deliberate `stateless_http=True`.
+- **No deprecated capabilities.** Protocol logging (`ctx.info`/`ctx.warning`),
+  sampling and roots are deprecated in `2026-07-28` (SEP-2577). The server uses
+  none of them; operational logs go to stderr. The test suite turns
+  `MCPDeprecationWarning` into an error, so a reintroduced call fails CI.
+- **No server-to-client requests.** No tool asks the client anything, so
+  nothing depends on a back-channel `2026-07-28` no longer has.
+- **Progress** (server-to-client, still in the spec) arrives in both eras, on
+  the response stream of the tool call.
+- **Cache hints** (`ttlMs`/`cacheScope`, SEP-2549) on the listing methods, and
+  **CORS** for the routing headers `Mcp-Method`, `Mcp-Name`,
+  `Mcp-Protocol-Version`.
 
 Both revisions are pinned in
 [`tests/test_protocol_version.py`](tests/test_protocol_version.py) and asserted
@@ -308,8 +329,8 @@ silently. The handshake ceiling is measured against a live `initialize` through
 the assembled ASGI stack, not read off a constant name.
 
 Note that the SDK's `LATEST_PROTOCOL_VERSION` is an alias for the **modern**
-era, not for the handshake era — pinning against it alone would leave the era
-that current clients actually negotiate free to drift.
+era, not for the handshake era — pinning against it alone would leave the
+handshake era free to drift.
 
 **Update policy.** When the gate fails, do not edit the constant blindly: read
 the spec changelog between the two revisions, verify the server still behaves,

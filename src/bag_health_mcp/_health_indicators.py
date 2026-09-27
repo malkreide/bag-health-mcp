@@ -35,7 +35,6 @@ import time
 from html import unescape
 from typing import Any
 
-from mcp.server.mcpserver import Context
 from mcp.types import ToolAnnotations
 
 from bag_health_mcp._models import (
@@ -60,6 +59,7 @@ from bag_health_mcp.server import (
     _fail_not_found,
     _get_with_retry,
     _traced,
+    logger,
     mcp,
 )
 
@@ -989,11 +989,10 @@ async def bag_search_health_indicators(
     ),
 )
 @_traced
-async def bag_get_indicator_series(
-    params: GetIndicatorSeriesInput, ctx: Context | None = None
-) -> IndicatorSeriesOutput:
-    if ctx:
-        await ctx.info(f"Fetching {params.source} indicator '{params.indicator_id}'")
+async def bag_get_indicator_series(params: GetIndicatorSeriesInput) -> IndicatorSeriesOutput:
+    # Server log, not ctx.info: protocol logging is deprecated in Spec 2026-07-28
+    # (SEP-2577), and it was the only thing this tool used a Context for.
+    logger.info("fetching %s indicator '%s'", params.source, params.indicator_id)
     if params.source == "obsan":
         return await _obsan_series(params, attribution=OBSAN_ATTRIBUTION)
     if params.source == "suchtschweiz":

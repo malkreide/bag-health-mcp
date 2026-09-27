@@ -270,17 +270,13 @@ async def bag_get_disease_data(
         _fail("series_id must be 'topic/chapter/aggregation/temporality'.")
     topic, chapter, aggregation, temporality = parts
 
-    # This tool makes two round-trips (details, then data); surface progress and
-    # structured logging to the client when a Context is injected (SDK-003).
-    #
-    # ctx.info/warning emit an MCPDeprecationWarning under mcp 2.x: SEP-2577
-    # deprecates the server->client *logging* capability in the 2026-07-28
-    # revision. It still works and there is no replacement API, so the SDK-003
-    # behaviour is kept as-is; revisit if the capability is actually removed.
-    # report_progress is unaffected (only client-to-server progress is
-    # deprecated).
+    # This tool makes two round-trips (details, then data); report progress to
+    # the client when a Context is injected (SDK-003). Progress is server->client
+    # and stays in Spec 2026-07-28. Protocol logging (ctx.info/ctx.warning) does
+    # not: SEP-2577 deprecates it with no in-protocol replacement, so the step
+    # goes to the server log instead — what the model should read is returned.
+    logger.info("resolving filters for '%s'", params.series_id)
     if ctx:
-        await ctx.info(f"Resolving filters for '{params.series_id}'")
         await ctx.report_progress(progress=0, total=2)
 
     # Build filter body based on series details
@@ -354,8 +350,8 @@ async def bag_get_disease_data(
     group_by = "canton" if params.canton == "all" else None
 
     # Fetch data
+    logger.info("fetching time series for '%s'", params.series_id)
     if ctx:
-        await ctx.info(f"Fetching time series for '{params.series_id}'")
         await ctx.report_progress(progress=1, total=2)
     async with _client() as c:
         url = f"/api/v1/data/{topic}/{chapter}/{aggregation}/{temporality}"
@@ -730,18 +726,17 @@ async def bag_get_canton_situation(
             # Don't surface the raw exception to the model — log it server-side
             # and report a stable, generic per-series status (OBS-002). An egress
             # block fails this series closed; the guard already logged the target.
+            # The degradation reaches the model through the result itself
+            # (status="unavailable"); the former ctx.warning duplicated that over
+            # the protocol-logging channel SEP-2577 deprecates.
             logger.warning("canton_situation series '%s' failed: %r", name, exc)
-            if ctx:
-                # Tell the client this series degraded (no raw cause — OBS-002).
-                await ctx.warning(f"Series '{name}' unavailable; continuing.")
             return name, CantonDiseaseStatus(status="unavailable")
 
     # Fan out over the series, reporting progress as each completes. The overview
     # makes 5+ (2 round-trips each) calls and can take a few seconds, so a
     # long-running client gets incremental progress (SDK-003).
     total = len(school_relevant)
-    if ctx:
-        await ctx.info(f"Building situation overview for canton {canton_up} ({total} series)")
+    logger.info("building situation overview for canton %s (%d series)", canton_up, total)
     tasks = [
         asyncio.ensure_future(_fetch_series(name, sid)) for name, sid in school_relevant.items()
     ]
