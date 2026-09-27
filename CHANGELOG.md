@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-09-27
+
+Zwei Selbstauskünfte stimmten nicht. Beide am publizierten 0.4.0 gemessen
+(frische venv von PyPI, stdio, beide Protokoll-Ären), beide dieselbe Klasse wie
+in `bag-epl-mcp` 1.0.4. Am Verhalten der Tools ändert sich nichts.
+
+### Behoben
+
+- **`serverInfo.version` war leer, in beiden Ären.** `MCPServer` wurde ohne
+  `version=` gebaut, und der SDK-Default ist `""`. Jetzt aus den
+  Paket-Metadaten, derselben Quelle wie der User-Agent.
+- **Unter `2026-07-28` versprach der Server Änderungsmeldungen, die nie kommen.**
+  Das SDK leitet `resources.subscribe` und alle drei `listChanged` allein daraus
+  ab, ob `subscriptions/listen` bedient wird, und `MCPServer` registriert den
+  Handler immer. Die Listen stehen aber beim Import fest; der Server
+  veröffentlicht kein Ereignis. Ein lauschender Client bekam einen Stream, auf
+  dem nichts ankam (gemessen: 5 s ohne Antwort). Jetzt ist der Handler entfernt:
+  `server/discover` meldet alles `false`, `subscriptions/listen` antwortet
+  404 / `-32601`. Die Handshake-Ära meldete schon vorher `false`.
+
+  Einen öffentlichen Schalter hat das SDK nicht; der Eingriff geht über ein
+  privates Attribut (`_request_handlers`). Er ist mit `del` geschrieben, damit
+  ein SDK-Bump, der das Attribut entfernt, den Import laut brechen lässt, statt
+  still wieder `true` zu melden.
+
+### Hinzugefügt
+
+- Sechs Tests in `tests/test_spec_2026_07_28.py`: Version je Ära, Capabilities
+  je Ära, der fehlende Handler, und eine **Negativkontrolle** gegen einen
+  unveränderten `MCPServer`, die fällt, sobald das SDK seine Ableitung ändert —
+  dann gehört der Eingriff zurückgebaut. Gegenprobe: ohne `version=` fallen
+  genau die zwei Versionstests, ohne den Eingriff genau die zwei
+  Capability-Tests.
+
 ## [0.4.0] - 2026-09-27
 
 Minor- statt Patch-Release: seit 0.3.0 kamen neue Konfiguration, neue
