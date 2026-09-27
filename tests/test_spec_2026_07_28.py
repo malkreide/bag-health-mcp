@@ -22,13 +22,16 @@ Die HTTP-Faelle laufen durch `build_http_app`, nicht durch
 
 from __future__ import annotations
 
+import importlib.metadata
 import json
 import pathlib
 import tomllib
 
 import httpx
+import pytest
 import respx
 from mcp import Client
+from mcp.server.mcpserver import MCPServer
 from test_server import MOCK_DATA, MOCK_DETAILS
 
 from bag_health_mcp.server import IDD_BASE, STATELESS_HTTP, Settings, build_http_app, mcp
@@ -272,3 +275,77 @@ def test_die_deprecation_wache_ist_eingeschaltet() -> None:
     config = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
     filters = config["tool"]["pytest"]["ini_options"].get("filterwarnings", [])
     assert "error::mcp.MCPDeprecationWarning" in filters
+
+
+# ---------------------------------------------------------------------------
+# Ehrliche Selbstauskunft: serverInfo und Capabilities
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("mode", ["auto", "legacy"])
+async def test_serverinfo_traegt_die_paketversion(mode: str) -> None:
+    """Ohne `version=` meldete jede Antwort `serverInfo.version == ""`, in
+    beiden Aeren — gemessen am publizierten 0.4.0. Die Erwartung kommt aus den
+    Paket-Metadaten, nicht aus einem Literal, das beim naechsten Bump driftet."""
+    expected = importlib.metadata.version("bag-health-mcp")
+    async with Client(mcp, mode=mode) as client:
+        assert client.server_info is not None
+        assert client.server_info.version == expected
+    assert expected  # ein leerer Erwartungswert wuerde den leeren Befund bestaetigen
+
+
+async def test_modern_verspricht_keine_aenderungsmeldungen() -> None:
+    """Die Listen stehen beim Import fest; der Server veroeffentlicht kein
+    Ereignis. Unter 2026-07-28 meldete das SDK trotzdem `subscribe` und alle
+    drei `listChanged` als `true`."""
+    async with Client(mcp) as client:
+        assert client.protocol_version == MODERN
+        caps = client.server_capabilities
+    assert caps.resources is not None and caps.tools is not None and caps.prompts is not None
+    assert caps.resources.subscribe is False
+    assert caps.resources.list_changed is False
+    assert caps.tools.list_changed is False
+    assert caps.prompts.list_changed is False
+
+
+async def test_legacy_meldete_schon_vorher_nichts() -> None:
+    async with Client(mcp, mode="legacy") as client:
+        assert client.protocol_version == LEGACY
+        caps = client.server_capabilities
+    assert not caps.resources.subscribe
+    assert not caps.resources.list_changed
+    assert not caps.tools.list_changed
+    assert not caps.prompts.list_changed
+
+
+async def test_negativkontrolle_das_sdk_meldet_ohne_eingriff_true() -> None:
+    """Gegenprobe: ein unveraenderter `MCPServer` mit derselben Ausstattung.
+    Faellt dieser Test, hat das SDK seine Ableitung geaendert — dann ist der
+    Eingriff in `server.py` womoeglich ueberfluessig und gehoert zurueckgebaut,
+    statt still weiterzulaufen."""
+    probe = MCPServer("kontrolle")
+
+    @probe.tool()
+    def ping() -> str:
+        return "pong"
+
+    @probe.resource("probe://x")
+    def res() -> str:
+        return "x"
+
+    @probe.prompt()
+    def pr() -> str:
+        return "p"
+
+    async with Client(probe) as client:
+        assert client.protocol_version == MODERN
+        caps = client.server_capabilities
+    assert caps.resources.subscribe is True
+    assert caps.tools.list_changed is True
+
+
+def test_subscriptions_listen_wird_nicht_bedient() -> None:
+    """Die Zusage und der Handler gehoeren zusammen: kein Handler, keine
+    Zusage, und ein lauschender Client bekommt eine Absage statt eines
+    Streams, auf dem nie etwas ankommt."""
+    assert mcp._lowlevel_server.get_request_handler("subscriptions/listen") is None
