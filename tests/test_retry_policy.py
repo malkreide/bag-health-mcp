@@ -251,6 +251,119 @@ async def test_a_wait_that_would_outlast_the_budget_is_not_taken(monkeypatch):
     assert route.call_count == 1
 
 
+# --- What the message claims -------------------------------------------------
+#
+# The message printed RETRY_ATTEMPTS whatever happened. The live runs of
+# 2026-10-05 and 2026-11-03 each logged `fetch budget spent ... attempt 0` — one
+# request that hung until the budget ran out — and reported it to the model and
+# into the live-failure issue as "after 4 attempts". A reader of the message
+# alone saw four refusals where the source had not answered once.
+
+
+async def _hang(_request):
+    await asyncio.sleep(_SLOW_RESPONSE)
+    return httpx.Response(200)
+
+
+@respx.mock
+async def test_a_budget_cut_on_the_first_attempt_is_one_attempt(monkeypatch):
+    """The production case, on the real path: `asyncio.timeout` fires mid-request.
+
+    Not a hand-raised `TimeoutError` — that would encode the assumption about
+    which exception arrives instead of letting the deadline produce it. Costs
+    `_BUDGET` of wall clock.
+    """
+    monkeypatch.setattr(srv, "RETRY_TOTAL_BUDGET", _BUDGET)
+    respx.get(URL).mock(side_effect=_hang)
+    async with httpx.AsyncClient() as client:
+        with pytest.raises(ToolError) as exc:
+            await srv._get_with_retry(client, URL, context="testing")
+    msg = str(exc.value)
+    # No `call_count` check: respx counts a call once a response exists, and
+    # here none ever does. The count under test is the one in the message.
+    assert "after 1 attempt:" in msg, msg
+    assert f"{srv.RETRY_ATTEMPTS} attempts" not in msg, msg
+    assert "ran out while waiting for an answer" in msg, msg
+    assert msg.endswith("retry later."), "a timeout is transient; the advice stays"
+
+
+@respx.mock
+async def test_the_count_is_counted_not_assumed(monkeypatch):
+    # Two 503s, then a wait that does not fit: the loop stops after the
+    # *second* request. Guards against a fix that merely swaps one constant (4)
+    # for another (1). Deterministic and instant — no wall clock involved, so a
+    # stalled runner cannot move the count.
+    monkeypatch.setattr(srv, "_retry_delay", lambda attempt, _r: 0.0 if attempt == 1 else 999.0)
+    route = respx.get(URL).mock(return_value=httpx.Response(503))
+    async with httpx.AsyncClient() as client:
+        with pytest.raises(ToolError) as exc:
+            await srv._get_with_retry(client, URL, context="testing")
+    msg = str(exc.value)
+    assert route.call_count == 2
+    assert "after 2 attempts:" in msg, msg
+
+
+@respx.mock
+async def test_every_attempt_used_is_reported_as_the_cap(monkeypatch):
+    # The one case the old message described correctly — it has to stay so,
+    # and without a budget reason the loop never hit.
+    monkeypatch.setattr(srv, "_retry_delay", lambda *_a, **_k: 0.0)
+    route = respx.get(URL).mock(return_value=httpx.Response(503, text="upstream-internal-detail"))
+    async with httpx.AsyncClient() as client:
+        with pytest.raises(ToolError) as exc:
+            await srv._get_with_retry(client, URL, context="testing")
+    msg = str(exc.value)
+    assert route.call_count == srv.RETRY_ATTEMPTS
+    assert f"after {srv.RETRY_ATTEMPTS} attempts." in msg, msg
+    assert "budget" not in msg, msg
+    assert "upstream-internal-detail" not in msg, "raw upstream detail stays in the log (OBS-002)"
+
+
+@respx.mock
+async def test_a_wait_that_does_not_fit_is_named_as_the_reason(monkeypatch):
+    # The source did answer here — with a 503 — so "waiting for an answer"
+    # would be the wrong story. The budget simply had no room for the next try.
+    monkeypatch.setattr(srv, "RETRY_TOTAL_BUDGET", 1.0)
+    monkeypatch.setattr(srv, "_retry_delay", lambda *_a, **_k: 999.0)
+    respx.get(URL).mock(return_value=httpx.Response(503))
+    async with httpx.AsyncClient() as client:
+        with pytest.raises(ToolError) as exc:
+            await srv._get_with_retry(client, URL, context="testing")
+    msg = str(exc.value)
+    assert "after 1 attempt:" in msg, msg
+    assert "the 1s time budget left no room for another retry" in msg, msg
+    assert "waiting for an answer" not in msg, msg
+
+
+@respx.mock
+async def test_a_budget_spent_during_the_wait_is_named_as_the_reason(monkeypatch):
+    # The wait fitted when it was taken and overran anyway — a sleep is a lower
+    # bound, not an exact duration — so nothing is left for a second request.
+    # The other branch that stops for want of room. Costs ~0.6s of wall clock.
+    route = respx.get(URL).mock(return_value=httpx.Response(200, json={}))
+    async with httpx.AsyncClient() as client:
+        # Warm-up on the default budget, as in the deadline test above: the
+        # first call through a fresh client pays its setup, and that must not
+        # eat the narrow budget before the one request that should fit.
+        await srv._get_with_retry(client, URL, context="warm-up")
+        route.mock(return_value=httpx.Response(503))
+        before = route.call_count
+
+        monkeypatch.setattr(srv, "RETRY_TOTAL_BUDGET", _BUDGET)
+        monkeypatch.setattr(srv, "_retry_delay", lambda *_a, **_k: 0.0)
+
+        async def _overrun(_seconds: float) -> None:
+            await asyncio.sleep(_BUDGET * 1.2)
+
+        monkeypatch.setattr(srv, "_sleep", _overrun)
+        with pytest.raises(ToolError) as exc:
+            await srv._get_with_retry(client, URL, context="testing")
+    msg = str(exc.value)
+    assert route.call_count - before == 1
+    assert "after 1 attempt:" in msg, msg
+    assert f"the {_BUDGET:g}s time budget left no room for another retry" in msg, msg
+
+
 # --- The seam, and why it is not `asyncio.sleep` -----------------------------
 
 

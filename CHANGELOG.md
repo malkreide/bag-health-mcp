@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Behoben
+
+- **Die Meldung «Upstream source unreachable» zählte Versuche, die nie
+  stattfanden.** Sie nannte immer `RETRY_ATTEMPTS` (4), auch wenn die Schleife
+  vorher aufgehört hatte. Die Live-Läufe vom 5.10. und 3.11.2026 loggten beide
+  `fetch budget spent … attempt 0`: Eine einzige Anfrage an Obsan hing, bis das
+  25-s-Budget aufgebraucht war. Beim Modell und im Live-Failure-Issue kam das
+  als «after 4 attempts» an. Wer nur die Meldung las, sah vier Absagen einer
+  Quelle, die kein einziges Mal geantwortet hatte.
+
+  Jetzt nennt die Meldung die tatsächlich gesendeten Anfragen und, wenn das
+  Budget den Abbruch erzwang, auch den Grund:
+
+  | Fall | Meldung (Auszug) |
+  |---|---|
+  | Budget läuft während einer Anfrage ab | `after 1 attempt: the 25s time budget ran out while waiting for an answer.` |
+  | Nächste Wartezeit passt nicht mehr ins Budget | `after 1 attempt: the 25s time budget left no room for another retry.` |
+  | Alle Versuche verbraucht | `after 4 attempts.` (unverändert) |
+
+  Der Rat «retry later» bleibt in allen drei Fällen: Jeder davon ist
+  vorübergehend. Eine deterministische Absage (4xx ausser 429) kommt gar nicht
+  bis hierher, sie scheitert sofort in `_ensure_ok`.
+
+### Hinzugefügt
+
+- Fünf Tests in `tests/test_retry_policy.py`, einer je Abbruchweg, dazu ein
+  Zähltest mit zwei Anfragen, damit eine Korrektur, die bloss die Konstante 4
+  gegen die Konstante 1 tauscht, nicht durchkommt. Der Produktionsfall läuft
+  über den echten Weg: `asyncio.timeout` löst mitten in einer Anfrage aus,
+  kein von Hand geworfener `TimeoutError`. Gegenprobe: acht Mutationen am
+  Code (alte Meldung, Zahl fest auf 1, je ein fehlender Abbruchgrund, Detail
+  der Quelle in der Meldung, Plural immer, gezählt erst nach der Antwort),
+  jede einzeln gesetzt; jede bringt genau die zugehörigen Tests zu Fall.
+
 ## [0.4.1] - 2026-09-27
 
 Zwei Selbstauskünfte stimmten nicht. Beide am publizierten 0.4.0 gemessen
