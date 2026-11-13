@@ -975,8 +975,10 @@ async def _get_with_retry(
     read expiring.
 
     On ``allow_404`` a 404 is returned to the caller (for domain not-found
-    messages). After the final attempt a safe ToolError is raised; raw upstream
-    detail is logged server-side only (OBS-002).
+    messages). When the loop gives up, a safe ToolError is raised; raw upstream
+    detail is logged server-side only (OBS-002). The message counts the attempts
+    actually made and, when the budget ended the loop early, says so — see
+    :func:`_unreachable_message`.
 
     Used by the multi-source indicator tools, whose upstreams (Obsan dynamic JSON,
     the Versorgungsatlas static store) can return transient 5xx under load — the
@@ -984,6 +986,8 @@ async def _get_with_retry(
     """
     last_detail: str | None = None
     last_response: httpx.Response | None = None
+    attempts = 0  # requests actually sent — not RETRY_ATTEMPTS, which is a cap
+    stopped_by: str | None = None  # None: every attempt was used
     deadline = time.monotonic() + RETRY_TOTAL_BUDGET
     for attempt in range(RETRY_ATTEMPTS):
         if attempt > 0:
@@ -991,11 +995,14 @@ async def _get_with_retry(
             # A wait that outlasts the budget is a wait for nobody: the caller
             # has given up by the time it ends. Stop instead of sleeping.
             if delay >= deadline - time.monotonic():
+                stopped_by = _STOPPED_NO_ROOM
                 break
             await _sleep(delay)
         remaining = deadline - time.monotonic()
         if remaining <= 0:
+            stopped_by = _STOPPED_NO_ROOM
             break
+        attempts += 1
         try:
             # `asyncio.timeout` is the wall-clock deadline the budget promises;
             # the httpx TIMEOUT stays alongside it as the per-operation bound.
@@ -1006,6 +1013,7 @@ async def _get_with_retry(
         except TimeoutError as exc:  # the budget is gone, not just this try
             last_detail = repr(exc)
             logger.warning("fetch budget spent (%s) attempt %d", context, attempt)
+            stopped_by = _STOPPED_TIMEOUT
             break
         except httpx.HTTPError as exc:
             last_detail = repr(exc)
@@ -1029,10 +1037,37 @@ async def _get_with_retry(
             continue
         # Permanent client error — do not retry.
         _ensure_ok(r, context=context)
-    _fail(
-        f"Upstream source unreachable while {context} after {RETRY_ATTEMPTS} attempts. "
-        "The service may be temporarily unavailable; retry later.",
-        detail=last_detail,
+    _fail(_unreachable_message(context, attempts, stopped_by), detail=last_detail)
+
+
+# Why `_get_with_retry` stopped before using every attempt. The message used to
+# print RETRY_ATTEMPTS whatever happened, so a single request that hung until
+# the budget ran out read as four refusals. Live runs on 2026-10-05 and
+# 2026-11-03 logged `fetch budget spent ... attempt 0` next to "after 4
+# attempts": one request, reported as four.
+_STOPPED_TIMEOUT = "timeout"  # the budget ran out while waiting for an answer
+_STOPPED_NO_ROOM = "no-room"  # the budget left no time for another attempt
+
+
+def _unreachable_message(context: str, attempts: int, stopped_by: str | None) -> str:
+    """The model-facing message once `_get_with_retry` gives up.
+
+    States the attempts actually made and, when the budget cut the loop short,
+    why. "Retry later" stays in every variant: each of these is transient — a
+    deterministic refusal (a 4xx other than 429) never reaches this point, it
+    fails fast in `_ensure_ok`.
+    """
+    noun = "attempt" if attempts == 1 else "attempts"
+    budget = f"{RETRY_TOTAL_BUDGET:g}s time budget"
+    if stopped_by == _STOPPED_TIMEOUT:
+        reason = f": the {budget} ran out while waiting for an answer"
+    elif stopped_by == _STOPPED_NO_ROOM:
+        reason = f": the {budget} left no room for another retry"
+    else:
+        reason = ""
+    return (
+        f"Upstream source unreachable while {context} after {attempts} {noun}{reason}. "
+        "The service may be temporarily unavailable; retry later."
     )
 
 
